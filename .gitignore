@@ -1,0 +1,80 @@
+# Build systems and compiled products
+/build/
+/cmake-build-*/
+CMakeCache.txt
+CMakeFiles/
+*.o
+*.obj
+*.a
+*.so
+*.dylib
+*.dll
+*.exe
+
+# Python and local environments
+/.venv/
+/.venv-*/
+/venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+
+# Large references and generated biological indexes
+/GCF_*.fna.gz
+/data/genomes/*
+!/data/genomes/test.fa
+/data/indexes/
+/data/neural_window/
+/data/tools/
+/data/benchmarks/reference/*.fa
+*.ppfm
+*.jf
+*.bt2
+*.bt2l
+*.ebwt
+*.ebwtl
+*.amb
+*.ann
+*.bwt
+*.pac
+*.sa
+*.mmi
+*.ht2
+
+# Generated experiments and local installations
+/results/
+/logs/
+/backups/
+/third_party/mfeprimer/
+
+# Local scratch files from interactive shell sessions
+/0
+/6
+/=
+/requests
+/CMakeLists.txt.backup
+*.before_*
+*.backup
+*.backup.*
+*.bak
+*.orig
+*.rej
+
+# Editor and OS files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+credentials*
+secrets*

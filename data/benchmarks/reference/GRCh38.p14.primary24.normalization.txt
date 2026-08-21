@@ -1,0 +1,14 @@
+PrimerPair-Search Test #79 reference policy
+
+Source assembly: GRCh38.p14
+Scope: chr1..chr22, chrX, chrY
+Coordinate convention: sequence length preserved
+Canonical bases preserved: A C G T N
+IUPAC ambiguity normalization: RYSWKMBDHV -> N
+Observed source ambiguity symbols: B K M R S W Y
+Observed IUPAC->N replacements: 99
+
+Reason:
+This reproduces src/fasta_reader.cpp normalization
+used before PPFM PackedReference and BiFM construction.
+
