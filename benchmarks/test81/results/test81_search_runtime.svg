@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="430" viewBox="0 0 920 430">
+<rect width="100%" height="100%" fill="white"/>
+<style>text{font-family:serif;fill:#000}.axis{stroke:#000;stroke-width:1}.bar{fill:#333}</style>
+<text x="460" y="25" text-anchor="middle" font-size="17">Measured search wall time (log-scaled bar length)</text>
+<text x="240" y="85" text-anchor="end" font-size="13">Independent full-scan oracle</text>
+<rect class="bar" x="250" y="60" width="407.26" height="38"/>
+<text x="258" y="85" fill="white" font-size="13">194.11 s</text>
+<text x="240" y="145" text-anchor="end" font-size="13">OligoScout</text>
+<rect class="bar" x="250" y="120" width="364.95" height="38"/>
+<text x="258" y="145" fill="white" font-size="13">111.80 s</text>
+<text x="240" y="205" text-anchor="end" font-size="13">Bowtie 1 + contract filter</text>
+<rect class="bar" x="250" y="180" width="386.77" height="38"/>
+<text x="258" y="205" fill="white" font-size="13">148.64 s</text>
+<text x="240" y="265" text-anchor="end" font-size="13">BWA-aln + contract filter</text>
+<rect class="bar" x="250" y="240" width="382.80" height="38"/>
+<text x="258" y="265" fill="white" font-size="13">141.14 s</text>
+<text x="240" y="325" text-anchor="end" font-size="13">BLASTN-short e=1100 + contract filter</text>
+<rect class="bar" x="250" y="300" width="620.00" height="38"/>
+<text x="258" y="325" fill="white" font-size="13">3065.39 s</text>
+<line class="axis" x1="250" y1="355" x2="870" y2="355"/>
+</svg>

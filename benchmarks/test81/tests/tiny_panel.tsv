@@ -1,0 +1,2 @@
+pair_id	primer1_id	primer1	primer2_id	primer2	expected_chromosome	expected_amplicon_start	expected_amplicon_end_exclusive	expected_amplicon_length
+0	tiny_p1	ACGTCAGT	tiny_p2	GCTATCGA	chrT	3	39	36

@@ -1,0 +1,17 @@
+kind	bindings
+panel_pairs	1024
+truth_count	8262803
+prediction_count	8255989
+intersection_count	8255989
+truth_only_count	6814
+prediction_only_count	0
+micro_precision	1.0
+micro_recall	0.9991753403778355
+micro_f1	0.9995875001029132
+jaccard	0.9991753403778355
+macro_pair_f1	0.9999407151989952
+macro_pair_f1_bootstrap_95_low	0.9998618386180839
+macro_pair_f1_bootstrap_95_high	0.999993917030282
+bootstrap_replicates	10000
+bootstrap_unit	primer_pair
+exact_set_equality	False
