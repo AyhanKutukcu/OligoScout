@@ -1,0 +1,114 @@
+# =============================================================================
+# OligoScout — .gitignore
+# Veri, uretilen ciktilar, derleme urunleri ve yerel scratch dosyalari HARIC.
+# Depoda yalniz KAYNAK kod, scriptler ve dokumanlar tutulur.
+# =============================================================================
+
+# --- Buyuk biyolojik veri (asla commit etme) --------------------------------
+/OligoScout/data/
+/downloads/
+# Genom, transkriptom, indeks ve donusturulmus FASTA'lar
+*.fa
+*.fasta
+*.fa.gz
+*.fasta.gz
+*.2bit
+*.gtf
+*.gtf.gz
+*.gff
+*.gff3
+*.gff3.gz
+genomicSuperDups*.txt*
+# FM-index / hizalama indeksleri
+*.ppfm
+*.jf
+*.bt2
+*.bt2l
+*.ebwt
+*.ebwtl
+*.amb
+*.ann
+*.bwt
+*.pac
+*.sa
+*.mmi
+*.ht2
+# Noral model agirliklari (ikili)
+*.pt
+*.onnx
+
+# --- Uretilen ciktilar -------------------------------------------------------
+/reference_py/out/
+/OligoScout/build/
+/OligoScout/cmake-build-*/
+/OligoScout/results/
+/OligoScout/logs/
+/logs/
+*.jsonl
+
+# --- Ucuncu taraf (harici bagimlilik; ayrica klonlanir) ---------------------
+/OligoScout/third_party/primer3/
+/OligoScout/third_party/mfeprimer/
+
+# --- Yerel scratch / arac ciktilari -----------------------------------------
+/oligoscout_panel_*/
+/params_in/
+/params_out/
+/Claude outputs/
+/.claude/
+/_tree.txt
+/hedef.fa
+/hedef_chr22.fa
+
+# --- Uretilen web verisi (kaynak build betikleri tutulur) -------------------
+/web/oligoscout_data.json
+/web/index.html
+
+# --- Derleme sistemleri ------------------------------------------------------
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+*.o
+*.obj
+*.a
+*.so
+*.dylib
+*.dll
+*.exe
+
+# --- Python ------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+/.venv/
+/venv/
+*.egg-info/
+
+# --- Editor / OS -------------------------------------------------------------
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+
+# --- Sirlar / yerel yapilandirma --------------------------------------------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+credentials*
+secrets*
+
+# --- Yedek / gecici ----------------------------------------------------------
+*.bak
+*.backup
+*.backup.*
+*.orig
+*.rej
+*.before_*

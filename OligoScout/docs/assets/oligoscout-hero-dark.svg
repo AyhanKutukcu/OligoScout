@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 300" width="1200" height="300" role="img" aria-label="OligoScout: anchor-aware exhaustive search for primer binding sites and off-target amplicons">
+<rect x="0" y="0" width="1200" height="300" rx="0" fill="#0d1117"/>
+<rect x="0" y="0" width="6" height="300" rx="0" fill="#5aa2e0"/>
+<text x="54" y="92" font-family="ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="52" fill="#e6edf3" font-weight="700" text-anchor="start" letter-spacing="-0.5">OligoScout</text>
+<text x="54" y="126" font-family="ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#5aa2e0" font-weight="600" text-anchor="start" letter-spacing="1.6">ANCHOR-AWARE EXHAUSTIVE SEARCH FOR PRIMER PAIRS</text>
+<text x="54" y="162" font-family="ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" fill="#9198a1" font-weight="400" text-anchor="start">Every binding site and every amplifiable product across the</text>
+<text x="54" y="184" font-family="ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" fill="#9198a1" font-weight="400" text-anchor="start">human reference — under one explicit molecular contract.</text>
+<rect x="54" y="210" width="107.2" height="28" rx="14" fill="#151b23" stroke="#2f3742" stroke-width="1"/>
+<text x="107.6" y="229" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="12.5" fill="#9198a1" font-weight="500" text-anchor="middle">24-nt primers</text>
+<rect x="171.2" y="210" width="166.4" height="28" rx="14" fill="#151b23" stroke="#2f3742" stroke-width="1"/>
+<text x="254.39999999999998" y="229" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="12.5" fill="#9198a1" font-weight="500" text-anchor="middle">exact 12-nt 3′ anchor</text>
+<rect x="347.6" y="210" width="114.60000000000001" height="28" rx="14" fill="#151b23" stroke="#2f3742" stroke-width="1"/>
+<text x="404.90000000000003" y="229" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="12.5" fill="#9198a1" font-weight="500" text-anchor="middle">≤ 3 mismatches</text>
+<rect x="472.20000000000005" y="210" width="159.0" height="28" rx="14" fill="#151b23" stroke="#2f3742" stroke-width="1"/>
+<text x="551.7" y="229" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="12.5" fill="#9198a1" font-weight="500" text-anchor="middle">50–3,000 bp products</text>
+<rect x="690" y="132" width="452" height="11" rx="0" fill="#151b23" stroke="#2f3742" stroke-width="1"/>
+<rect x="690" y="158" width="452" height="11" rx="0" fill="#151b23" stroke="#2f3742" stroke-width="1"/>
+<text x="678" y="141" font-family="ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#9198a1" font-weight="600" text-anchor="middle">+</text>
+<text x="678" y="167" font-family="ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#9198a1" font-weight="600" text-anchor="middle">−</text>
+<rect x="698.0" y="102" width="6.300000000000001" height="17" rx="1" fill="#1e3a55"/>
+<rect x="705.4" y="102" width="6.300000000000001" height="17" rx="1" fill="#1e3a55"/>
+<rect x="712.8" y="102" width="6.300000000000001" height="17" rx="1" fill="#1e3a55"/>
+<rect x="720.2" y="102" width="6.300000000000001" height="17" rx="1" fill="#1e3a55"/>
+<rect x="727.6" y="102" width="6.300000000000001" height="17" rx="1" fill="#1e3a55"/>
+<rect x="735.0" y="102" width="6.300000000000001" height="17" rx="1" fill="#1e3a55"/>
+<rect x="742.4" y="102" width="6.300000000000001" height="17" rx="1" fill="#1e3a55"/>
+<rect x="749.8" y="102" width="6.300000000000001" height="17" rx="1" fill="#1e3a55"/>
+<rect x="757.2" y="102" width="6.300000000000001" height="17" rx="1" fill="#1e3a55"/>
+<rect x="764.6" y="102" width="6.300000000000001" height="17" rx="1" fill="#1e3a55"/>
+<rect x="772.0" y="102" width="6.300000000000001" height="17" rx="1" fill="#1e3a55"/>
+<rect x="779.4" y="102" width="6.300000000000001" height="17" rx="1" fill="#1e3a55"/>
+<rect x="786.8" y="102" width="6.300000000000001" height="17" rx="1" fill="#5aa2e0"/>
+<rect x="794.2" y="102" width="6.300000000000001" height="17" rx="1" fill="#5aa2e0"/>
+<rect x="801.6" y="102" width="6.300000000000001" height="17" rx="1" fill="#5aa2e0"/>
+<rect x="809.0" y="102" width="6.300000000000001" height="17" rx="1" fill="#5aa2e0"/>
+<rect x="816.4" y="102" width="6.300000000000001" height="17" rx="1" fill="#5aa2e0"/>
+<rect x="823.8" y="102" width="6.300000000000001" height="17" rx="1" fill="#5aa2e0"/>
+<rect x="831.2" y="102" width="6.300000000000001" height="17" rx="1" fill="#5aa2e0"/>
+<rect x="838.6" y="102" width="6.300000000000001" height="17" rx="1" fill="#5aa2e0"/>
+<rect x="846.0" y="102" width="6.300000000000001" height="17" rx="1" fill="#5aa2e0"/>
+<rect x="853.4" y="102" width="6.300000000000001" height="17" rx="1" fill="#5aa2e0"/>
+<rect x="860.8" y="102" width="6.300000000000001" height="17" rx="1" fill="#5aa2e0"/>
+<rect x="868.2" y="102" width="6.300000000000001" height="17" rx="1" fill="#5aa2e0"/>
+<path d="M705.15,94 L711.9499999999999,94 L708.55,99.6 Z" fill="#e06c78"/>
+<path d="M742.15,94 L748.9499999999999,94 L745.55,99.6 Z" fill="#e06c78"/>
+<text x="698" y="96" font-family="ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" fill="#9198a1" font-weight="400" text-anchor="start">5′</text>
+<text x="875.6" y="96" font-family="ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" fill="#9198a1" font-weight="400" text-anchor="end">3′</text>
+<path d="M879.6,137.5 h44" stroke="#5aa2e0" stroke-width="1.6" marker-end="url(#ah)"/>
+<rect x="956.4" y="182" width="6.300000000000001" height="17" rx="1" fill="#5aa2e0"/>
+<rect x="963.8" y="182" width="6.300000000000001" height="17" rx="1" fill="#5aa2e0"/>
+<rect x="971.1999999999999" y="182" width="6.300000000000001" height="17" rx="1" fill="#5aa2e0"/>
+<rect x="978.6" y="182" width="6.300000000000001" height="17" rx="1" fill="#5aa2e0"/>
+<rect x="986.0" y="182" width="6.300000000000001" height="17" rx="1" fill="#5aa2e0"/>
+<rect x="993.4" y="182" width="6.300000000000001" height="17" rx="1" fill="#5aa2e0"/>
+<rect x="1000.8" y="182" width="6.300000000000001" height="17" rx="1" fill="#5aa2e0"/>
+<rect x="1008.1999999999999" y="182" width="6.300000000000001" height="17" rx="1" fill="#5aa2e0"/>
+<rect x="1015.6" y="182" width="6.300000000000001" height="17" rx="1" fill="#5aa2e0"/>
+<rect x="1023.0" y="182" width="6.300000000000001" height="17" rx="1" fill="#5aa2e0"/>
+<rect x="1030.4" y="182" width="6.300000000000001" height="17" rx="1" fill="#5aa2e0"/>
+<rect x="1037.8" y="182" width="6.300000000000001" height="17" rx="1" fill="#5aa2e0"/>
+<rect x="1045.2" y="182" width="6.300000000000001" height="17" rx="1" fill="#1e3a55"/>
+<rect x="1052.6" y="182" width="6.300000000000001" height="17" rx="1" fill="#1e3a55"/>
+<rect x="1060.0" y="182" width="6.300000000000001" height="17" rx="1" fill="#1e3a55"/>
+<rect x="1067.4" y="182" width="6.300000000000001" height="17" rx="1" fill="#1e3a55"/>
+<rect x="1074.8" y="182" width="6.300000000000001" height="17" rx="1" fill="#1e3a55"/>
+<rect x="1082.2" y="182" width="6.300000000000001" height="17" rx="1" fill="#1e3a55"/>
+<rect x="1089.6" y="182" width="6.300000000000001" height="17" rx="1" fill="#1e3a55"/>
+<rect x="1097.0" y="182" width="6.300000000000001" height="17" rx="1" fill="#1e3a55"/>
+<rect x="1104.4" y="182" width="6.300000000000001" height="17" rx="1" fill="#1e3a55"/>
+<rect x="1111.8" y="182" width="6.300000000000001" height="17" rx="1" fill="#1e3a55"/>
+<rect x="1119.2" y="182" width="6.300000000000001" height="17" rx="1" fill="#1e3a55"/>
+<rect x="1126.6" y="182" width="6.300000000000001" height="17" rx="1" fill="#1e3a55"/>
+<path d="M1126.35,174 L1133.15,174 L1129.75,179.6 Z" fill="#e06c78"/>
+<path d="M1059.75,174 L1066.5500000000002,174 L1063.15,179.6 Z" fill="#e06c78"/>
+<text x="956.4" y="216" font-family="ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" fill="#9198a1" font-weight="400" text-anchor="start">3′</text>
+<text x="1134.0" y="216" font-family="ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" fill="#9198a1" font-weight="400" text-anchor="end">5′</text>
+<path d="M944.4,163.5 h-44" stroke="#5aa2e0" stroke-width="1.6" marker-end="url(#ah)"/>
+<path d="M698,80 H1134" stroke="#e6edf3" stroke-width="1.1" marker-start="url(#ah2)" marker-end="url(#ah2)" opacity="0.75"/>
+<text x="916.0" y="74" font-family="ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#e6edf3" font-weight="500" text-anchor="middle" opacity="0.8">amplicon</text>
+<rect x="698" y="228" width="13" height="9" rx="1" fill="#1e3a55"/>
+<rect x="713" y="228" width="13" height="9" rx="1" fill="#5aa2e0"/>
+<text x="732" y="236" font-family="ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#9198a1" font-weight="400" text-anchor="start">5′ region / exact anchor</text>
+<path d="M900.6,228 L907.4,228 L904,237 Z" fill="#e06c78"/>
+<text x="916" y="236" font-family="ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#9198a1" font-weight="400" text-anchor="start">mismatch (never inside the anchor)</text>
+<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,1 L9,5 L0,9 z" fill="#5aa2e0"/></marker><marker id="ah2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,1 L9,5 L0,9 z" fill="#e6edf3" opacity="0.75"/></marker></defs>
+</svg>

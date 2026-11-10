@@ -1,0 +1,4 @@
+@HD	VN:1.6	SO:unsorted
+@SQ	SN:chrT	LN:42
+tiny_p1	0	chrT	4	255	8M	*	0	0	ACGTCAGT	IIIIIIII
+tiny_p2	16	chrT	32	255	8M	*	0	0	GCTATCGA	IIIIIIII

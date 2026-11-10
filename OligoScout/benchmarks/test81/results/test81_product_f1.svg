@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="430" viewBox="0 0 920 430">
+<rect width="100%" height="100%" fill="white"/>
+<style>text{font-family:serif;fill:#000}.axis{stroke:#000;stroke-width:1}.bar{fill:#555}.grid{stroke:#bbb;stroke-width:.7;stroke-dasharray:3 3}</style>
+<text x="460" y="25" text-anchor="middle" font-size="17">Product-set F1 against independent oracle</text>
+<line class="grid" x1="250.0" y1="45" x2="250.0" y2="355"/>
+<text x="250.0" y="377" text-anchor="middle" font-size="12">0.00</text>
+<line class="grid" x1="405.0" y1="45" x2="405.0" y2="355"/>
+<text x="405.0" y="377" text-anchor="middle" font-size="12">0.25</text>
+<line class="grid" x1="560.0" y1="45" x2="560.0" y2="355"/>
+<text x="560.0" y="377" text-anchor="middle" font-size="12">0.50</text>
+<line class="grid" x1="715.0" y1="45" x2="715.0" y2="355"/>
+<text x="715.0" y="377" text-anchor="middle" font-size="12">0.75</text>
+<line class="grid" x1="870.0" y1="45" x2="870.0" y2="355"/>
+<text x="870.0" y="377" text-anchor="middle" font-size="12">1.00</text>
+<text x="240" y="85" text-anchor="end" font-size="13">Independent full-scan oracle</text>
+<rect class="bar" x="250" y="60" width="620.00" height="38"/>
+<text x="864.0" y="85" text-anchor="end" fill="white" font-size="13">1.000000</text>
+<text x="240" y="145" text-anchor="end" font-size="13">OligoScout</text>
+<rect class="bar" x="250" y="120" width="620.00" height="38"/>
+<text x="864.0" y="145" text-anchor="end" fill="white" font-size="13">1.000000</text>
+<text x="240" y="205" text-anchor="end" font-size="13">Bowtie 1 + contract filter</text>
+<rect class="bar" x="250" y="180" width="620.00" height="38"/>
+<text x="864.0" y="205" text-anchor="end" fill="white" font-size="13">1.000000</text>
+<text x="240" y="265" text-anchor="end" font-size="13">BWA-aln + contract filter</text>
+<rect class="bar" x="250" y="240" width="620.00" height="38"/>
+<text x="864.0" y="265" text-anchor="end" fill="white" font-size="13">1.000000</text>
+<text x="240" y="325" text-anchor="end" font-size="13">BLASTN-short e=1100 + contract filter</text>
+<rect class="bar" x="250" y="300" width="620.00" height="38"/>
+<text x="863.9985413618035" y="325" text-anchor="end" fill="white" font-size="13">0.999998</text>
+<line class="axis" x1="250" y1="355" x2="870" y2="355"/>
+</svg>

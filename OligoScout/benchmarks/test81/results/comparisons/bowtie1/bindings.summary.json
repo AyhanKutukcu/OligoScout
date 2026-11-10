@@ -1,0 +1,19 @@
+{
+  "kind": "bindings",
+  "panel_pairs": 1024,
+  "truth_count": 8262803,
+  "prediction_count": 8262803,
+  "intersection_count": 8262803,
+  "truth_only_count": 0,
+  "prediction_only_count": 0,
+  "micro_precision": 1.0,
+  "micro_recall": 1.0,
+  "micro_f1": 1.0,
+  "jaccard": 1.0,
+  "macro_pair_f1": 1.0,
+  "macro_pair_f1_bootstrap_95_low": 1.0,
+  "macro_pair_f1_bootstrap_95_high": 1.0,
+  "bootstrap_replicates": 10000,
+  "bootstrap_unit": "primer_pair",
+  "exact_set_equality": true
+}

@@ -1,0 +1,22 @@
+{
+  "kind": "products",
+  "panel_pairs": 1024,
+  "truth_count": 425055,
+  "prediction_count": 425055,
+  "intersection_count": 425055,
+  "truth_only_count": 0,
+  "prediction_only_count": 0,
+  "micro_precision": 1.0,
+  "micro_recall": 1.0,
+  "micro_f1": 1.0,
+  "jaccard": 1.0,
+  "macro_pair_f1": 1.0,
+  "macro_pair_f1_bootstrap_95_low": 1.0,
+  "macro_pair_f1_bootstrap_95_high": 1.0,
+  "bootstrap_replicates": 10000,
+  "bootstrap_unit": "primer_pair",
+  "exact_set_equality": true,
+  "intended_products_recovered": 1024,
+  "intended_products_total": 1024,
+  "intended_product_recall": 1.0
+}

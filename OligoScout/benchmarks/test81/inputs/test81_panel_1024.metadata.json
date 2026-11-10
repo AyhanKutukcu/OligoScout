@@ -1,0 +1,19 @@
+{
+  "schema": "test81_panel_generation_v1",
+  "seed": 810024,
+  "candidate_windows_requested": 6000,
+  "candidate_pairs_valid": 5919,
+  "selected_pairs": 1024,
+  "primer_length": 24,
+  "anchor_length": 12,
+  "strata": {
+    "Q1_LOW": 256,
+    "Q2_MEDIUM_LOW": 256,
+    "Q3_MEDIUM_HIGH": 256,
+    "Q4_HIGH": 256
+  },
+  "panel_sha256": "ce19b7f209c2c693f18d5da128c1bf965e87da9ec007e725ddec95ed272ffa4d",
+  "difficulty_min": 26,
+  "difficulty_max": 925550,
+  "selection": "four anchor12-frequency quartiles, deterministic spaced sample, interleaved"
+}

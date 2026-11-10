@@ -1,0 +1,69 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 20,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "debug",
+      "displayName": "Debug with sanitizers",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/debug",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "PRIMERPAIR_ENABLE_SANITIZERS": "ON",
+        "PRIMERPAIR_ENABLE_AVX2": "OFF"
+      }
+    },
+    {
+      "name": "release",
+      "displayName": "Portable scalar release",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "PRIMERPAIR_ENABLE_SANITIZERS": "OFF",
+        "PRIMERPAIR_ENABLE_AVX2": "OFF"
+      }
+    },
+    {
+      "name": "release-avx2",
+      "displayName": "Release with AVX2 backend",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/release-avx2",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "PRIMERPAIR_ENABLE_SANITIZERS": "OFF",
+        "PRIMERPAIR_ENABLE_AVX2": "ON"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "debug",
+      "configurePreset": "debug",
+      "jobs": 4
+    },
+    {
+      "name": "release",
+      "configurePreset": "release",
+      "jobs": 4
+    },
+    {
+      "name": "release-avx2",
+      "configurePreset": "release-avx2",
+      "jobs": 4
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "debug",
+      "configurePreset": "debug",
+      "output": {
+        "outputOnFailure": true
+      }
+    }
+  ]
+}

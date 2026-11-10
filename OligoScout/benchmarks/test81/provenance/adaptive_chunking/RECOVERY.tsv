@@ -1,0 +1,13 @@
+event	ADAPTIVE_BLAST_QUERY_CHUNKING
+run_tag	test81_publication_20260825_031353
+trigger	64_QUERY_FINAL_CHUNK_TERMINATED_TWICE
+completed_original_chunks_preserved	31
+recovered_original_chunk	queries_0031
+original_queries	64
+replacement_chunks	8
+queries_per_replacement_chunk	8
+total_queries_after_recovery	2048
+total_chunks_after_recovery	39
+search_contract_changed	NO
+scientific_query_set_changed	NO
+resource_execution_schedule_changed	YES

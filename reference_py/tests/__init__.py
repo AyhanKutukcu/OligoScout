@@ -1,0 +1,1 @@
+"""Termodinamik motor dogrulama paketi."""

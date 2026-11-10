@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 520" width="1200" height="520" role="img" aria-label="Amplicon recovery on the 32-pair panel and search wall time on the 1,024-pair panel">
+<rect x="0" y="0" width="1200" height="520" rx="0" fill="#ffffff"/>
+<text x="40" y="44" font-family="ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="17" fill="#1f2328" font-weight="700" text-anchor="start">Completed searches: 32-pair panel</text>
+<text x="40" y="66" font-family="ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#59636e" font-weight="400" text-anchor="start">fraction of the 65,467-amplicon exhaustive set recovered under one shared contract</text>
+<path d="M152,86 V324" stroke="#e4e8ec" stroke-width="1"/>
+<text x="152" y="342" font-family="ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" fill="#59636e" font-weight="400" text-anchor="middle">0.00</text>
+<path d="M267.5,86 V324" stroke="#e4e8ec" stroke-width="1"/>
+<text x="267.5" y="342" font-family="ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" fill="#59636e" font-weight="400" text-anchor="middle">0.25</text>
+<path d="M383.0,86 V324" stroke="#e4e8ec" stroke-width="1"/>
+<text x="383.0" y="342" font-family="ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" fill="#59636e" font-weight="400" text-anchor="middle">0.50</text>
+<path d="M498.5,86 V324" stroke="#e4e8ec" stroke-width="1"/>
+<text x="498.5" y="342" font-family="ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" fill="#59636e" font-weight="400" text-anchor="middle">0.75</text>
+<path d="M614.0,86 V324" stroke="#e4e8ec" stroke-width="1"/>
+<text x="614.0" y="342" font-family="ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" fill="#59636e" font-weight="400" text-anchor="middle">1.00</text>
+<text x="140" y="107" font-family="ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#1f2328" font-weight="500" text-anchor="end">OligoScout</text>
+<rect x="152" y="92" width="462" height="20" rx="3" fill="#f6f8fa"/>
+<rect x="152" y="92" width="462.0" height="20" rx="3" fill="#1f4e79"/>
+<text x="604.0" y="107" font-family="ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#ffffff" font-weight="700" text-anchor="end">1.0000</text>
+<text x="690" y="107" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11" fill="#59636e" font-weight="400" text-anchor="end">65,467</text>
+<rect x="700" y="95" width="46" height="15" rx="7" fill="#2e7d5b" opacity="0.14"/>
+<text x="723" y="106" font-family="ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="9.5" fill="#2e7d5b" font-weight="700" text-anchor="middle" letter-spacing="0.4">exact</text>
+<text x="140" y="141" font-family="ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#1f2328" font-weight="500" text-anchor="end">Bowtie 1</text>
+<rect x="152" y="126" width="462" height="20" rx="3" fill="#f6f8fa"/>
+<rect x="152" y="126" width="462.0" height="20" rx="3" fill="#2e7d5b"/>
+<text x="604.0" y="141" font-family="ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#ffffff" font-weight="700" text-anchor="end">1.0000</text>
+<text x="690" y="141" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11" fill="#59636e" font-weight="400" text-anchor="end">65,467</text>
+<rect x="700" y="129" width="46" height="15" rx="7" fill="#2e7d5b" opacity="0.14"/>
+<text x="723" y="140" font-family="ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="9.5" fill="#2e7d5b" font-weight="700" text-anchor="middle" letter-spacing="0.4">exact</text>
+<text x="140" y="175" font-family="ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#1f2328" font-weight="500" text-anchor="end">BWA-aln</text>
+<rect x="152" y="160" width="462" height="20" rx="3" fill="#f6f8fa"/>
+<rect x="152" y="160" width="462.0" height="20" rx="3" fill="#2e7d5b"/>
+<text x="604.0" y="175" font-family="ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#ffffff" font-weight="700" text-anchor="end">1.0000</text>
+<text x="690" y="175" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11" fill="#59636e" font-weight="400" text-anchor="end">65,467</text>
+<rect x="700" y="163" width="46" height="15" rx="7" fill="#2e7d5b" opacity="0.14"/>
+<text x="723" y="174" font-family="ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="9.5" fill="#2e7d5b" font-weight="700" text-anchor="middle" letter-spacing="0.4">exact</text>
+<text x="140" y="209" font-family="ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#1f2328" font-weight="500" text-anchor="end">SeqKit</text>
+<rect x="152" y="194" width="462" height="20" rx="3" fill="#f6f8fa"/>
+<rect x="152" y="194" width="462.0" height="20" rx="3" fill="#2e7d5b"/>
+<text x="604.0" y="209" font-family="ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#ffffff" font-weight="700" text-anchor="end">1.0000</text>
+<text x="690" y="209" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11" fill="#59636e" font-weight="400" text-anchor="end">65,467</text>
+<rect x="700" y="197" width="46" height="15" rx="7" fill="#2e7d5b" opacity="0.14"/>
+<text x="723" y="208" font-family="ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="9.5" fill="#2e7d5b" font-weight="700" text-anchor="middle" letter-spacing="0.4">exact</text>
+<text x="140" y="243" font-family="ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#1f2328" font-weight="500" text-anchor="end">BLAST+</text>
+<rect x="152" y="228" width="462" height="20" rx="3" fill="#f6f8fa"/>
+<rect x="152" y="228" width="461.9082591229169" height="20" rx="3" fill="#c2701c"/>
+<text x="603.9082591229169" y="243" font-family="ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#ffffff" font-weight="700" text-anchor="end">0.9998</text>
+<text x="690" y="243" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11" fill="#59636e" font-weight="400" text-anchor="end">65,454</text>
+<text x="140" y="277" font-family="ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#1f2328" font-weight="500" text-anchor="end">minimap2</text>
+<rect x="152" y="262" width="462" height="20" rx="3" fill="#f6f8fa"/>
+<rect x="152" y="262" width="45.150625505980116" height="20" rx="3" fill="#a32e38"/>
+<text x="206.15062550598012" y="277" font-family="ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#1f2328" font-weight="600" text-anchor="start">0.0977</text>
+<text x="690" y="277" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11" fill="#59636e" font-weight="400" text-anchor="end">6,398</text>
+<text x="140" y="311" font-family="ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#1f2328" font-weight="500" text-anchor="end">HISAT2</text>
+<rect x="152" y="296" width="462" height="20" rx="3" fill="#f6f8fa"/>
+<rect x="152" y="296" width="41.593902271373366" height="20" rx="3" fill="#a32e38"/>
+<text x="202.59390227137337" y="311" font-family="ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#1f2328" font-weight="600" text-anchor="start">0.0900</text>
+<text x="690" y="311" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11" fill="#59636e" font-weight="400" text-anchor="end">5,894</text>
+<text x="40" y="386" font-family="ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#59636e" font-weight="400" text-anchor="start">Bowtie 2: partial (31/32); details in README.</text>
+<text x="40" y="407" font-family="ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#59636e" font-weight="400" text-anchor="start">MFEprimer: different panel; comparison not verified.</text>
+<path d="M760,80 V470" stroke="#d0d7de" stroke-width="1"/>
+<text x="800" y="44" font-family="ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="17" fill="#1f2328" font-weight="700" text-anchor="start">Publication-scale panel</text>
+<text x="800" y="66" font-family="ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#59636e" font-weight="400" text-anchor="start">1,024 primer pairs vs. an independent oracle</text>
+<rect x="800" y="88" width="360" height="52" rx="8" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1"/>
+<text x="816" y="114" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="20" fill="#1f4e79" font-weight="700" text-anchor="start">8,262,803</text>
+<text x="816" y="131" font-family="ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#59636e" font-weight="400" text-anchor="start">binding sites</text>
+<rect x="800" y="148" width="360" height="52" rx="8" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1"/>
+<text x="816" y="174" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="20" fill="#1f4e79" font-weight="700" text-anchor="start">425,055</text>
+<text x="816" y="191" font-family="ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#59636e" font-weight="400" text-anchor="start">amplicons</text>
+<rect x="800" y="208" width="360" height="52" rx="8" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1"/>
+<text x="816" y="234" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="20" fill="#1f4e79" font-weight="700" text-anchor="start">1.0000000000</text>
+<text x="816" y="251" font-family="ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#59636e" font-weight="400" text-anchor="start">precision / recall / F1 / Jaccard</text>
+<text x="800" y="290" font-family="ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#1f2328" font-weight="600" text-anchor="start">Reported search-stage wall time</text>
+<text x="874" y="318" font-family="ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#1f2328" font-weight="500" text-anchor="end">OligoScout</text>
+<rect x="884" y="304" width="30.55610658696869" height="18" rx="3" fill="#1f4e79"/>
+<text x="922.5561065869687" y="318" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11" fill="#59636e" font-weight="400" text-anchor="start">111.80 s</text>
+<text x="874" y="348" font-family="ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#1f2328" font-weight="500" text-anchor="end">BWA-aln</text>
+<rect x="884" y="334" width="34.332242470364314" height="18" rx="3" fill="#2e7d5b"/>
+<text x="926.3322424703643" y="348" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11" fill="#59636e" font-weight="400" text-anchor="start">141.14 s</text>
+<text x="874" y="378" font-family="ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#1f2328" font-weight="500" text-anchor="end">Bowtie 1</text>
+<rect x="884" y="364" width="35.232621869844735" height="18" rx="3" fill="#2e7d5b"/>
+<text x="927.2326218698447" y="378" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11" fill="#59636e" font-weight="400" text-anchor="start">148.64 s</text>
+<text x="874" y="408" font-family="ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#1f2328" font-weight="500" text-anchor="end">oracle</text>
+<rect x="884" y="394" width="40.26253073023473" height="18" rx="3" fill="#59636e"/>
+<text x="932.2625307302347" y="408" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11" fill="#59636e" font-weight="400" text-anchor="start">194.11 s</text>
+<text x="874" y="438" font-family="ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11.5" fill="#1f2328" font-weight="500" text-anchor="end">BLAST+</text>
+<rect x="884" y="424" width="160.0" height="18" rx="3" fill="#c2701c"/>
+<text x="1052.0" y="438" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11" fill="#59636e" font-weight="400" text-anchor="start">3,065.39 s</text>
+<text x="800" y="470" font-family="ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5" fill="#59636e" font-weight="400" text-anchor="start">bars ∝ √time; scope details in README</text>
+<text x="40" y="504" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace" font-size="11.5" fill="#59636e" font-weight="400" text-anchor="start">GRCh38.p14 Primary 24  ·  24-nt primers  ·  exact 12-nt 3′ anchor  ·  ≤ 3 mismatches  ·  50–3,000 bp products</text>
+</svg>
