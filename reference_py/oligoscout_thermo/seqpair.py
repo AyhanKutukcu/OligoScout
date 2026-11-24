@@ -237,6 +237,10 @@ def check_pair(fwd: str, rev: str, product_start: int, product_end: int,
                     {"warn": f"ara < {cons.pair_gap_min_nt} nt", "fail": "ortusme"},
                     sev))
 
+    if "N" in amplicon.upper():
+        # The geometry remains evaluable; SEQ-04 reports unknown template bases.
+        return out
+
     # PAIR-04 urun Tm'i - primer Tm'i
     prod_tm = concentration.build(amplicon, cond=cond,
                                   salt_model=salt_model).tm_c
@@ -632,6 +636,107 @@ def check_spc08(primer: str, contigs: dict[str, str],
                 {"warn": "contig'te uyumsuzluklu baglanma",
                  "fail": "contig'te 3'-capali (uzatilabilir) baglanma"}, sev,
                 "kucuk contig'ler Python'da taranir; buyuk ALT icin C++ gerekir")
+
+
+# Birincil 24 kromozom disindaki GRCh38.p14 dizileri (cli/build_extra_contigs.py)
+# C++ `oligoscout_contig_scan --all` ile taranir; burada siniflanir.
+SPC08_ROLE_POLICY = {
+    # rol: (3'-capali yer / urun siddeti, uyumsuzluklu yer siddeti)
+    "mitochondrion": ("FAIL", "WARN"),
+    "unlocalized": ("FAIL", "WARN"),
+    "unplaced": ("FAIL", "WARN"),
+    "other": ("WARN", "INFO"),
+    # ALT lokuslar ve yamalar birincil bir lokusun alternatif kopyasidir;
+    # hedef bolgenin ALT kopyasina baglanma beklenir. Bilgi olarak raporlanir.
+    "alt_locus": ("INFO", "INFO"),
+    "fix_patch": ("INFO", "INFO"),
+    "novel_patch": ("INFO", "INFO"),
+}
+
+
+def check_spc08_scan(primers: dict[str, str], sites: list[dict], roles: dict[str, str],
+                     max_mismatch: int = 2, anchor: int = 3,
+                     min_amp: int = 50, max_amp: int = 3000,
+                     terminal: tuple[int, int] | None = None) -> list[dict]:
+    """SPC-08: ek GRCh38 dizilerinde baglanma ve urun (C++ tarama sonucundan).
+
+    `primers` {rol: dizi} (F, R); `sites` tarayicinin satirlari
+    (primer_id=dizi, chrom, start, end_exclusive, strand, mismatches, mask);
+    `roles` {contig: rol}. Her primer icin bir kayit ve cift icin bir urun
+    kaydi dondurur. 3'-capa: son `anchor` nt tam eslesme. `terminal`
+    (pencere, en_fazla) verilirse (hassas mod) capa yerine Primer-BLAST kurali:
+    son `pencere` nt icinde en fazla `en_fazla` uyumsuzluk.
+    """
+    order = {"INFO": 0, "WARN": 1, "FAIL": 2}
+    usable = []
+    for s in sites:
+        mm = int(s["mismatches"])
+        if mm > max_mismatch:
+            continue
+        mask = s["mask"]
+        usable.append({**s, "mismatches": mm, "start": int(s["start"]), "end": int(s["end_exclusive"]),
+                       "anchored": (mask[-terminal[0]:].count("X") <= terminal[1]) if terminal
+                       else ("X" not in mask[-anchor:]), "role": roles.get(s["chrom"], "other")})
+    records = []
+    for prole, seq in primers.items():
+        mine = [s for s in usable if s["primer_id"] == seq]
+        per_role: dict[str, dict] = {}
+        sev = "INFO"
+        for s in mine:
+            r = per_role.setdefault(s["role"], {"sites": 0, "anchored": 0, "contigs": set()})
+            r["sites"] += 1
+            r["anchored"] += s["anchored"]
+            r["contigs"].add(s["chrom"])
+            pol = SPC08_ROLE_POLICY.get(s["role"], SPC08_ROLE_POLICY["other"])
+            this = pol[0] if s["anchored"] else pol[1]
+            sev = max(sev, this, key=order.get)
+        summary = {k: {"sites": v["sites"], "anchored": v["anchored"], "contigs": sorted(v["contigs"])[:10]}
+                   for k, v in sorted(per_role.items())}
+        rec = _rec("SPC-08",
+                   {"scanned": True, "scope": "GRCh38.p14 extra sequences (chrM, ALT, patches, scaffolds)",
+                    "per_role": summary, "total_sites": len(mine),
+                    "anchored_sites": sum(s["anchored"] for s in mine),
+                    "max_mismatch": max_mismatch, "anchor_nt": None if terminal else anchor,
+                    "terminal_rule": list(terminal) if terminal else None},
+                   {"fail": "chrM / iskele dizisinde 3'-capali baglanma",
+                    "warn": "chrM / iskele dizisinde uyumsuzluklu baglanma",
+                    "info": "ALT lokus / yama baglanmasi (alternatif haplotip kopyasi)"},
+                   sev, "ALT ve yama dizileri birincil lokuslarin alternatif kopyalaridir; "
+                        "hedef bolgenin ALT kopyasina baglanma beklenir")
+        rec["role"] = prole
+        records.append(rec)
+    # urunler: ayni contig, + iplikte sol yer, - iplikte sag yer, her iki primer
+    # yonelimi ve tek primer urunleri dahil; her iki yer 3'-capali olmali
+    anchored = [s for s in usable if s["anchored"]]
+    products = []
+    by_contig: dict[str, list] = {}
+    for s in anchored:
+        by_contig.setdefault(s["chrom"], []).append(s)
+    names = {seq: r for r, seq in primers.items()}
+    for contig, ss in by_contig.items():
+        plus = [s for s in ss if s["strand"] == "+"]
+        minus = [s for s in ss if s["strand"] == "-"]
+        for p in plus:
+            for m in minus:
+                if m["start"] < p["end"]:
+                    continue
+                length = m["end"] - p["start"]
+                if min_amp <= length <= max_amp:
+                    products.append({"contig": contig, "role": roles.get(contig, "other"),
+                                     "start": p["start"], "length": length,
+                                     "orientation": f"{names.get(p['primer_id'], '?')}-{names.get(m['primer_id'], '?')}",
+                                     "total_mismatches": p["mismatches"] + m["mismatches"]})
+    psev = "INFO"
+    for pr in products:
+        psev = max(psev, SPC08_ROLE_POLICY.get(pr["role"], SPC08_ROLE_POLICY["other"])[0], key=order.get)
+    prec = _rec("SPC-08",
+                {"scanned": True, "products": products[:20], "product_count": len(products),
+                 "by_role": {r: sum(1 for p in products if p["role"] == r) for r in sorted({p["role"] for p in products})}},
+                {"fail": "chrM / iskele dizisinde urun", "info": "ALT / yama dizisinde urun"},
+                psev, "urun: iki 3'-capali yer, 50-3000 bp, tum yonelimler")
+    prec["role"] = "pair"
+    records.append(prec)
+    return records
 
 
 SEVERITY_ORDER = {"INFO": 0, "WARN": 1, "FAIL": 2}

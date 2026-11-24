@@ -1,20 +1,34 @@
 /* ================= ÇİFT İNCELEME ================= */
 const PTABS = [
   {id:'harita', t:'Harita', i:'map'}, {id:'ozgulluk', t:'Özgüllük', i:'target'}, {id:'varyant', t:'Varyant', i:'snp'},
-  {id:'yapi', t:'Yapı & Dimer', i:'struct'}, {id:'termo', t:'Termodinamik', i:'thermo'}, {id:'kanit', t:'Kanıt · 91 kural', i:'list'}];
+  {id:'yapi', t:'Yapı & Dimer', i:'struct'}, {id:'termo', t:'Termodinamik', i:'thermo'}, {id:'kanit', t:'Kanıt', i:'list'}];
 RENDER.cift = el => {
-  const pm = getPair(STATE.pair); const E = evidenceFor(pm); pm._E = E;
-  const famSev = fams => worst(Object.entries(E).filter(([id]) => fams.some(f => id.startsWith(f))).map(([, e]) => e.sev).filter(Boolean));
-  const tabSev = {ozgulluk: pm.kind === 'project' ? famSev(['SPC-']) : null, varyant: pm.hasVar ? famSev(['VAR-']) : null, yapi: famSev(['DIM-0','SS-']), termo: famSev(['TH-']), kanit: worst(Object.values(E).map(e => e.sev).filter(Boolean))};
-  const opts = [`<optgroup label="Proje paneli · genom taraması yapıldı">${PROJ.map(p => `<option value="${p.key}" ${p.key === pm.key ? 'selected' : ''}>#${p.rank} ${p.id} · ${p.prod} bp · ${p.verdict}</option>`).join('')}</optgroup>`,
-    STATE.local.length ? `<optgroup label="Bu oturumda tasarlananlar">${STATE.local.map(p => `<option value="${p.key}" ${p.key === pm.key ? 'selected' : ''}>${p.label} · ${p.prod} bp</option>`).join('')}</optgroup>` : ''].join('');
+  const example = STATE.view === 'dokumantasyon';
+  const pool = example ? PROJ : STATE.local;
+  const pm = pool.find(p => p.key === (example ? STATE.docPair : STATE.pair)) ||
+    (example ? pool[0] : STATE.design?.pms?.[0] || pool.at(-1));
+  if (!pm) {
+    el.innerHTML = liveResult('Henüz bir primer çifti yok', `<p class="muted">Tasarım ve otomatik özgüllük taraması tamamlandığında çiftinizi burada inceleyebilirsiniz.</p>
+      <div class="row"><a class="btn pri" href="#tasarla">Primer tasarla</a><a class="btn" href="#dokumantasyon/panel">Örnek çıktıyı gör</a></div>`);
+    return;
+  }
+  if (example) STATE.docPair = pm.key; else STATE.pair = pm.key;
+  const E = evidenceFor(pm); pm._E = E;
+  const famSev = fams => {
+    const assessed = Object.entries(E)
+      .filter(([id]) => fams.some(f => id.startsWith(f)))
+      .map(([, group]) => group.sev).filter(Boolean);
+    return assessed.length ? worst(assessed) : null;
+  };
+  const tabSev = {ozgulluk: pm.kind === 'project' || pm.liveScan ? famSev(['SPC-']) : null, varyant: pm.hasVar ? famSev(['VAR-']) : null, yapi: famSev(['DIM-0','SS-']), termo: famSev(['TH-']), kanit: famSev([''])};
+  const opts = pool.map(p => `<option value="${esc(p.key)}" ${p.key === pm.key ? 'selected' : ''}>${esc(example ? p.id : p.label + ' · ' + p.tplName)} · ${p.prod} bp</option>`).join('');
   const amp = pm.tpl.slice(pm.fStart, pm.rEnd + 1);
-  const ampFa = `>${pm.id} ${pm.chrom}:${gposAny(pm, pm.fStart)}-${gposAny(pm, pm.rEnd)} ${pm.prod} bp\n${amp.match(/.{1,60}/g).join('\n')}`;
+  const ampFa = `>${pm.id} ${pm.chrom}:${gposAny(pm, pm.fStart)}-${gposAny(pm, pm.rEnd)} ${pm.prod} bp\n${(amp.match(/.{1,60}/g) || []).join('\n')}`;
   el.innerHTML = `<div class="stack">
     <div class="card"><div class="bd pairhead">
       <div style="min-width:0">
         <div class="row" style="gap:8px;margin-bottom:8px"><select id="pairSel" style="width:auto;max-width:100%;font-weight:600">${opts}</select>
-          <span class="tag ${pm.kind === 'project' ? 'eng' : 'br'}">${pm.kind === 'project' ? 'motor çıktısı · ' + esc(D.meta.qc_dir) : 'tarayıcı tasarımı · ' + esc(pm.profile)}</span></div>
+          <span class="tag ${pm.kind === 'project' ? 'eng' : 'br'}">${pm.kind === 'project' ? 'motor çıktısı · ' + esc(D.meta.qc_dir) : (pm.kind === 'live' ? 'Primer tasarımı · ' : 'tarayıcı ön tasarımı · ') + esc(pm.profile)}</span></div>
         <div style="display:grid;gap:6px">
           <div class="primerline"><span class="r F">F</span><span class="seq">${seqC(pm.F)}</span><span class="faint small">${pm.F.length} nt · ${pm.chrom}:${gposAny(pm, pm.fStart)}(+)</span>${copyBtn(pm.F)}</div>
           <div class="primerline"><span class="r R">R</span><span class="seq">${seqC(pm.R)}</span><span class="faint small">${pm.R.length} nt · ${pm.chrom}:${gposAny(pm, pm.rEnd)}(−)</span>${copyBtn(pm.R)}</div>
@@ -22,20 +36,31 @@ RENDER.cift = el => {
         </div>
       </div>
       <div style="display:grid;gap:10px;justify-items:end">
-        <div class="row" style="gap:6px;justify-content:flex-end">${pm.kind === 'project' ? `<span class="chip">karar ${sev(pm.verdict)}</span><span class="chip">özgüllük ${sev(pm.spec)}</span><span class="chip">varyant ${sev(pm.varv)}</span>` : `<span class="chip">Pareto <b>${pm.pareto}</b></span><span class="chip">özgüllük ${sev('NA','taranmadı')}</span>`}</div>
+        <div class="row" style="gap:6px;justify-content:flex-end">${pm.kind === 'project' ? `<span class="chip">karar ${sev(pm.verdict)}</span><span class="chip">özgüllük ${sev(pm.spec)}</span><span class="chip">varyant ${sev(pm.varv)}</span>` : `<span class="chip">Pareto <b>${pm.pareto}</b></span><span class="chip">özgüllük ${pm.liveScan ? sev(worst([pm.liveScan.result.summary?.spc01, pm.liveScan.result.summary?.spc03])) : pm.liveBis ? sev('INFO','BIS-04 hazır') : sev('NA','taranmadı')}</span>`}</div>
         <div class="mini-stats"><div><div class="k">Ürün</div><div class="v">${pm.prod}<small class="faint" style="font-size:11px"> bp</small></div></div><div><div class="k">Tm F / R</div><div class="v">${nf(pm.tmF,1)} / ${nf(pm.tmR,1)}</div></div><div><div class="k">ΔTm</div><div class="v">${nf(pm.dtm,2)}</div></div><div><div class="k">θ(Ta) F / R</div><div class="v">${nf(pm.thetaF,2)} / ${nf(pm.thetaR,2)}</div></div></div>
       </div></div>
-      <div class="tabs" role="tablist" style="padding:0 10px">${PTABS.map(t => `<button role="tab" data-ptab="${t.id}" aria-selected="${STATE.ptab === t.id}">${ic(t.i)}${t.t}${tabSev[t.id] ? ' ' + sev(tabSev[t.id]) : ''}</button>`).join('')}</div>
+      <div class="tabs pair-tabs" role="tablist" style="padding:0 10px">${PTABS.map(t => `<button role="tab" data-ptab="${t.id}" aria-selected="${STATE.ptab === t.id}">${ic(t.i)}${t.t}${tabSev[t.id] ? ' ' + sev(tabSev[t.id]) : ''}</button>`).join('')}</div>
     </div>
     <div id="ptab"></div></div>`;
-  $('#pairSel', el).onchange = e => { STATE.pair = e.target.value; rerender(); };
-  $$('[data-ptab]', el).forEach(b => b.onclick = () => { STATE.ptab = b.dataset.ptab; rerender(); });
-  const host = $('#ptab', el); ({harita: tabMap, ozgulluk: tabSpec, varyant: tabVar, yapi: tabStruct, termo: tabThermo, kanit: tabEvidence})[STATE.ptab](host, pm, E);
+  $('#pairSel', el).onchange = e => {
+    if (example) go('dokumantasyon/cift/' + e.target.value + '/' + STATE.ptab);
+    else { STATE.pair = e.target.value; rerender(); }
+  };
+  $$('[data-ptab]', el).forEach(b => b.onclick = () => {
+    if (example) go('dokumantasyon/cift/' + pm.key + '/' + b.dataset.ptab);
+    else { STATE.ptab = b.dataset.ptab; rerender(); }
+  });
+  const host = $('#ptab', el);
+  ({harita: tabMap, ozgulluk: tabSpec, varyant: tabVar, yapi: tabStruct, termo: tabThermo, kanit: tabEvidence})[STATE.ptab](host, pm, E);
+  if (STATE.ptab === 'kanit' && liveReady() && !example && !pm.liveQC) {
+    host.insertAdjacentHTML('afterbegin', `<div class="row live-actions">${pairAction(pm, 'qc', 'Kalite kontrolü yap')}</div>${jobNotice('qc:' + pm.key)}`);
+    bindPairActions(host, pm);
+  }
 };
 
 /* ---- harita ---- */
 function tabMap(host, pm) {
-  const others = pm.kind === 'project' ? PROJ.filter(p => p.key !== pm.key) : STATE.local.filter(p => p.key !== pm.key);
+  const others = pm.kind === 'project' ? PROJ.filter(p => p.key !== pm.key) : STATE.local.filter(p => p.key !== pm.key && p.source === pm.source);
   const pad = STATE.mapPad || 24;
   host.innerHTML = `<div class="stack">
     <div class="card"><div class="hd"><h2>Şablondaki konum</h2><span class="faint small">${esc(pm.tplName || D.meta.header)}</span></div><div class="bd scrollx" id="mTrack"></div></div>
@@ -57,7 +82,7 @@ function tabMap(host, pm) {
     bands: [{a: 0, b: pm.F.length, c: css('--fwd'), op: .12}, {a: amp.length - pm.R.length, b: amp.length, c: css('--rev'), op: .12}], vlines: []});
 }
 function ampHTML(pm) {
-  const a = pm.tpl.slice(pm.fStart, pm.rEnd + 1), fL = pm.F.length, rL = pm.R.length; const vv = pm.hasVar ? new Set(varsIn(pm.fStart, pm.rEnd).filter(v => v.af >= 0.001).map(v => v.idx - pm.fStart)) : new Set();
+  const a = pm.tpl.slice(pm.fStart, pm.rEnd + 1), fL = pm.F.length, rL = pm.R.length; const vv = pm.hasVar ? new Set(varsIn(pm.fStart, pm.rEnd, pm).filter(v => v.af >= 0.001).map(v => v.idx - pm.fStart)) : new Set();
   return a.split('').map((c, i) => { const inF = i < fL, inR = i >= a.length - rL; const st = inF ? 'color:var(--fwd);font-weight:700' : inR ? 'color:var(--rev);font-weight:700' : 'color:var(--ink2)';
     return `<span style="${st}${vv.has(i) ? ';background:var(--warn-soft);border-bottom:2px solid var(--warn)' : ''}">${c}</span>${(i + 1) % 10 === 0 ? ' ' : ''}`; }).join('');
 }
@@ -65,32 +90,54 @@ function ampHTML(pm) {
 /* ---- özgüllük ---- */
 const CHRLEN = {chr1:248956422,chr2:242193529,chr3:198295559,chr4:190214555,chr5:181538259,chr6:170805979,chr7:159345973,chr8:145138636,chr9:138394717,chr10:133797422,chr11:135086622,chr12:133275309,chr13:114364328,chr14:107043718,chr15:101991189,chr16:90338345,chr17:83257441,chr18:80373285,chr19:58617616,chr20:64444167,chr21:46709983,chr22:50818468,chrX:156040895,chrY:57227415};
 function tabSpec(host, pm, E) {
-  if (pm.kind !== 'project') {
-    host.innerHTML = `<div class="stack"><div class="verdict na"><div class="ic">${ic('target')}</div><div><h3>Genom-geneli tarama henüz yapılmadı</h3><div class="small muted">Tarayıcı, 3,1 Gb'lık GRCh38 FM-index'ini taşıyamaz. SPC-01…09 için çifti C++ çekirdeğine gönderin.</div></div></div>
-      ${pm.match ? `<div class="note">${ic('info')}<div>Bu çift proje panelindeki <b>${pm.match.id}</b> ile aynı. <button class="btn sm" data-open="${pm.match.key}">Gerçek tarama sonuçlarını aç</button></div></div>` : ''}
-      <div class="card"><div class="hd"><h2>Taramaya gönder</h2><span class="sp"></span>${copyBtn(panelTSV([pm]), 'TSV kopyala')}</div><div class="bd small muted">1 · Aşağıdaki satırları projede <span class="mono">panel_yeni.tsv</span> olarak kaydedin. 2 · <code>RUN_PANEL.cmd panel_yeni.tsv 166</code> (ctDNA için cfDNA ağırlığı). 3 · <code>python web/build_web_data.py</code> ile siteyi güncelleyin.<pre class="json" style="margin-top:10px">${esc(panelTSV([pm]))}</pre><div style="margin-top:10px">Sözleşme: çapa ${D.meta.contract.anchor_length} nt · maks ${D.meta.contract.max_mismatches} uyumsuzluk · ürün ${D.meta.contract.min_amplicon_length}–${D.meta.contract.max_amplicon_length} bp · ${D.meta.contract.shards} shard.</div></div></div></div>`;
+  const scan = pm.liveScan;
+  const actions = `<div class="row live-actions">${pairAction(pm, 'scan', scan || pm.liveBis ? 'Yeniden tara' : 'Özgüllük taraması')}
+    ${localToolLink('scan', 'Panel ve arama ayarları', pm)}</div>${jobNotice('scan:' + pm.key)}`;
+  if (pm.liveBis) {
+    const result = pm.liveBis;
+    const rows = result.summary.filter(row => row.pair_id === pm.id);
+    host.innerHTML = actions + liveResult('BIS-04 · CT ve GA özgüllüğü',
+      localRows(rows) + localRecords(result.records.filter(r => r.pair_id === pm.id).map(r => r.check || r))) +
+      liveResult('CT / GA arama sözleşmeleri',
+        Object.entries(result.contracts).map(([conv, contract]) => `<h3>${conv}</h3>${kvHTML(contract)}`).join(''));
+    bindPairActions(host, pm);
     return;
   }
-  const p = pm.raw, q = p.panelqc; const ex = [+q.exact_f, +q.exact_r], ot = +q.offtarget_total;
-  const specific = ot === 0 && ex[0] === 1 && ex[1] === 1;
-  const ck = id => (E[id] || {}).recs || [];
-  const spc01 = ck('SPC-01'), spc02 = ck('SPC-02');
+  if (pm.kind !== 'project' && !scan) {
+    host.innerHTML = `<div class="stack">${actions}${liveNote(liveReady()
+      ? 'Bu çift henüz taranmadı.'
+      : localAvailability())}</div>`;
+    bindPairActions(host, pm);
+    return;
+  }
+  const contract = scan?.contract || D.meta.contract;
+  const p = scan ? {...scan.result, panelqc:scan.result.summary} : pm.raw;
+  const q = p.panelqc;
+  const ex = [+q.exact_f, +q.exact_r], ot = +q.offtarget_total;
+  const intended = +q.products_intended;
+  const specific = intended === 1 && ot === 0 && ex[0] === 1 && ex[1] === 1;
+  const summarySeverity = scan ? worst([q.spc01, q.spc03, E['SPC-01']?.sev]) : p.specificity_verdict;
+  const heading = specific ? 'Arama kapsamında tek hedef ürün' : intended !== 1
+    ? 'Beklenen hedef ürün doğrulanamadı' : ot ? ot + ' hedef dışı ürün bulundu'
+    : 'Primer tam eşleşme sayıları incelenmeli';
   const mmHist = role => { const h = {0:0,1:0,2:0,3:0}; p.bindings[role].hist.forEach(x => h[x.mm] = (h[x.mm] || 0) + x.n); return h; };
   const hF = mmHist('F'), hR = mmHist('R');
-  host.innerHTML = `<div class="stack">
-    <div class="verdict ${specific ? 'ok' : ot ? 'warn' : 'warn'}"><div class="ic">${ic(specific ? 'ok' : 'warn')}</div><div style="min-width:0"><h3>${specific ? 'Spesifik — genomda tek hedef ürün' : ot ? `Spesifik değil — ${ot} hedef dışı ürün` : 'Primer düzeyinde birden fazla tam eşleşme'}</h3>
-      <div class="small">${specific ? `F ve R'nin GRCh38'de tek tam eşleşmeli yeri var; ${D.meta.contract.max_mismatches} uyumsuzluğa kadar taranan ${ni(+q.sites_f + +q.sites_r)} bağlanma yerinden hiçbiri ${D.meta.contract.min_amplicon_length}–${D.meta.contract.max_amplicon_length} bp aralıkta ikinci ürün oluşturmuyor.` : `Toplam ${q.products_total} ürün; ${q.products_intended} hedef. En az ${q.min_offtarget_mismatches || '—'} toplam uyumsuzluk. Ayrıntılar aşağıda hizalamalı.`}</div></div><span class="sp" style="flex:1"></span>${sev(p.specificity_verdict)}</div>
+  host.innerHTML = `<div class="stack">${actions}
+    <div class="verdict ${specific ? 'ok' : summarySeverity === 'FAIL' ? 'fail' : 'warn'}"><div class="ic">${ic(specific ? 'ok' : 'warn')}</div><div style="min-width:0"><h3>${heading}</h3>
+      <div class="small">${scan ? 'Genom taraması sonucu' : 'Kayıtlı panel sonucu'} · ${q.products_total} toplam ürün · ${intended} hedef · ${ot} hedef dışı. ${contract.shards} kromozom, primer başına en fazla ${contract.max_mismatches} uyumsuzluk, ${contract.min_amplicon_length}–${contract.max_amplicon_length} bp ürün.</div>
+      </div><span class="sp" style="flex:1"></span>${sev(summarySeverity)}</div>
     <div class="ccgrid">${['SPC-01','SPC-02','SPC-03','SPC-05','SPC-06','SPC-07'].map(id => ckCard(id, E[id])).join('')}</div>
     <div class="g2">
-      <div class="card"><div class="hd"><h2>Uyumsuzluk sınıfı histogramı</h2><span class="faint small">SPC-02 · tüm bağlanma yerleri 3′ ${D.meta.contract.anchor_length} nt çapalı</span></div><div class="bd" id="mmHist"></div></div>
+      <div class="card"><div class="hd"><h2>Uyumsuzluk sınıfı histogramı</h2><span class="faint small">SPC-02 · tüm bağlanma yerleri 3′ ${contract.anchor_length} nt çapalı</span></div><div class="bd" id="mmHist"></div></div>
       <div class="card"><div class="hd"><h2>Genomdaki bağlanma yerleri</h2><span class="faint small">en yakın 40 yer / primer</span></div><div class="bd scrollx" id="ideo"></div></div>
     </div>
     <div class="card"><div class="hd"><h2>Bağlanma yeri hizalamaları</h2><span class="faint small">Primer-BLAST gösterimi · nokta = eşleşme, harf = uyumsuz baz</span><span class="sp"></span>
       <div class="seg" id="roleSeg"><button data-role="F" aria-pressed="${(STATE.specRole||'F')==='F'}">Forward · ${p.bindings.F.n}</button><button data-role="R" aria-pressed="${STATE.specRole==='R'}">Reverse · ${p.bindings.R.n}</button></div>
       <div class="seg" id="mmSeg"><button data-mm="9" aria-pressed="${(STATE.specMM??9)===9}">tümü</button><button data-mm="1" aria-pressed="${STATE.specMM===1}">≤1</button><button data-mm="2" aria-pressed="${STATE.specMM===2}">≤2</button></div></div>
       <div class="bd flush" id="alnList"></div></div>
-    <div class="card"><div class="hd"><h2>Hedef dışı ürünler</h2><span class="faint small">SPC-03 · F–R ürünleri · ${D.meta.contract.min_amplicon_length}–${D.meta.contract.max_amplicon_length} bp</span></div><div class="bd ${p.offtarget.length ? 'flush' : ''}">${offtHTML(pm)}</div></div>
-    <div class="card"><div class="hd"><h2>Arama sözleşmesi</h2><span class="faint small">SPC-09 · bu sonuç şu indeks ve sözleşmeyle üretildi</span></div><div class="bd">${kvHTML((D.meta.panel_checks.find(c => c.id === 'SPC-09') || {}).value || D.meta.contract)}${((D.meta.panel_checks.find(c => c.id === 'SPC-09') || {}).value || {}).index_manifest_found === false ? `<div class="note" style="margin-top:10px">${ic('info')}<div>QC katmanı bu pakette WSL dışında koşuldu; FM-index manifest'i (<span class="mono">${esc(D.meta.contract.manifest)}</span>) bu ortamdan okunamadığı için indeks checksum'ı boş. <code>RUN_PANEL.cmd … hizli</code> WSL içinde 24 shard SHA-256'sından birleşik digest'i doldurur.</div></div>` : ''}</div></div>
+    <div class="card"><div class="hd"><h2>Hedef dışı ürünler</h2><span class="faint small">SPC-03 · F–R, R–F ve tek primer (F–F, R–R) ürünleri · ${contract.min_amplicon_length}–${contract.max_amplicon_length} bp</span></div><div class="bd ${p.offtarget.length ? 'flush' : ''}">${offtHTML(pm, p, contract, q)}</div></div>
+    <div class="card"><div class="hd"><h2>Arama sözleşmesi</h2><span class="faint small">SPC-09 · bu sonuç şu indeks ve sözleşmeyle üretildi</span></div><div class="bd">${kvHTML(scan ? {...contract, ...scan.records.find(r => r.id === 'SPC-09')?.value} :
+      (D.meta.panel_checks.find(c => c.id === 'SPC-09') || {}).value || contract)}</div></div>
   </div>`;
   // histogram
   const mx = Math.max(...[0,1,2,3].map(k => Math.max(hF[k], hR[k])), 1); const Wd = Math.max(300, W_OF($('#mmHist', host)) - 36), Hh = 190, bw = (Wd - 60) / 4;
@@ -104,30 +151,32 @@ function tabSpec(host, pm, E) {
   const chrs = Object.keys(CHRLEN); const iw = Math.max(320, W_OF($('#ideo', host)) - 36), maxL = CHRLEN.chr1; const rowH = 15;
   const sites = [...p.bindings.F.top.map(s => ({...s, role:'F'})), ...p.bindings.R.top.map(s => ({...s, role:'R'}))];
   $('#ideo', host).innerHTML = `<svg width="${iw}" height="${chrs.length * rowH + 20}" viewBox="0 0 ${iw} ${chrs.length * rowH + 20}">${chrs.map((c, i) => { const y = 8 + i * rowH, w = (iw - 60) * CHRLEN[c] / maxL;
-    return `<text x="40" y="${y + 8}" class="axm" text-anchor="end">${c.replace('chr','')}</text><rect x="48" y="${y + 2}" width="${w}" height="7" rx="3.5" fill="${css('--sunk')}" stroke="${css('--line')}"/>` + sites.filter(s => s.chrom === c).map(s => { const x = 48 + (s.start / CHRLEN[c]) * w; const hit = s.mm === 0 && s.chrom === CHR && Math.abs(s.start - OFF - (s.role === 'F' ? pm.fStart : pm.rStart)) < 3;
+    return `<text x="40" y="${y + 8}" class="axm" text-anchor="end">${c.replace('chr','')}</text><rect x="48" y="${y + 2}" width="${w}" height="7" rx="3.5" fill="${css('--sunk')}" stroke="${css('--line')}"/>` + sites.filter(s => s.chrom === c).map(s => { const x = 48 + (s.start / CHRLEN[c]) * w; const hit = s.mm === 0 && s.chrom === pm.chrom && s.strand === (s.role === 'F' ? '+' : '-') && s.start === pm.tplOff + (s.role === 'F' ? pm.fStart : pm.rStart);
       return `<rect x="${x - 1.2}" y="${y - (s.role === 'F' ? 1 : -3)}" width="${hit ? 3.4 : 2.4}" height="${hit ? 13 : 8}" fill="${hit ? css('--ok') : s.role === 'F' ? css('--fwd') : css('--rev')}" opacity="${hit ? 1 : s.mm <= 1 ? .95 : s.mm === 2 ? .7 : .4}" data-tip="${esc(`<b>${s.role} · ${s.chrom}:${(s.start+1).toLocaleString('tr-TR')} (${s.strand})</b><br>${s.mm} uyumsuzluk${hit ? ' · HEDEF' : ''}<br><span class='m'>${s.mask}</span>`)}"/>`; }).join(''); }).join('')}</svg>
-    <div class="legend"><span><i class="dot" style="background:var(--ok)"></i>hedef (chr22)</span><span><i class="dot" style="background:var(--fwd)"></i>F yeri</span><span><i class="dot" style="background:var(--rev)"></i>R yeri</span><span class="faint">soluk = daha çok uyumsuzluk</span></div>`;
+    <div class="legend"><span><i class="dot" style="background:var(--ok)"></i>hedef (${esc(pm.chrom)})</span><span><i class="dot" style="background:var(--fwd)"></i>F yeri</span><span><i class="dot" style="background:var(--rev)"></i>R yeri</span><span class="faint">soluk = daha çok uyumsuzluk</span></div>`;
   const drawAln = () => { const role = STATE.specRole || 'F', mm = STATE.specMM ?? 9; const primer = role === 'F' ? pm.F : pm.R; const list = p.bindings[role].top.filter(s => s.mm <= mm);
     const tgt = role === 'F' ? pm.fStart : pm.rStart;
-    const head = siteAlignHTML(primer, primer, D.meta.contract.anchor_length);
-    $('#alnList', host).innerHTML = `<div class="siterow" style="background:var(--sunk)"><div class="loc"><b>${role === 'F' ? 'Forward' : 'Reverse'} primer</b> 5′→3′</div><div class="aln">${head.top}</div><div class="tiny faint">3′ çapa: son ${D.meta.contract.anchor_length} nt</div></div>` +
-      list.map(s => { const al = siteAlignHTML(primer, s.site, D.meta.contract.anchor_length); const hit = s.mm === 0 && s.chrom === CHR && Math.abs(s.start - OFF - tgt) < 3;
+    const head = siteAlignHTML(primer, primer, contract.anchor_length);
+    $('#alnList', host).innerHTML = `<div class="siterow" style="background:var(--sunk)"><div class="loc"><b>${role === 'F' ? 'Forward' : 'Reverse'} primer</b> 5′→3′</div><div class="aln">${head.top}</div><div class="tiny faint">3′ çapa: son ${contract.anchor_length} nt</div></div>` +
+      list.map(s => { const al = siteAlignHTML(primer, s.site, contract.anchor_length); const hit = s.mm === 0 && s.chrom === pm.chrom && s.strand === (role === 'F' ? '+' : '-') && s.start === pm.tplOff + tgt;
         return `<div class="siterow ${hit ? 'hit' : ''}"><div class="loc"><b>${s.chrom}:${(s.start + 1).toLocaleString('tr-TR')}</b> (${s.strand})${hit ? ' · <span style="color:var(--ok);font-weight:700">hedef</span>' : ''}</div><div class="aln">${al.bot}</div><div class="row" style="gap:6px;justify-content:flex-end">${s.mm === 0 ? sev(hit ? 'PASS' : 'FAIL', hit ? 'tam · hedef' : 'tam eşleşme') : `<span class="chip mono">${s.mm} mm</span>`}${s.anchored ? '<span class="tag">3′ sağlam</span>' : ''}</div></div>`; }).join('') +
-      `<div class="siterow"><div class="tiny faint" style="grid-column:1/-1">Toplam ${p.bindings[role].n} yerden en yakın ${p.bindings[role].top.length} tanesi pakette. Tam liste: <span class="mono">reference_py/out/panel_design_ctdna/panel.bindings.tsv</span></div></div>`; };
+      `<div class="siterow"><div class="tiny faint" style="grid-column:1/-1">Toplam ${p.bindings[role].n} yerden en yakın ${p.bindings[role].top.length} tanesi pakette. ${scan ? 'En düşük uyumsuzluklu yerler gösteriliyor.' : 'Kaynak: kayıtlı proje paneli.'}</div></div>`; };
+  bindPairActions(host, pm);
   drawAln();
   $$('#roleSeg button', host).forEach(b => b.onclick = () => { STATE.specRole = b.dataset.role; $$('#roleSeg button', host).forEach(x => x.setAttribute('aria-pressed', x === b)); drawAln(); });
   $$('#mmSeg button', host).forEach(b => b.onclick = () => { STATE.specMM = +b.dataset.mm; $$('#mmSeg button', host).forEach(x => x.setAttribute('aria-pressed', x === b)); drawAln(); });
 }
-function offtHTML(pm) {
-  const p = pm.raw; if (!p.offtarget.length) return `<div class="row" style="gap:10px">${sev('PASS', 'yok')}<span class="small muted">Sözleşme aralığında hedef dışı ürün oluşmuyor (SPC-03 INFO). Bu çift için tek ürün: hedef ${pm.prod} bp.</span></div>`;
+function offtHTML(pm, p, contract, summary) {
+  if (!p.offtarget.length) return `<div class="row" style="gap:10px">${sev('PASS', 'yok')}<span class="small muted">Arama sözleşmesi içinde hedef dışı ürün raporlanmadı. Beklenen hedef ürün sayısı ${summary.products_intended}.</span></div>`;
   const maskRow = (primer, mask) => primer.split('').map((c, i) => mask[i] === 'X' ? `<span class="mm">${c}</span>` : '<span>.</span>').join('');
-  const findSite = (role, chrom, pos) => p.bindings[role].top.find(s => s.chrom === chrom && Math.abs(s.start - pos) < 40);
-  return p.offtarget.map(o => { const sf = findSite('F', o.chrom, o.amplicon_start), sr = findSite('R', o.chrom, o.amplicon_start + o.amplicon_length - pm.R.length);
-    const fa = sf ? siteAlignHTML(pm.F, sf.site).bot : maskRow(pm.F, o.left_mask), ra = sr ? siteAlignHTML(pm.R, sr.site).bot : maskRow(pm.R, o.right_mask);
-    return `<div style="padding:12px 18px;border-bottom:1px solid var(--line)"><div class="row" style="gap:8px;margin-bottom:8px"><b class="mono">${o.chrom}:${(o.amplicon_start+1).toLocaleString('tr-TR')}</b><span class="chip"><b>${o.amplicon_length}</b> bp</span><span class="chip">${o.total_mismatches} toplam uyumsuzluk</span><span class="tag">${esc(o.class)}</span>${o.left_anchor_intact === 'True' || o.left_anchor_intact === true ? '<span class="tag">F 3′ sağlam</span>' : ''}${o.right_anchor_intact === 'True' || o.right_anchor_intact === true ? '<span class="tag">R 3′ sağlam</span>' : ''}<span class="sp" style="flex:1"></span>${sev(o.amplicon_length >= 60 && o.amplicon_length <= 100 ? 'WARN' : 'INFO', o.amplicon_length >= 60 && o.amplicon_length <= 100 ? 'profil penceresinde' : 'pencere dışı boy')}</div>
-      <div class="aln small"><span class="lbl">F  5′ </span>${seqC(pm.F)}<span class="lbl"> 3′</span>\n<span class="lbl">   yer </span>${fa}\n<span class="lbl">R  5′ </span>${seqC(pm.R)}<span class="lbl"> 3′</span>\n<span class="lbl">   yer </span>${ra}</div></div>`; }).join('');
+  const findSite = (role, chrom, pos, strand) => p.bindings[role].top.find(s => s.chrom === chrom && s.start === pos && s.strand === strand);
+  return p.offtarget.map(o => { const lr = o.left_role || 'F', rr = o.right_role || 'R', single = lr === rr;
+    const sf = findSite(lr, o.chrom, o.left_position ?? o.amplicon_start, '+'), sr = findSite(rr, o.chrom, o.right_position ?? o.amplicon_start + o.amplicon_length - pm[rr].length, '-');
+    const fa = sf ? siteAlignHTML(pm[lr], sf.site, contract.anchor_length).bot : maskRow(pm[lr], o.left_mask), ra = sr ? siteAlignHTML(pm[rr], sr.site, contract.anchor_length).bot : maskRow(pm[rr], o.right_mask);
+    return `<div style="padding:12px 18px;border-bottom:1px solid var(--line)"><div class="row" style="gap:8px;margin-bottom:8px"><b class="mono">${o.chrom}:${(o.amplicon_start+1).toLocaleString('tr-TR')}</b><span class="chip"><b>${o.amplicon_length}</b> bp</span><span class="chip">${o.total_mismatches} toplam uyumsuzluk</span><span class="chip" title="sol site + iplikte, sağ site − iplikte">${lr}→ ←${rr}${single ? ' · tek primer' : ''}</span><span class="tag">${esc(o.class || (o.total_mismatches === 0 ? 'tam eşleşmeli' : 'uyumsuzluklu'))}</span>${o.left_anchor_intact === 'True' || o.left_anchor_intact === true ? `<span class="tag">sol ${lr} 3′ sağlam</span>` : ''}${o.right_anchor_intact === 'True' || o.right_anchor_intact === true ? `<span class="tag">sağ ${rr} 3′ sağlam</span>` : ''}<span class="sp" style="flex:1"></span>${o.total_mismatches === 0 ? sev('FAIL','tam hedef dışı') : sev('WARN','hedef dışı')}</div>
+      <div class="aln small"><span class="lbl">${lr}  5′ </span>${seqC(pm[lr])}<span class="lbl"> 3′</span>\n<span class="lbl">   yer </span>${fa}\n<span class="lbl">${rr}  5′ </span>${seqC(pm[rr])}<span class="lbl"> 3′</span>\n<span class="lbl">   yer </span>${ra}</div></div>`; }).join('');
 }
-function kvHTML(obj) { return `<div class="kv">${Object.entries(obj || {}).map(([k, v]) => `<div>${esc(tidyKey(k))}</div><div class="mono">${esc(typeof v === 'object' ? JSON.stringify(v) : v)}</div>`).join('')}</div>`; }
+function kvHTML(obj) { return `<div class="kv">${Object.entries(obj || {}).filter(([k]) => !technicalField(k)).map(([k, v]) => `<div>${esc(tidyKey(k))}</div><div class="mono">${esc(typeof v === 'object' ? evidenceJson(v) : v)}</div>`).join('')}</div>`; }
 function ckCard(id, e) {
   const c = CATI[id] || {name: id}; if (!e) return '';
   const recs = (e.recs || []).filter(r => !r.ne);
@@ -146,20 +195,35 @@ const fmtv = x => typeof x === 'number' ? (Math.abs(x) > 0 && Math.abs(x) < 1e-3
 
 /* ---- varyant (SNPCheck) ---- */
 function tabVar(host, pm, E) {
+  const liveVar = pm.kind === 'live' || !!pm.liveVariants;
+  if (liveVar && !pm.liveVariants?.evaluated) {
+    const result = pm.liveVariants;
+    const retry = liveReady() ? `<div class="row live-actions">
+      ${pairAction(pm, 'variants', 'Varyant verisini yeniden sorgula')}</div>${jobNotice('variants:' + pm.key)}` : '';
+    host.innerHTML = `<div class="stack">${result ? renderLocalOutput('variants', result) : liveNote('Bu çift için gnomAD kaydı henüz alınmadı.')}${retry}</div>`;
+    bindPairActions(host, pm);
+    return;
+  }
   if (!pm.hasVar) { host.innerHTML = `<div class="verdict na"><div class="ic">${ic('snp')}</div><div><h3>Bu şablon için varyant verisi yok</h3><div class="small muted">gnomAD v4 önbelleği yalnız proje bölgesini (chr22:20.000.001–20.001.000) kapsar. Başka bölgeler için <code>RUN_VARIANT.cmd</code> ile varyant önbelleği oluşturun.</div></div></div>`; return; }
   const vr = ['VAR-01','VAR-02','VAR-03','VAR-04','VAR-06','VAR-07','VAR-08'];
   const vsev = worst(vr.map(id => E[id] && E[id].sev).filter(Boolean));
-  const ampV = varsIn(pm.fEnd + 1, pm.rStart - 1);
+  const ampV = varsIn(pm.fEnd + 1, pm.rStart - 1, pm);
   host.innerHTML = `<div class="stack">
-    <div class="verdict ${vsev === 'FAIL' ? 'fail' : vsev === 'WARN' ? 'warn' : 'ok'}"><div class="ic">${ic(vsev === 'INFO' ? 'ok' : 'warn')}</div><div><h3>${vsev === 'FAIL' ? 'Yaygın varyant primer altında' : vsev === 'WARN' ? 'Primer altında incelenmesi gereken varyant var' : 'Primer altında anlamlı varyant yok'}</h3><div class="small">gnomAD v4 genom (r4) · ${varsIn(pm.fStart, pm.rEnd).length} varyant amplikonda · ${varsIn(pm.fStart, pm.fEnd).length} F altında · ${varsIn(pm.rStart, pm.rEnd).length} R altında · eşikler literatür başlangıç değeri (kalibre değil)</div></div><span class="sp" style="flex:1"></span>${sev(vsev)}</div>
+    <div class="verdict ${vsev === 'FAIL' ? 'fail' : vsev === 'WARN' ? 'warn' : 'ok'}"><div class="ic">${ic(vsev === 'INFO' ? 'ok' : 'warn')}</div><div><h3>${vsev === 'FAIL' ? 'Yaygın varyant primer altında' : vsev === 'WARN' ? 'Primer altında incelenmesi gereken varyant var' : 'Primer altında anlamlı varyant yok'}</h3><div class="small">gnomAD v4 genom (r4) · ${varsIn(pm.fStart, pm.rEnd, pm).length} varyant amplikonda · ${varsIn(pm.fStart, pm.fEnd, pm).length} F altında · ${varsIn(pm.rStart, pm.rEnd, pm).length} R altında</div></div><span class="sp" style="flex:1"></span>${sev(vsev)}</div>
     ${['F','R'].map(role => `<div class="card"><div class="hd"><h2>${role === 'F' ? 'Forward' : 'Reverse'} primer bağlanma yeri</h2><span class="faint small">${pm.chrom}:${gposAny(pm, footprint(pm, role)[0])}–${gposAny(pm, footprint(pm, role)[1])} · ${role === 'F' ? '+' : '−'} iplik</span><span class="sp"></span>${(pm.kind === 'project' ? ['VAR-01','VAR-02','VAR-03'] : ['VAR-01','VAR-02','VAR-03']).map(id => { const r = (E[id]?.recs || []).find(x => x.role === role); return r ? `<span class="chip">${id} ${sev(r.sev)}</span>` : ''; }).join('')}</div>
       <div class="bd"><div class="scrollx" id="snp${role}"></div><div class="g2" style="margin-top:14px"><div id="lol${role}"></div><div class="scrollx" id="vt${role}"></div></div></div></div>`).join('')}
     <div class="card"><div class="hd"><h2>Motor kayıtları</h2><span class="faint small">variant_qc.py · VAR ailesi (kodun kural numaralandırması)</span></div><div class="bd"><div class="ccgrid">${vr.map(id => E[id] ? ckCard(id, E[id]) : '').join('')}</div></div></div>
+    ${liveVar ? liveResult('gnomAD · amplikon ve primer bölgeleri', `<div class="scrollx" id="liveVarTrack"></div><p class="small muted">${pm.liveVariants.variants.length ? 'İşaretlerin üzerine gelerek alel ve frekans bilgisine bakabilirsiniz.' : 'Sorgu tamamlandı. Bu amplikonda kayıtlı varyant bulunmadı.'}</p>`) : ''}
     <div class="card"><div class="hd"><h2>Primerler arası varyantlar</h2><span class="faint small">amplifikasyonu engellemez; prob/blocker tasarımı için bilgi</span></div><div class="bd small">${ampV.length ? `${ampV.length} varyant · AF ≥ %0,1: ${ampV.filter(v => v.af >= 0.001).map(v => `<span class="chip mono">${esc(v.rsid)} ${esc(v.ref)}>${esc(v.alt)} ${afFmt(v.af)}</span>`).join(' ') || 'yok'}` : 'Yok'}</div></div>
+    ${liveVar ? liveResult('Amplikonla örtüşen varyantlar', localRows(pm.liveVariants.variants,
+      [['pos','Konum'],['rsid','rsID'],['ref','Referans'],['alt','Alternatif'],['genome_af','Genom AF'],['exome_af','Ekzom AF'],['af','Kullanılan AF']])) : ''}
   </div>`;
+  const liveTrack = $('#liveVarTrack', host);
+  if (liveTrack) liveTrack.innerHTML = overviewTrack(Math.max(345, W_OF(liveTrack)), {tpl:pm.tpl, off:pm.tplOff,
+    pairs:[pm], win:[pm.fStart, pm.rEnd + 1], showGC:false, variantPair:pm, interactive:false});
   for (const role of ['F','R']) {
     const [lo, hi] = footprint(pm, role); const flank = 6; const a = Math.max(0, lo - flank), b = Math.min(pm.tpl.length - 1, hi + flank);
-    const vs = varsIn(a, b); const primer = role === 'F' ? pm.F : pm.R;
+    const vs = varsIn(a, b, pm); const primer = role === 'F' ? pm.F : pm.R;
     // SNPCheck kutuları: primer 5'->3' yönünde göster
     const idxs = []; for (let i = a; i <= b; i++) idxs.push(i); if (role === 'R') idxs.reverse();
     const baseAt = i => role === 'F' ? pm.tpl[i] : OS.COMP[pm.tpl[i]];
@@ -175,7 +239,7 @@ function tabVar(host, pm, E) {
     o.push(`<text x="${p3 - 2}" y="14" text-anchor="end" style="font:700 10px var(--sans);fill:${css('--rev')}">3′ ucu · son 5 nt (VAR-02 penceresi)</text>`);
     $('#snp' + role, host).innerHTML = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="SNPCheck görünümü">${o.join('')}</svg>`;
     // lolipop: konum vs log AF
-    const inV = varsIn(lo, hi); const Lw = Math.max(280, W_OF($('#lol' + role, host)));
+    const inV = varsIn(lo, hi, pm); const Lw = Math.max(280, W_OF($('#lol' + role, host)));
     const pts = inV.map(v => ({x: primer.length - 1 - dist3(pm, role, v.idx), y: Math.log10(Math.max(v.af || 1e-7, 1e-7)), v}));
     const m = {l:46, r:10, t:12, b:30}, iw = Lw - m.l - m.r, ih = 170 - m.t - m.b; const X = k => m.l + (k + .5) / primer.length * iw, Yv = y => m.t + ih - (y + 6.5) / 6.5 * ih;
     const g = [`<rect x="${X(primer.length - 5.5)}" y="${m.t}" width="${X(primer.length - .5) - X(primer.length - 5.5)}" height="${ih}" fill="${css('--rev')}" opacity=".08"/>`];
@@ -192,12 +256,14 @@ function tabVar(host, pm, E) {
 
 /* ---- yapı & dimer ---- */
 function tabStruct(host, pm, E) {
-  const pr = role => pm.kind === 'project' ? pm.raw.primers[role] : null;
+  const motor = pm.kind === 'live' || !!pm.liveQC;
+  if (motor && !pm.liveQC) { host.innerHTML = liveNote('Bu çift için yapı ve dimer QC kaydı bulunamadı.'); return; }
+  const hasStructureRecords = motor || pm.kind === 'project';
   const recVal = (id, role) => { const r = (E[id]?.recs || []).find(x => x.role === role && !x.ne); return r ? r.value : null; };
   const dCard = (title, sub, anyV, p3V, list, sevs) => `<div class="card"><div class="hd"><h2>${title}</h2><span class="faint small">${sub}</span><span class="sp"></span>${sevs}</div><div class="bd">
-      <div class="sub-h">En kararlı yapı (her konum)</div>${anyV && anyV.alignment ? dimerHTML(anyV.alignment) : '<div class="faint small">Kararlı yapı yok</div>'}
+      <div class="sub-h">En kararlı yapı (her konum)</div>${anyV && anyV.alignment ? '<div class="scrollx">' + dimerHTML(anyV.alignment) + '</div>' : '<div class="faint small">Kararlı yapı yok</div>'}
       ${anyV && anyV.alignment ? `<div class="row small" style="gap:14px;margin-top:8px"><span>ΔG₃₇ <b class="mono">${nf(anyV.dG37_kcal_mol,2)}</b> kcal/mol</span><span>ΔH <b class="mono">${nf(anyV.dH_kcal_mol,1)}</b></span><span>ΔS <b class="mono">${nf(anyV.dS_cal_mol_K,1)}</b></span><span>helis <b class="mono">${anyV.helix_len}</b> bp</span>${anyV.mismatch_count ? '<span class="tag">1 iç uyumsuzluk</span>' : ''}${anyV.bulge_count ? '<span class="tag">1 bulge</span>' : ''}</div>` : ''}
-      <div class="sub-h" style="margin-top:14px">3′ uçlu, uzatılabilir yapı</div>${p3V && p3V.alignment ? dimerHTML(p3V.alignment) + `<div class="small" style="margin-top:6px">ΔG₃₇ <b class="mono">${nf(p3V.dG37_kcal_mol,2)}</b> kcal/mol · helis ${p3V.helix_len} bp</div>` : '<div class="faint small">3′ ucu eşleşen yapı yok — uzama riski düşük</div>'}
+      <div class="sub-h" style="margin-top:14px">3′ uçlu, uzatılabilir yapı</div>${p3V && p3V.alignment ? '<div class="scrollx">' + dimerHTML(p3V.alignment) + '</div>' + `<div class="small" style="margin-top:6px">ΔG₃₇ <b class="mono">${nf(p3V.dG37_kcal_mol,2)}</b> kcal/mol · helis ${p3V.helix_len} bp</div>` : '<div class="faint small">3′ ucu eşleşen yapı yok — uzama riski düşük</div>'}
       ${list && list.length ? `<details style="margin-top:12px"><summary class="small" style="cursor:pointer;font-weight:600">Diğer olası yapılar (${list.length})</summary>${list.map(d => `<div style="border-top:1px dashed var(--line);padding:8px 0">${dimerHTML(d.alignment)}<div class="tiny faint">ΔG₃₇ ${nf(d.dG,2)} kcal/mol · ${d.helix_len} bp${d.three_prime_paired ? ' · 3′ eşleşmiş' : ''}</div></div>`).join('')}</details>` : ''}
     </div></div>`;
   const sevPair = (a, b) => [a, b].map((id, k) => { const r = E[id]; return r ? `<span class="chip">${id} ${sev(r.recs.filter(x => x.role === (k === 0 ? 'X' : 'X')).length ? 'INFO' : r.sev)}</span>` : ''; }).join('');
@@ -205,7 +271,7 @@ function tabStruct(host, pm, E) {
   const alts = (a, b, best) => OS.dimerList(a, b, 5).filter(d => !best || Math.abs(d.dG - best.dG37_kcal_mol) > 1e-6).slice(0, 4);
   const hetA = recVal('DIM-03', 'pair'), het3 = recVal('DIM-04', 'pair');
   host.innerHTML = `<div class="stack">
-    <div class="note">${ic('info')}<div>Dimer modeli: <b>${pm.kind === 'project' ? 'motor kaydı' : 'motor portu'}</b> · WC yığınları + en fazla bir iç uyumsuzluk (Allawi-Peyret) ya da tek bazlık bulge (SantaLucia-Hicks 2004; A·T kapanış sabiti ${D.engine_params.at_bulge_closure_dg37} kcal/mol, proje modelleme kararı). <span class="bd" style="color:var(--accent)">┃</span> G·C, <span style="color:var(--ink3)">│</span> A·T bağı, <span style="color:var(--fail)">×</span> uyumsuzluk, <span style="color:var(--fail)">^</span> bulge.</div></div>
+    <div class="note">${ic('info')}<div>Dimer modeli: <b>${hasStructureRecords ? 'Analiz kaydı' : 'motor portu'}</b> · WC yığınları + en fazla bir iç uyumsuzluk (Allawi-Peyret) ya da tek bazlık bulge (SantaLucia-Hicks 2004; A·T kapanış sabiti ${D.engine_params.at_bulge_closure_dg37} kcal/mol, proje modelleme kararı). <span class="bd" style="color:var(--accent)">┃</span> G·C, <span style="color:var(--ink3)">│</span> A·T bağı, <span style="color:var(--fail)">×</span> uyumsuzluk, <span style="color:var(--fail)">^</span> bulge.</div></div>
     <div class="g3">
       ${dCard('Forward self-dimer', 'DIM-01 · DIM-02', recVal('DIM-01','F'), recVal('DIM-02','F'), alts(pm.F, pm.F, recVal('DIM-01','F')), sevRole(['DIM-01','DIM-02'],'F'))}
       ${dCard('Reverse self-dimer', 'DIM-01 · DIM-02', recVal('DIM-01','R'), recVal('DIM-02','R'), alts(pm.R, pm.R, recVal('DIM-01','R')), sevRole(['DIM-01','DIM-02'],'R'))}
@@ -214,26 +280,72 @@ function tabStruct(host, pm, E) {
     <div class="g2">${['F','R'].map(role => { const s = role === 'F' ? pm.F : pm.R; const ss01 = recVal('SS-01', role); const hp = OS.hairpinStem(s); const ss02 = recVal('SS-02', role);
       const db = ss01 && ss01.dot_bracket ? ss01.dot_bracket : null;
       return `<div class="card"><div class="hd"><h2>${role === 'F' ? 'Forward' : 'Reverse'} · hairpin</h2><span class="faint small">SS-01 · SS-02</span><span class="sp"></span>${sevRole(['SS-01','SS-02'], role)}</div><div class="bd">
-        ${pm.kind === 'project' && db ? `<div class="sub-h">Motor: Zuker MFE (fold.zuker_mfe)</div><div class="scrollx">${hairpinSVG(s, db)}</div><div class="small">MFE <b class="mono">${nf(ss01.mfe_kcal_mol,2)}</b> kcal/mol · nokta-parantez <span class="mono">${esc(db)}</span></div>` : ''}
+        ${hasStructureRecords && db ? `<div class="sub-h">Motor: Zuker MFE (fold.zuker_mfe)</div><div class="scrollx">${hairpinSVG(s, db)}</div><div class="small">MFE <b class="mono">${nf(ss01.mfe_kcal_mol,2)}</b> kcal/mol · nokta-parantez <span class="mono">${esc(db)}</span></div>` : ''}
+        ${`
         <div class="sub-h" style="margin-top:12px">En güçlü sap adayı (align.hairpin_stem)</div>
-        ${hp ? `<div class="row" style="gap:16px;align-items:flex-start"><div>${stemLoopSVG(s, hp)}</div><div class="small" style="display:grid;gap:4px;min-width:150px"><span>Sap ΔG₃₇ <b class="mono">${nf(hp.dG,2)}</b> kcal/mol</span><span>sap ${hp.helix_len} bp · ilmek ${hp.loop} nt</span><span>3′ ucu sapta: <b>${hp.three_prime_paired ? 'evet' : 'hayır'}</b></span><span class="faint tiny">Yalnız yığın enerjisi; ilmek cezası eklenmez. ΔG > 0 ise yapı kararsızdır.</span>${ss02 ? `<span>SS-02 sap ΔG <b class="mono">${nf(ss02.stem_dG37_kcal_mol,2)}</b> · uzatılabilir: ${ss02.three_prime_extendable ? 'evet' : 'hayır'}</span>` : ''}</div></div>` : '<div class="faint small">En az 2 bp sap yok</div>'}
+        ${hp ? `<div class="row" style="gap:16px;align-items:flex-start"><div>${stemLoopSVG(s, hp)}</div><div class="small" style="display:grid;gap:4px;min-width:150px"><span>Sap ΔG₃₇ <b class="mono">${nf(hp.dG,2)}</b> kcal/mol</span><span>sap ${hp.helix_len} bp · ilmek ${hp.loop} nt</span><span>3′ ucu sapta: <b>${hp.three_prime_paired ? 'evet' : 'hayır'}</b></span><span class="faint tiny">Yalnız yığın enerjisi; ilmek cezası eklenmez. ΔG > 0 ise yapı kararsızdır.</span>${ss02 ? `<span>SS-02 sap ΔG <b class="mono">${nf(ss02.stem_dG37_kcal_mol,2)}</b> · uzatılabilir: ${ss02.three_prime_extendable ? 'evet' : 'hayır'}</span>` : ''}</div></div>` : '<div class="faint small">En az 2 bp sap yok</div>'}`}
       </div></div>`; }).join('')}</div>
-    ${pm.kind === 'project' ? `<div class="g2"><div class="card"><div class="hd"><h2>Kalıp erişilebilirliği</h2><span class="faint small">SS-03 · McCaskill eşleşmemiş olasılığı, bağlanma bölgesi</span></div><div class="bd" id="ss03"></div></div>
+    ${hasStructureRecords ? `<div class="g2"><div class="card"><div class="hd"><h2>Primer bazlarının erişilebilirliği</h2><span class="faint small">SS-03 · bazın eşleşmemiş olma olasılığı</span></div><div class="bd" id="ss03"></div></div>
       <div class="card"><div class="hd"><h2>Amplikon ikincil yapısı</h2><span class="faint small">SS-04 · tek iplik amplikon MFE</span><span class="sp"></span>${E['SS-04'] ? sev(E['SS-04'].sev) : ''}</div><div class="bd" id="ss04"></div></div></div>` : ''}
   </div>`;
-  if (pm.kind === 'project') {
+  if (hasStructureRecords) {
     const host3 = $('#ss03', host); const w = Math.max(300, W_OF(host3) - 36);
     host3.innerHTML = ['F','R'].map(role => { const v = recVal('SS-03', role); if (!v || !v.p_unpaired_by_base) return ''; const s = role === 'F' ? pm.F : pm.R; const n = v.p_unpaired_by_base.length, bw = (w - 40) / n;
-      return `<div class="sub-h">${role} · 3′ ortalaması ${nf(v.mean_p_unpaired_3p,3)}</div><svg width="${w}" height="96" viewBox="0 0 ${w} 96">${v.p_unpaired_by_base.map((p, i) => `<rect x="${34 + i*bw + 1}" y="${8 + (1-p)*60}" width="${bw-2}" height="${p*60}" rx="2" fill="${p < .5 ? css('--warn') : role === 'F' ? css('--fwd') : css('--rev')}" opacity=".85" data-tip="${role} ${i+1}. baz ${s[i] || ''}: p(eşleşmemiş) ${nf(p,3)}"/><text x="${34 + i*bw + bw/2}" y="84" text-anchor="middle" class="seqt" style="font-size:9px;fill:${css('--n'+(s[i]||'N'))}">${s[i] || ''}</text>`).join('')}<text x="2" y="12" class="axm">1,0</text><text x="2" y="70" class="axm">0</text><line x1="34" x2="${w}" y1="38" y2="38" stroke="${css('--grid')}" stroke-dasharray="3 3"/></svg>`; }).join('') + `<div class="tiny faint">Kalıbın kendi yapısı bağlanma yerini kapatıyorsa olasılık düşer (sarı &lt; 0,5).</div>`;
-    const s4 = (E['SS-04']?.recs || [])[0]; const h4 = $('#ss04', host);
+      return `<div class="sub-h">${role} · 3′ ortalaması ${nf(v.mean_p_unpaired_3p,3)}</div><svg width="${w}" height="96" viewBox="0 0 ${w} 96">${v.p_unpaired_by_base.map((p, i) => `<rect x="${34 + i*bw + 1}" y="${8 + (1-p)*60}" width="${bw-2}" height="${p*60}" rx="2" fill="${p < .5 ? css('--warn') : role === 'F' ? css('--fwd') : css('--rev')}" opacity=".85" data-tip="${role} ${i+1}. baz ${s[i] || ''}: p(eşleşmemiş) ${nf(p,3)}"/><text x="${34 + i*bw + bw/2}" y="84" text-anchor="middle" class="seqt" style="font-size:9px;fill:${css('--n'+(s[i]||'N'))}">${s[i] || ''}</text>`).join('')}<text x="2" y="12" class="axm">1,0</text><text x="2" y="70" class="axm">0</text><line x1="34" x2="${w}" y1="38" y2="38" stroke="${css('--grid')}" stroke-dasharray="3 3"/></svg>`; }).join('') + `<div class="tiny faint">Primer kendi içinde eşleştiğinde bu olasılık düşer (sarı &lt; 0,5).</div>`;
+    const s4 = (E['SS-04']?.recs || []).find(r => Number.isFinite(r.value?.structure_tm_c)); const h4 = $('#ss04', host);
     if (s4) { const v = s4.value; h4.innerHTML = `<div class="mini-stats" style="grid-template-columns:repeat(3,1fr)"><div><div class="k">MFE</div><div class="v">${nf(v.amplicon_mfe_kcal_mol,2)}</div></div><div><div class="k">Tm (yapı)</div><div class="v">${nf(v.structure_tm_c,1)} °C</div></div><div><div class="k">Baz çifti</div><div class="v">${v.n_base_pairs}</div></div></div>
       ${gaugeHTML(v.structure_tm_c, 20, 90, [{a:20,b:50,c:css('--ok'),op:.3},{a:50,b:60,c:css('--warn'),op:.4},{a:60,b:90,c:css('--fail'),op:.35}], x => nf(x,0), ' °C')}
       <div class="small muted" style="margin-top:8px">Eşik: WARN Tm_yapı &gt; 50 °C, FAIL &gt; 60 °C · Ta ${v.anneal_c} °C. ${esc(s4.note || '')}</div>`; }
+    else h4.innerHTML = '<p class="small muted">Amplikon ikincil yapısı için ölçüm yok.</p>';
   }
+  if (motor) host.firstElementChild.insertAdjacentHTML('beforeend', qualityCheckCards(E, ['DIM-', 'SS-', 'AMP-']));
 }
 
 /* ---- termodinamik ---- */
+function tabLiveThermo(host, pm, E) {
+  const qc = pm.liveQC;
+  if (!qc) { host.innerHTML = liveNote('Bu çift için termodinamik QC kaydı bulunamadı.'); return; }
+  const get = (id, role) => E[id]?.recs.find(r => r.role === role && r.value)?.value;
+  const roles = ['F', 'R'];
+  const ta = get('TH-03', 'F')?.ta_c ?? pm.cond.ta;
+  const tmValues = roles.map(role => qc.thermo?.[role]?.tm_c).filter(Number.isFinite);
+  const series = roles.map(role => ({role, pts:qc.melting_curves?.[role] || [], c:css(role === 'F' ? '--fwd' : '--rev'), dash:role === 'R' ? '6 4' : undefined}));
+  const canPlot = series.every(s => s.pts.length > 1);
+  host.innerHTML = `<div class="stack">
+    ${canPlot ? liveResult('Primer erime eğrileri · θ(T)', `
+      <div class="row doc-legend"><span><i class="dot" style="background:var(--fwd)"></i>İleri primer</span>
+      <span><i class="dot" style="background:var(--rev)"></i>Geri primer (kesikli)</span><span>Kesikli çizgi: Ta ${nf(ta,1)} °C</span></div>
+      <div id="liveThermoPlot" class="scrollx"></div>
+      <p class="small muted">θ(T), modelin o sıcaklıkta hedefe bağlı olduğunu öngördüğü primer oranıdır. Tm’de θ ≈ 0,5.</p>`) :
+      liveNote('Bu QC kaydında eğri noktaları yok. Yeni bir tasarımda eğriler otomatik oluşturulur.')}
+    <div class="g2">${roles.map(role => {
+      const t = qc.thermo?.[role];
+      const bound = get('TH-03', role);
+      const salt = get('TH-02', role);
+      return liveResult(role === 'F' ? 'İleri primer (F)' : 'Geri primer (R)', `
+        <div class="mini-stats thermo-stats"><div><div class="k">Tm</div><div class="v">${nf(t?.tm_c,2)} °C</div></div>
+        <div><div class="k">Bağlanma oranı · θ(Ta)</div><div class="v">${nf(bound?.theta_at_ta,3)}</div></div>
+        <div><div class="k">Tuz modelleri arası Tm farkı</div><div class="v">${nf(salt?.spread_c,2)} °C</div></div></div>`);
+    }).join('')}</div>
+    ${qualityCheckCards(E, ['TH-', 'COND-', 'PAIR-'])}
+  </div>`;
+  if (!canPlot) return;
+  const plot = $('#liveThermoPlot', host);
+  const range = [...tmValues, ta].filter(Number.isFinite);
+  const full = series[0].pts;
+  const x0 = range.length ? Math.max(full[0][0], Math.floor(Math.min(...range) - 8)) : full[0][0];
+  const x1 = range.length ? Math.min(full.at(-1)[0], Math.ceil(Math.max(...range) + 8)) : full.at(-1)[0];
+  for (const s of series) s.pts = s.pts.filter(([x]) => x >= x0 && x <= x1);
+  plot.innerHTML = lineChart(W_OF(plot), 245, series, {
+    x0, x1, y0:0, y1:1, xlabel:'Sıcaklık (°C)', yticks:[0,.25,.5,.75,1], yfmt:y=>nf(y,2),
+    vlines:Number.isFinite(ta) ? [{x:ta, t:'Ta', end:ta > (x0+x1)/2}] : [],
+    hover:i => `<b>${nf(series[0].pts[i][0],1)} °C</b><br>${series.map(s => s.role + ' · θ ' + nf(s.pts[i]?.[1],3)).join('<br>')}`
+  });
+  $('svg', plot).setAttribute('aria-label', 'İleri ve geri primerin sıcaklığa göre bağlanma oranı');
+}
+
 function tabThermo(host, pm, E) {
+  if (pm.kind === 'live' || pm.liveQC) { tabLiveThermo(host, pm, E); return; }
   const c = pm.cond; const tF = OS.thermo(pm.F, c, pm.salt), tR = OS.thermo(pm.R, c, pm.salt);
   const prof = PROFILES[pm.profile] || PROFILES.ctdna; const [tlo, thi] = prof.tm_window_c;
   const col = role => { const s = role === 'F' ? pm.F : pm.R, t = role === 'F' ? tF : tR, sp = OS.saltSpread(s, c), d3 = OS.dG3(s), hv = OS.halves(s);
@@ -281,7 +393,7 @@ function tabEvidence(host, pm, E) {
   const pass = x => (f === 'all' || (f === 'eval' && x.e.sev) || x.e.sev === f || (f === 'ne' && !x.e.sev && x.e.status !== 'profile' && x.e.status !== 'pend') || (f === 'profile' && x.e.status === 'profile') || (f === 'pend' && x.e.status === 'pend')) && (!q || (x.r.id + ' ' + x.r.name + ' ' + x.r.method).toLowerCase().includes(q));
   host.innerHTML = `<div class="stack"><div class="card"><div class="bd">
     <div class="row" style="justify-content:space-between;gap:16px"><div><div class="eyebrow">Bu çift için QC kataloğu</div><h2 style="font-size:19px;margin-top:4px">${cnt.eval} kural kanıtla değerlendirildi · ${cnt.FAIL} FAIL · ${cnt.WARN} WARN</h2>
-      <div class="small muted" style="margin-top:4px">${cnt.ne} kural bu çift için koşulmadı ya da panel düzeyinde · ${cnt.profile} kural ${esc(pm.profile)} profilinde uygulanmaz · ${cnt.pend} kural altyapı bekliyor. Kutucuğa tıklayın: değer, eşik, model ve kaynak dosya.</div></div>
+      <div class="small muted" style="margin-top:4px">${cnt.ne} kural bu çift için koşulmadı ya da panel düzeyinde · ${cnt.profile} kural ${esc(pm.profile)} profilinde uygulanmaz · ${cnt.pend} kural altyapı bekliyor. Ölçümü, eşiği ve modeli görmek için bir kurala tıklayın.</div></div>
       <div style="display:flex;height:12px;border-radius:6px;overflow:hidden;width:min(320px,100%);background:var(--sunk)">${[['FAIL','--fail'],['WARN','--warn'],['INFO','--info']].map(([k, v]) => `<i style="width:${cnt[k]/CAT.length*100}%;background:var(${v})"></i>`).join('')}<i style="width:${cnt.ne/CAT.length*100}%;background:var(--line2)"></i><i style="width:${cnt.pend/CAT.length*100}%;background:var(--probe);opacity:.6"></i></div></div>
     <div class="row" style="margin-top:14px;gap:10px"><div class="seg" id="evSeg">${[['all','Tümü ' + CAT.length],['FAIL','FAIL ' + cnt.FAIL],['WARN','WARN ' + cnt.WARN],['eval','Değerlendirilen ' + cnt.eval],['ne','Koşulmadı ' + cnt.ne],['profile','Profil dışı ' + cnt.profile],['pend','Bekliyor ' + cnt.pend]].map(([k, t]) => `<button data-f="${k}" aria-pressed="${f === k}">${t}</button>`).join('')}</div>
       <input type="text" id="evQ" placeholder="Kural ara: TH-02, dimer, varyant…" value="${esc(STATE.evQ || '')}" style="max-width:260px"></div></div></div>
@@ -297,14 +409,28 @@ function roleSummary(e) { const by = {}; e.recs.filter(r => !r.ne && r.sev).forE
 /* ---- kural çekmecesi ---- */
 document.addEventListener('click', e => {
   const b = e.target.closest('[data-rule]'); if (!b) return; const id = b.dataset.rule;
-  const pm = STATE.view === 'cift' ? getPair(STATE.pair) : null; const E = pm ? (pm._E || evidenceFor(pm)) : null; openRule(id, E ? E[id] : null, pm);
+  const pm = STATE.view === 'cift' ? getPair(STATE.pair) : STATE.view === 'dokumantasyon' && STATE.docSection === 'cift' ? getPair(STATE.docPair) : null; const E = pm ? (pm._E || evidenceFor(pm)) : null; openRule(id, E ? E[id] : null, b);
 });
-function openRule(id, e, pm) {
-  const r = CATI[id] || {id, name:id, method:'', scope:'', fam:'', status:'', where:''}; const st = STATUS[r.status] || {t:r.status, c:'NA'};
-  const dv = document.createElement('div'); dv.className = 'drawer'; dv.innerHTML = `<div class="pane" role="dialog" aria-modal="true" aria-label="${esc(id)}">
-    <div class="row" style="justify-content:space-between;align-items:flex-start"><div><div class="eyebrow">${esc(FAMTR[r.fam] || r.fam)} · ${esc(r.scope)}</div><h3 style="margin-top:4px"><span class="mono">${esc(id)}</span> · ${esc(r.name)}</h3></div><button class="iconbtn" data-close aria-label="Kapat">${ic('x')}</button></div>
-    <p class="small muted" style="margin:10px 0">${esc(r.method || '—')}</p>
-    <div class="row" style="gap:6px;margin-bottom:14px">${sev(st.c, st.t)}${e && e.sev ? sev(e.sev) : ''}<span class="chip mono" style="white-space:normal">${esc(r.where || '')}</span></div>
+function openRule(id, e, opener) {
+  const r = CATI[id];
+  if (!r) return;
+  const st = STATUS[r.status] || {t:'Bekleyen', c:'NA'};
+  const dv = document.createElement('dialog');
+  dv.className = 'qc-dialog';
+  dv.setAttribute('aria-labelledby', 'qc-rule-title');
+  dv.innerHTML = `<div class="qc-dialog-body">
+    <header class="qc-dialog-head">
+      <div><div class="eyebrow">${esc(FAMTR[r.fam])}</div><span class="mono qc-code">${esc(id)}</span>
+      <h2 id="qc-rule-title">${esc(r.name)}</h2></div>
+      <button class="iconbtn" type="button" data-close aria-label="Kapat" autofocus>${ic('x')}</button>
+    </header>
+    <div class="row qc-dialog-meta"><span class="small muted">Katalog kapsamı</span>${sev(st.c, st.t)}</div>
+    <div class="qc-explain">
+      <section><div class="qc-explain-mark" aria-hidden="true">01</div><div><h3>Neyi kontrol eder?</h3><p>${esc(r.check)}</p></div></section>
+      <section><div class="qc-explain-mark" aria-hidden="true">02</div><div><h3>Neden önemli?</h3><p>${esc(r.why)}</p></div></section>
+    </div>
+    ${QC_SCOPE_NOTES[id] ? `<div class="note">${ic('info')}<div><b>Bu kurulumun kapsamı</b><p>${esc(QC_SCOPE_NOTES[id])}</p></div></div>` : ''}
+    ${e && e.sev ? `<div class="row qc-dialog-meta"><span class="small muted">Seçili çiftin sonucu</span>${sev(e.sev)}</div>` : ''}
     ${e ? (e.recs.length ? e.recs.map(x => `<div style="border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:10px">
         <div class="row" style="gap:6px;margin-bottom:8px">${x.role ? `<span class="tag">${esc(x.role)}</span>` : ''}<span class="tag ${x.src === 'tarayıcı' ? 'br' : 'eng'}">${esc(x.src)}</span>${x.id !== id ? `<span class="tag">${esc(x.id)}</span>` : ''}<span class="sp" style="flex:1"></span>${x.sev ? sev(x.sev) : sev('NA', 'değerlendirilmedi')}</div>
         ${x.value && x.value.alignment ? dimerHTML(x.value.alignment) : ''}
@@ -312,14 +438,17 @@ function openRule(id, e, pm) {
         ${x.thr && Object.keys(x.thr).length ? `<div class="small" style="margin-top:8px"><span class="faint">Eşik</span> ${Object.entries(x.thr).map(([k, v]) => `<span class="chip mono">${esc(k)}: ${esc(v)}</span>`).join(' ')}</div>` : ''}
         ${x.note ? `<div class="small muted" style="margin-top:8px">${esc(x.note)}</div>` : ''}
         ${x.model ? `<details style="margin-top:8px"><summary class="tiny" style="cursor:pointer">model künyesi</summary>${kvHTML(x.model)}</details>` : ''}</div>`).join('')
-        : `<div class="note">${ic('info')}<div>${esc(e.reason || 'Bu çift için kayıt yok.')}</div></div>`) : `<div class="note">${ic('info')}<div>Bir çift seçildiğinde bu kuralın kanıtı burada görünür.</div></div>`}
-    ${e && e.recs.length ? `<details style="margin-top:6px"><summary class="small" style="cursor:pointer;font-weight:600">Ham kanıt kaydı (JSON)</summary><pre class="json" style="margin-top:8px">${esc(JSON.stringify(e.recs, null, 2))}</pre></details>` : ''}
-    <div class="tiny faint" style="margin-top:14px">param_set_sha256 ${esc(D.meta.seqpair_param_sha)} · REP-03: eşikler kalibre değil</div></div>`;
+        : `<div class="note">${ic('info')}<div>${esc(e.reason || 'Bu çift için kayıt yok.')}</div></div>`) : ''}
+    ${e && e.recs.length ? `<details style="margin-top:6px"><summary class="small" style="cursor:pointer;font-weight:600">Ham kanıt kaydı (JSON)</summary><pre class="json" style="margin-top:8px">${esc(evidenceJson(e.recs, 2))}</pre></details>` : ''}
+    </div>`;
   document.body.appendChild(dv);
-  const close = () => dv.remove(); dv.addEventListener('click', ev => { if (ev.target === dv || ev.target.closest('[data-close]')) close(); });
-  document.addEventListener('keydown', function k(ev) { if (ev.key === 'Escape') { close(); document.removeEventListener('keydown', k); } });
-  dv.querySelector('[data-close]').focus();
+  dv.addEventListener('click', ev => { if (ev.target === dv || ev.target.closest('[data-close]')) dv.close(); });
+  dv.addEventListener('close', () => {
+    dv.remove();
+    if (opener?.isConnected) opener.focus({preventScroll:true});
+  }, {once:true});
+  dv.showModal();
 }
 function flatten(v, pre='', out={}) { if (v == null || typeof v !== 'object' || Array.isArray(v)) { out[pre || 'değer'] = Array.isArray(v) ? (v.length > 12 ? `[${v.slice(0, 12).map(fmtv).join(', ')} … ${v.length}]` : JSON.stringify(v.map(fmtv))) : fmtv(v); return out; }
-  for (const [k, x] of Object.entries(v)) { if (k === 'alignment') continue; if (x && typeof x === 'object' && !Array.isArray(x) && Object.keys(x).length < 12) flatten(x, pre ? pre + '.' + k : k, out); else out[pre ? pre + '.' + k : k] = Array.isArray(x) ? (x.length > 10 ? `[${x.slice(0, 10).map(y => typeof y === 'object' ? JSON.stringify(y) : fmtv(y)).join(', ')} … ${x.length}]` : JSON.stringify(x)) : fmtv(x); }
+  for (const [k, x] of Object.entries(v)) { if (k === 'alignment' || technicalField(k)) continue; if (x && typeof x === 'object' && !Array.isArray(x) && Object.keys(x).length < 12) flatten(x, pre ? pre + '.' + k : k, out); else out[pre ? pre + '.' + k : k] = Array.isArray(x) ? (x.length > 10 ? `[${x.slice(0, 10).map(y => typeof y === 'object' ? JSON.stringify(y) : fmtv(y)).join(', ')} … ${x.length}]` : JSON.stringify(x)) : fmtv(x); }
   return out; }

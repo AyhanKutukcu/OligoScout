@@ -1,0 +1,54 @@
+{
+  "machine": "AMD Ryzen 9 9950X (VM, 2 vCPU, 3 GiB RAM), Ubuntu 22.04, native Linux kernel; PPFM index read from the connected Windows folder mount; single search thread",
+  "note": "Repeated runs, warm page cache after the first. Test #81 full-panel numbers from the original i5-12500H/WSL2 run are kept separately in specificity_test81.",
+  "runs": {
+    "ctdna_anchored": {
+      "n": 5,
+      "search_s_mean": 26.16,
+      "search_s_sd": 0.12,
+      "search_s_min": 25.9707,
+      "search_s_max": 26.2795,
+      "max_rss_mib": 660.5,
+      "products": 27
+    },
+    "ctdna_sensitive": {
+      "n": 5,
+      "search_s_mean": 28.98,
+      "search_s_sd": 0.12,
+      "search_s_min": 28.884,
+      "search_s_max": 29.2239,
+      "max_rss_mib": 660.6,
+      "products": 728
+    },
+    "t81_64_anchored": {
+      "n": 5,
+      "search_s_mean": 26.69,
+      "search_s_sd": 0.15,
+      "search_s_min": 26.4892,
+      "search_s_max": 26.8947,
+      "max_rss_mib": 660.6,
+      "products": 1684
+    },
+    "t81_64_sensitive": {
+      "n": 5,
+      "search_s_mean": 42.96,
+      "search_s_sd": 0.08,
+      "search_s_min": 42.8986,
+      "search_s_max": 43.1021,
+      "max_rss_mib": 662.5,
+      "products": 95153
+    },
+    "test81_1024_anchored": {
+      "n": 4,
+      "search_s_mean": 33.73,
+      "search_s_sd": 0.41,
+      "search_s_min": 33.3638,
+      "search_s_max": 34.4127,
+      "max_rss_mib": 684.5,
+      "bindings": 8262803,
+      "hetero_products": 425055,
+      "single_primer_products": 569666,
+      "oracle_match": "bindings 8,262,803 and hetero products 425,055 equal the Test #81 oracle"
+    }
+  }
+}

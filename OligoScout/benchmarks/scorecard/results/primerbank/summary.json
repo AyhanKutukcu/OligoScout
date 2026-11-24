@@ -1,0 +1,86 @@
+{
+ "source": "PrimerBank (pga.mgh.harvard.edu), mouse, searched by gene symbol; validation pages read 2026-11-22",
+ "pairs_collected": 121,
+ "genes": 89,
+ "with_validation_page": 121,
+ "works_sequence_confirmed": 101,
+ "profile": "rt_qpcr (default conditions)",
+ "by_outcome": {
+  "sequence_confirmed": {
+   "pairs": 101,
+   "worst": {
+    "WARN": 56,
+    "FAIL": 45
+   },
+   "fail_rate": 0.446,
+   "median_amplicon": 131
+  },
+  "expected_not_top_hit": {
+   "pairs": 9,
+   "worst": {
+    "FAIL": 4,
+    "WARN": 5
+   },
+   "fail_rate": 0.444,
+   "median_amplicon": 111
+  },
+  "blast_missing": {
+   "pairs": 11,
+   "worst": {
+    "FAIL": 7,
+    "WARN": 4
+   },
+   "fail_rate": 0.636,
+   "median_amplicon": 111
+  }
+ },
+ "worst_verdict_on_working_pairs": {
+  "WARN": 56,
+  "FAIL": 45
+ },
+ "fail_rate_on_working_pairs": 0.446,
+ "pairs_with_fail_by_check": {
+  "TH-03": 43,
+  "DIM-01": 3,
+  "TH-01": 1
+ },
+ "pairs_with_warn_by_check": {
+  "TH-02": 101,
+  "TH-01": 93,
+  "TH-04": 93,
+  "TH-03": 86,
+  "CMP-08": 45,
+  "PAIR-01": 28,
+  "DIM-01": 19,
+  "CMP-07": 12,
+  "DIM-03": 3,
+  "CMP-05": 2,
+  "SS-02": 1,
+  "DIM-02": 1
+ },
+ "tm_oligoscout_minus_primerbank": {
+  "n": 242,
+  "mean": 1.59,
+  "sd": 0.33
+ },
+ "limits": [
+  "'blast_missing' (no sequencing/BLAST result) is a weak failure proxy: PrimerBank notes short products (<75 bp) often fail sequencing; too few for sensitivity/AUC",
+  "specificity not evaluated: OligoScout indexes GRCh38 only",
+  "gene list is a convenience sample of well-studied genes"
+ ],
+ "th03_by_annealing_c": {
+  "60": {
+   "working_pairs_failing_TH03": 43,
+   "of": 101
+  },
+  "58": {
+   "working_pairs_failing_TH03": 0,
+   "of": 101
+  },
+  "56": {
+   "working_pairs_failing_TH03": 0,
+   "of": 101
+  }
+ },
+ "reading": "PrimerBank recommends 60 C annealing. At 60 C OligoScout's TH-03 (bound fraction < 0.80) fails pairs that were sequence-confirmed, because OligoScout's Tm under 50 mM Na+/1.5 mM Mg2+ sits near 60-64 C for these primers; TH-02 (salt-model spread > 2 C) warns on every primer. Both thresholds are uncalibrated (REP-03) and this sample argues for relaxing them."
+}

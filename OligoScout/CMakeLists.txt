@@ -86,6 +86,7 @@ add_library(
     src/strand_aware_primer_search.cpp
     src/primer_pair_search.cpp
     src/primer_pair_assembler.cpp
+    src/terminal_rule_search.cpp
     src/mismatch_features.cpp
     src/biological_mismatch_profile.cpp
     src/thermodynamic_backend.cpp
@@ -1350,6 +1351,19 @@ target_link_libraries(
 # Search and pair assembly only; no thermodynamics, no Primer3.
 # ------------------------------------------------------------
 
+# SPC-08: brute-force scan of sequences outside the PPFM index (chrM, ALT, patches)
+add_executable(
+    oligoscout_contig_scan
+    tools/oligoscout_contig_scan.cpp
+)
+
+find_package(Threads REQUIRED)
+target_link_libraries(
+    oligoscout_contig_scan
+    PRIVATE
+        Threads::Threads
+)
+
 add_executable(
     oligoscout_panel
     tools/oligoscout_panel.cpp
@@ -2120,6 +2134,40 @@ target_link_libraries(
 add_test(
     NAME primer_pair_assembler_equivalence
     COMMAND test_primer_pair_assembler_equivalence
+)
+
+
+add_executable(
+    test_single_primer_products
+    tests/test_single_primer_products.cpp
+)
+
+target_link_libraries(
+    test_single_primer_products
+    PRIVATE
+        primerpair_core
+)
+
+add_test(
+    NAME single_primer_products
+    COMMAND test_single_primer_products
+)
+
+
+add_executable(
+    test_terminal_rule_search
+    tests/test_terminal_rule_search.cpp
+)
+
+target_link_libraries(
+    test_terminal_rule_search
+    PRIVATE
+        primerpair_core
+)
+
+add_test(
+    NAME terminal_rule_search
+    COMMAND test_terminal_rule_search
 )
 
 

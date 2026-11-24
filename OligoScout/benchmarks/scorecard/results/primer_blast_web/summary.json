@@ -1,0 +1,266 @@
+{
+ "benchmark": "OligoScout sensitive mode vs NCBI Primer-BLAST web (2026-11-22)",
+ "primer_blast_settings": {
+  "database": "Genomes for selected organisms (primary reference assembly)",
+  "organism": "Homo sapiens (taxid:9606)",
+  "TOTAL_PRIMER_SPECIFICITY_MISMATCH": 2,
+  "PRIMER_3END_SPECIFICITY_MISMATCH": 2,
+  "MISMATCH_REGION_LENGTH": 5,
+  "TOTAL_MISMATCH_IGNORE": 6,
+  "MAX_TARGET_SIZE": 3000,
+  "note": "Default specificity stringency; Primer-BLAST lists targets up to TOTAL_MISMATCH_IGNORE, so its list is filtered here to products whose both sites have <=3 mismatches and <=1 in the 3'-terminal 5 nt (the rule OligoScout --mode sensitive implements)."
+ },
+ "oligoscout_settings": {
+  "mode": "sensitive",
+  "max_mismatches": 3,
+  "terminal_window": 5,
+  "terminal_max_mismatches": 1,
+  "amplicon": [
+   50,
+   3000
+  ],
+  "single_primer_products": true
+ },
+ "pairs": 31,
+ "pairs_detail": "20 ctDNA test designs (DESIGN_000-019) + 11 ready-made catalog pairs",
+ "primer_blast_products_listed": 2229,
+ "primer_blast_products_both_sites_le3mm": 742,
+ "primer_blast_products_rule_satisfying": 654,
+ "primer_blast_listed_but_violating_terminal_rule": 88,
+ "rule_products_also_found_by_oligoscout": 653,
+ "rule_products_missed_by_oligoscout": [
+  {
+   "pair": "DESIGN_015",
+   "product": "NT_187392.1:84605:69",
+   "explanation": "On chr22 unlocalized scaffold NT_187392.1 (HSCHR22_UNLOCALIZED_CTG7), 3/3 mismatches with 0 in the terminal 5 nt; part of the primary assembly but outside the 24-chromosome PPFM index. Found by SPC-08 in sensitive mode (oligoscout_contig_scan, <=3 mm + terminal rule) as NT_187392.1:84605 69 bp after this comparison; the earlier SPC-08 used <=2 mm."
+  }
+ ],
+ "primary_chromosome_recall": "653/653 (100%)",
+ "oligoscout_products": 740,
+ "oligoscout_only_products": 87,
+ "oligoscout_only_explanation": "Products satisfying the rule that Primer-BLAST did not report (BLAST word-seeding misses, e.g. DESIGN_000/001/011 chr5:40812528 2891 bp, DESIGN_007 chr1:87298596 89 bp). None was listed by Primer-BLAST with a different mismatch count.",
+ "kras_catalog_note": "CAT_KRAS_G12_G13: Primer-BLAST also reports the KRASP1 pseudogene product chr6:54770597 62 bp (1/1 mismatches), as OligoScout sensitive mode does.",
+ "per_pair_os_pbRule_matched_pbListed": {
+  "DESIGN_000": [
+   4,
+   1,
+   1,
+   2
+  ],
+  "DESIGN_001": [
+   5,
+   1,
+   1,
+   5
+  ],
+  "DESIGN_002": [
+   1,
+   1,
+   1,
+   3
+  ],
+  "DESIGN_003": [
+   1,
+   1,
+   1,
+   7
+  ],
+  "DESIGN_004": [
+   1,
+   1,
+   1,
+   2
+  ],
+  "DESIGN_005": [
+   2,
+   2,
+   2,
+   12
+  ],
+  "DESIGN_006": [
+   1,
+   1,
+   1,
+   26
+  ],
+  "DESIGN_007": [
+   24,
+   15,
+   15,
+   23
+  ],
+  "DESIGN_008": [
+   1,
+   1,
+   1,
+   27
+  ],
+  "DESIGN_009": [
+   54,
+   46,
+   46,
+   363
+  ],
+  "DESIGN_010": [
+   1,
+   1,
+   1,
+   11
+  ],
+  "DESIGN_011": [
+   4,
+   1,
+   1,
+   9
+  ],
+  "DESIGN_012": [
+   314,
+   282,
+   282,
+   794
+  ],
+  "DESIGN_013": [
+   1,
+   1,
+   1,
+   4
+  ],
+  "DESIGN_014": [
+   2,
+   2,
+   2,
+   34
+  ],
+  "DESIGN_015": [
+   301,
+   277,
+   276,
+   761
+  ],
+  "DESIGN_016": [
+   3,
+   3,
+   3,
+   45
+  ],
+  "DESIGN_017": [
+   3,
+   2,
+   2,
+   8
+  ],
+  "DESIGN_018": [
+   3,
+   1,
+   1,
+   14
+  ],
+  "DESIGN_019": [
+   2,
+   2,
+   2,
+   12
+  ],
+  "CAT_KRAS_G12_G13": [
+   2,
+   2,
+   2,
+   3
+  ],
+  "CAT_NRAS_Q61": [
+   1,
+   1,
+   1,
+   3
+  ],
+  "CAT_BRAF_V600": [
+   1,
+   1,
+   1,
+   1
+  ],
+  "CAT_EGFR_exon19del": [
+   1,
+   1,
+   1,
+   3
+  ],
+  "CAT_EGFR_T790": [
+   1,
+   1,
+   1,
+   2
+  ],
+  "CAT_EGFR_L858": [
+   1,
+   1,
+   1,
+   37
+  ],
+  "CAT_PIK3CA_E545": [
+   1,
+   1,
+   1,
+   6
+  ],
+  "CAT_PIK3CA_H1047": [
+   1,
+   1,
+   1,
+   1
+  ],
+  "CAT_IDH1_R132": [
+   1,
+   1,
+   1,
+   3
+  ],
+  "CAT_JAK2_V617": [
+   1,
+   1,
+   1,
+   1
+  ],
+  "CAT_TP53_R248": [
+   1,
+   1,
+   1,
+   7
+  ]
+ },
+ "primer_blast_job_keys": {
+  "DESIGN_000": "hoxb2vYm-47ctGuxZtFPgxzKXrEx2UWsMA",
+  "DESIGN_001": "gohf3vIm_47YtG-xYtFLgxjKWrE12UGsNA",
+  "DESIGN_002": "Ymi_MU_qQkJlfEd5ShljSzACcnkdEWlkHA",
+  "DESIGN_003": "gIpd3PAm_Y7atG2xYNFJgxrKWLE32UOsNg",
+  "DESIGN_004": "iYNXqTRlOc0e8yP2LpYHxFSNFvZ5ng3reA",
+  "DESIGN_005": "jIZR0Pwm8Y7WtGGxbNFFgxbKVLE72U-sOg",
+  "DESIGN_006": "i4FW1_sm9o7RtGaxa9FCgxHKU7E82UisPQ",
+  "DESIGN_007": "iIJV1Pgm9Y7StGWxaNFBgxLKULE_2UusPg",
+  "DESIGN_008": "aGK1O0XqSEJvfE15QBlpSzoCeHkXEWNkFg",
+  "DESIGN_009": "t71q68cmyo7ttFqxV9F-gy3Kb7EA2XSsAQ",
+  "DESIGN_010": "ioBUqjdlOs0d8yD2LZYExFeNFfZ6ng7rew",
+  "DESIGN_011": "s7lu78Mmzo7ptF6xU9F6gynKa7EE2XCsBQ",
+  "DESIGN_012": "joRQrjNlPs0Z8yT2KZYAxFONEfZ-ngrrfw",
+  "DESIGN_013": "gYtfoTxlMc0W8yv2JpYPxFyNHvZxngXrcA",
+  "DESIGN_014": "vrRj4s4mw47ktFOxXtF3gyTKZrEJ2X2sCA",
+  "DESIGN_015": "lZ9IxrvptkGRf7N6vhqXSMQBhnrpEp1n6A",
+  "DESIGN_016": "gIpeoD1lMM0X8yr2J5YOxF2NH_ZwngTrcQ",
+  "DESIGN_017": "gohcoj9lMs0V8yj2JZYMxF-NHfZyngbrcw",
+  "DESIGN_018": "v7Vi488mwo7ltFKxX9F2gyXKZ7EI2XysCQ",
+  "DESIGN_019": "h41ZpzplN80Q8y32IJYJxFqNGPZ3ngPrdg",
+  "CAT_KRAS_G12_G13": "kZtMwr_pskGVf7d6uhqTSMABgnrtEpln7A",
+  "CAT_NRAS_Q61": "npRDzbDpvUGaf7h6tRqcSM8BjXriEpZn4w",
+  "CAT_BRAF_V600": "mpBEuidlKs0N8zD2PZYUxEeNBfZqnh7raw",
+  "CAT_EGFR_exon19del": "vLZh4MwmwY7mtFGxXNF1gybKZLEL2X-sCg",
+  "CAT_EGFR_T790": "n5VBvyJlL80I8zX2OJYRxEKNAPZvnhvrbg",
+  "CAT_EGFR_L858": "mJJFy7bpu0Gcf756sxqaSMkBi3rkEpBn5Q",
+  "CAT_PIK3CA_E545": "uLJl5MgmxY7itFWxWNFxgyLKYLEP2XusDg",
+  "CAT_PIK3CA_H1047": "ubNk5ckmxI7jtFSxWdFwgyPKYbEO2XqsDw",
+  "CAT_IDH1_R132": "pqx7-tYm2478tEuxRtFvgzzKfrER2WWsEA",
+  "CAT_JAK2_V617": "kJpOsC1lIM0H8zr2N5YexE2ND_ZgnhTrYQ",
+  "CAT_TP53_R248": "gIpd067po0GEf6Z6qxqCSNEBk3r8Eohn_Q"
+ },
+ "rule_products_found_including_spc08": "654/654 (100%)",
+ "spc08_change": "SPC-08 now follows the search mode: sensitive -> <=3 mismatches, <=1 in the 3'-terminal 5 nt (was always <=2 mm + 3-nt anchor)."
+}

@@ -1,0 +1,114 @@
+{
+  "primers": 2048,
+  "pairs": 1024,
+  "seconds": 15.0,
+  "conditions": {
+    "na_mM": 50.0,
+    "mg_mM": 1.5,
+    "dntp_mM": 0.6,
+    "primer_nM": 200.0
+  },
+  "primer3_version_hint": "third_party/primer3/src (built in WSL, gcc -O2)",
+  "A_tm_1M_aligned_conc": {
+    "n": 2048,
+    "mean_diff": 0.0,
+    "sd_diff": 0.0,
+    "mae": 0.0,
+    "max_abs": 0.0001,
+    "pearson_r": 1.0,
+    "spearman_rho": 1.0
+  },
+  "B_tm_default_each_tool": {
+    "n": 2048,
+    "mean_diff": 0.9948,
+    "sd_diff": 0.2282,
+    "mae": 0.9948,
+    "max_abs": 1.8328,
+    "pearson_r": 0.9052,
+    "spearman_rho": 0.6604
+  },
+  "C_tm_same_salt_model_aligned_conc": {
+    "n": 2048,
+    "mean_diff": -0.0,
+    "sd_diff": 0.0,
+    "mae": 0.0,
+    "max_abs": 0.0001,
+    "pearson_r": 1.0,
+    "spearman_rho": 1.0
+  },
+  "D_heterodimer_dG37": {
+    "n": 1024,
+    "mean_diff": -0.007,
+    "sd_diff": 0.4624,
+    "mae": 0.2529,
+    "max_abs": 3.5954,
+    "pearson_r": 0.9617,
+    "spearman_rho": 0.961,
+    "flag_agreement": {
+      "threshold_kcal_mol": -6.0,
+      "both_flag": 126,
+      "oligoscout_only": 14,
+      "primer3_only": 23,
+      "neither": 861,
+      "agreement": 0.9639,
+      "cohen_kappa": 0.851
+    }
+  },
+  "E_selfdimer_dG37": {
+    "n": 2048,
+    "mean_diff": 0.0895,
+    "sd_diff": 0.709,
+    "mae": 0.36,
+    "max_abs": 4.49,
+    "pearson_r": 0.9446,
+    "spearman_rho": 0.9376,
+    "flag_agreement": {
+      "threshold_kcal_mol": -6.0,
+      "both_flag": 344,
+      "oligoscout_only": 32,
+      "primer3_only": 84,
+      "neither": 1588,
+      "agreement": 0.9434,
+      "cohen_kappa": 0.8207
+    }
+  },
+  "F_hairpin_dG37": {
+    "n": 2048,
+    "mean_diff": 0.2649,
+    "sd_diff": 0.3977,
+    "mae": 0.2779,
+    "max_abs": 2.348,
+    "pearson_r": 0.3453,
+    "spearman_rho": 0.3771,
+    "flag_agreement": {
+      "threshold_kcal_mol": -2.0,
+      "both_flag": 0,
+      "oligoscout_only": 1,
+      "primer3_only": 6,
+      "neither": 2041,
+      "agreement": 0.9966,
+      "cohen_kappa": -0.0008
+    }
+  },
+  "notes": [
+    "A isolates the NN layer: OligoScout uses C (primer excess), primer3 C/4; oligotm is given -d 4*C.",
+    "B is what users see: different salt model (Owczarzy 2008 vs SantaLucia 1998) AND concentration convention.",
+    "D-F: ntthal includes multiple loops/defects; OligoScout dimers are WC stacks + <=1 internal mismatch or 1-nt bulge, plus (since v0.4) the best end term per helix end (dangle, double dangle or terminal mismatch) exactly as ntthal selects them."
+  ],
+  "dimer_model": "nn_single_internal_mismatch_or_bulge+end_terms (dangling ends, double dangle, terminal mismatch)",
+  "previous_dimer_model": {
+    "model": "nn_single_internal_mismatch_or_bulge (no end terms)",
+    "D_heterodimer_dG37": {
+      "mean_diff": 1.7985,
+      "sd_diff": 0.6654,
+      "pearson_r": 0.9168,
+      "cohen_kappa": 0.4094
+    },
+    "E_selfdimer_dG37": {
+      "mean_diff": 1.9113,
+      "sd_diff": 1.0162,
+      "pearson_r": 0.8844,
+      "cohen_kappa": 0.4656
+    }
+  }
+}

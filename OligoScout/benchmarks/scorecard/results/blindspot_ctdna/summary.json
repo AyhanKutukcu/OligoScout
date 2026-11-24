@@ -1,0 +1,66 @@
+{
+  "label": "ctdna_20pairs",
+  "primers": 22,
+  "pairs": 20,
+  "contract": {
+    "max_mismatches": 3,
+    "anchor_nt": 12,
+    "pb_rule": "<=1 mismatch in 3' 5 nt",
+    "product_bp": [
+      50,
+      3000
+    ]
+  },
+  "sites": {
+    "all": 39049,
+    "anchored": 4931,
+    "pb_relevant": 32546,
+    "blind_spot": 27615,
+    "anchored_not_pb": 0,
+    "blind_spot_terminal_3p_mismatch": 2354
+  },
+  "blind_spot_fraction_of_pb_relevant": 0.8485,
+  "blind_spot_mismatch_distance_from_3p": {
+    "1": 2354,
+    "2": 1735,
+    "3": 2581,
+    "4": 3456,
+    "5": 3228,
+    "6": 5609,
+    "7": 4086,
+    "8": 2614,
+    "9": 2484,
+    "10": 5081,
+    "11": 6899,
+    "12": 7826
+  },
+  "products": {
+    "all_le3mm": 829,
+    "single_primer_le3mm": 104,
+    "oligoscout": 26,
+    "anchored_single_primer": 1,
+    "primer_blast_rule": 728,
+    "pb_not_oligoscout": 701,
+    "pb_not_oligoscout_max1mm_per_site": 0,
+    "pb_not_oligoscout_max2mm_per_site": 38,
+    "oligoscout_not_pb": 0,
+    "pairs_with_pb_extra": 13,
+    "pairs_with_pb_extra_max2mm": 3
+  },
+  "verify_sites_vs_oligoscout": {
+    "oligoscout_unique_sites": 4931,
+    "exhaustive_anchored_sites": 4931,
+    "intersection": 4931,
+    "only_oligoscout": 0,
+    "only_exhaustive": 0,
+    "exact_match": true
+  },
+  "verify_products_vs_oligoscout": {
+    "oligoscout_products": 27,
+    "exhaustive_anchored_products": 27,
+    "includes_single_primer": true,
+    "single_primer_in_oligoscout": 1,
+    "pairs_mismatching": [],
+    "exact_match": true
+  }
+}

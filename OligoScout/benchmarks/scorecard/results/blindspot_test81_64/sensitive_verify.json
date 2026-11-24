@@ -1,0 +1,13 @@
+{
+  "label": "test81_64",
+  "search_mode": "sensitive_terminal_rule",
+  "search_seconds": 40.2592,
+  "sites_bruteforce": 498315,
+  "sites_oligoscout": 498315,
+  "only_bruteforce": 0,
+  "only_oligoscout": 0,
+  "products_bruteforce": 95153,
+  "products_oligoscout": 95153,
+  "pairs_mismatching": [],
+  "exact_match": true
+}

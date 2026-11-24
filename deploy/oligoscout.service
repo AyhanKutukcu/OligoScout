@@ -1,0 +1,30 @@
+# OligoScout — systemd service (public deployment)
+# Install:  sudo cp deploy/oligoscout.service /etc/systemd/system/oligoscout.service
+#           sudo systemctl daemon-reload
+#           sudo systemctl enable --now oligoscout
+# Adjust User= and the /opt/oligoscout paths if you cloned elsewhere.
+
+[Unit]
+Description=OligoScout web engine (local HTTP app on 127.0.0.1:8765)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=oligoscout
+Group=oligoscout
+WorkingDirectory=/opt/oligoscout/web
+Environment=OLIGOSCOUT_ALLOWED_HOSTS=oligoscout.org,www.oligoscout.org
+Environment=OLIGOSCOUT_PUBLIC_SCHEME=https
+Environment=OLIGOSCOUT_GNOMAD_API=1
+ExecStart=/usr/bin/python3 /opt/oligoscout/web/local_server.py --port 8765
+Restart=on-failure
+RestartSec=3
+
+# Hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+
+[Install]
+WantedBy=multi-user.target

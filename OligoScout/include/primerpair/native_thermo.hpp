@@ -131,7 +131,8 @@ struct DimerResult {
 // -- QC yardimcilari ---------------------------------------------------------
 [[nodiscard]] double terminal_dG37(std::string_view seq, int window = 5);
 [[nodiscard]] DimerResult best_dimer(std::string_view a, std::string_view b,
-                                     std::string_view mode = "any");
+                                     std::string_view mode = "any",
+                                     bool end_terms = true);
 [[nodiscard]] inline DimerResult self_dimer(std::string_view a,
                                             std::string_view mode = "any") {
     return best_dimer(a, a, mode);

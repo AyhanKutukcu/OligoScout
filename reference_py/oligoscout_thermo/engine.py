@@ -17,7 +17,7 @@ from typing import Any
 
 from . import align, concentration, fold, nn, params, salt
 
-ENGINE_VERSION = "oligoscout-thermo-ref/0.3.0"
+ENGINE_VERSION = "oligoscout-thermo-ref/0.4.0"
 
 SEVERITY_ORDER = {"INFO": 0, "WARN": 1, "FAIL": 2}
 

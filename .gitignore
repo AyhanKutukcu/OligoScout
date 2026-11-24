@@ -112,3 +112,8 @@ secrets*
 *.orig
 *.rej
 *.before_*
+
+# --- Yerel, depoya girmez ---------------------------------------------------
+# Sunucu erisim bilgisi icerir: asla commit etme
+/deploy/DEPLOY.md
+/_backup_pairview/

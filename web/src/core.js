@@ -14,8 +14,11 @@ const afFmt = a => a==null ? '—' : a >= 0.01 ? (a*100).toLocaleString('tr-TR',
 const sevRank = s => ({FAIL:3, WARN:2, INFO:1, PASS:1, OK:1}[s] || 0);
 const worst = arr => arr.reduce((w, s) => sevRank(s) > sevRank(w) ? s : w, 'INFO');
 const tidyKey = k => String(k).replace(/_/g,' ');
+const technicalField = key => /sha[-_]?256|digest|calibration_status/i.test(key);
+const evidenceJson = (value, space) => JSON.stringify(value, (key, item) => technicalField(key) ? undefined : item, space);
 
 const ICON = {
+  close:'<path d="M6 6l12 12M18 6L6 18"/>',
   home:'<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/>',
   design:'<circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-4.6-4.6M8 10.5h5M10.5 8v5"/>',
   pair:'<path d="M4 7h11l-3-3M20 17H9l3 3"/>',
@@ -85,7 +88,7 @@ const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).
 /* ================= katalog ================= */
 const CAT = D.catalog.map(r => {
   const parts = (r.title || '').split(' / ');
-  return {...r, scope: parts[0] || '', name: parts[1] || (r.id === 'REP-03' ? 'Kalibrasyon durumu beyanı' : r.id === 'VAR-08' ? 'Varyant özeti (çift düzeyi)' : r.id), method: parts.slice(2).join(' / ')};
+  return {...r, ...QC_RULE_GUIDE[r.id], scope: parts[0] || (r.id === 'REP-03' ? 'rapor' : r.id === 'VAR-08' ? 'amplikon' : ''), method: r.id.startsWith('VAR-') ? '' : parts.slice(2).join(' / ')};
 });
 const CATI = Object.fromEntries(CAT.map(r => [r.id, r]));
 const FAMORDER = ['Dizi butunlugu','Kompozisyon','Termodinamik','Ikincil yapi','Dimer','Cift uyumu','Ozgulluk','Amplikon','Prob','ctDNA','mRNA/RT','qPCR','Bisulfit','Multipleks','Varyant','Kosul','NGS','Sanger','Rapor'];
@@ -96,8 +99,8 @@ const STATUS = {
   veri_gerekir_transkriptom_index: {t:'Transkriptom indeksi gerekir', c:'PEND'}
 };
 const isImpl = r => r.status === 'etiketli_uygulandi' || r.status === 'etiketli_kismi';
-const CAT_IMPL = CAT.filter(isImpl).length;            // 86 = 85 tam + SPC-08 kısmi
-const CAT_FULL = CAT.filter(r => r.status === 'etiketli_uygulandi').length;           // 85
+const CAT_IMPL = CAT.filter(isImpl).length;
+const CAT_FULL = CAT.filter(r => r.status === 'etiketli_uygulandi').length;
 
 /* ================= çift modeli ================= */
 const PROFILES = Object.fromEntries((D.app_profiles || []).map(p => [p.profile, p]));
@@ -108,14 +111,18 @@ const PROJ = D.pairs.map(p => ({
   thetaF: p.theta_f_at_ta, thetaR: p.theta_r_at_ta, verdict: p.verdict, spec: p.specificity_verdict, varv: p.variant_verdict,
   score: p.thermo_score, tpl: TPL, tplOff: OFF, chrom: CHR, hasVar: true, profile: 'ctdna', cond: {...COND0}, raw: p
 }));
-const STATE = { view: 'genel', pair: PROJ[0].key, ptab: 'harita', local: [], localTpl: null, design: null, mpxSel: null };
-const getPair = k => PROJ.find(p => p.key === k) || STATE.local.find(p => p.key === k) || PROJ[0];
+const STATE = { view: 'genel', pair: null, docPair: PROJ[0].key, docSection: 'rehber', ptab: 'harita', local: [], localTpl: null, design: null, mpxSel: null };
+const getPair = k => STATE.local.find(p => p.key === k) || PROJ.find(p => p.key === k);
 
 /* varyantlar (gnomAD v4 önbelleği, şablon indeksli) */
-const VARS = (() => { const s = new Set(); return D.variants.filter(v => { const k = v.pos + v.ref + '>' + v.alt; if (s.has(k)) return false; s.add(k); return true; }).sort((a, b) => a.idx - b.idx); })();
+const VARS = (() => { const s = new Set(); return D.variants.filter(v => { if (v.ref_ok === false) return false; const k = v.pos + v.ref + '>' + v.alt; if (s.has(k)) return false; s.add(k); return true; }).sort((a, b) => a.idx - b.idx); })();
 const varClass = af => af >= 0.01 ? 'common' : af >= 0.001 ? 'low' : 'rare';
 const varColor = af => af >= 0.01 ? css('--fail') : af >= 0.001 ? css('--warn') : css('--ink3');
-function varsIn(lo, hi) { return VARS.filter(v => v.idx <= hi && v.idx + Math.max(1, v.ref.length) - 1 >= lo); }
+function varsIn(lo, hi, pm) {
+  const live = pm?.liveVariants;
+  const pool = live?.evaluated ? live.variants.map(v => ({...v, idx:v.pos - 1 - pm.tplOff, pop:v.pop_af, chrom:pm.chrom}))
+    : pm?.kind === 'live' || live?.evaluated === false ? [] : VARS;
+  return pool.filter(v => v.idx <= hi && v.idx + Math.max(1, v.ref.length) - 1 >= lo); }
 function vtype(v) { return v.ref.length === 1 && v.alt.length === 1 ? 'SNV' : v.ref.length > v.alt.length ? 'Delesyon' : 'İnsersiyon'; }
 
 /* ================= kanıt (91 kural) ================= */
@@ -126,6 +133,9 @@ const ROLEN = {forward:'F', reverse:'R'};
 function rec(role, src, c, extra={}) { role = ROLEN[role] || role; return {role, src, id: c.id, sev: c.sev ?? c.severity, value: c.value, thr: c.thr ?? c.threshold, note: c.note, model: c.model, ...extra}; }
 
 function evidenceFor(pm) {
+  if (pm.kind === 'live' || pm.liveQC || pm.liveScan || pm.liveVariants || pm.liveExtras || pm.liveBis) {
+    return liveEvidence(pm);
+  }
   const E = {}; const add = (id, r) => { (E[id] = E[id] || {status:'eval', recs:[]}).recs.push(r); };
   const setNA = (id, status, reason) => { if (!E[id]) E[id] = {status, recs:[], reason}; };
   const browser = (id, role, sev, value, thr, note, model) => add(id, {role, src:'tarayıcı', id, sev, value, thr, note, model});
@@ -168,7 +178,7 @@ function evidenceFor(pm) {
       add(id, {role:'panel', src:'multiplex_qc.py', id: m.check, sev: m.severity, value: m.value, thr: m.threshold, note: m.note, panelLevel:true}); }
   } else {
     localChecks(pm, add, browser);
-    for (const id of ['SPC-01','SPC-02','SPC-03','SPC-04','SPC-05','SPC-06','SPC-07','SPC-09']) setNA(id, 'scan', 'Genom-geneli tarama gerekir (C++ oligoscout_panel → panel_qc.py)');
+    for (const id of ['SPC-01','SPC-02','SPC-03','SPC-04','SPC-05','SPC-06','SPC-07','SPC-09']) setNA(id, 'scan', 'Genom genelinde tarama gerekir');
     for (const id of ['MPX-01','MPX-02','MPX-03','DIM-06']) setNA(id, 'panel', 'Panel düzeyi; Multipleks sayfasında havuz olarak değerlendirilir');
     if (prof === 'ctdna') browser('CT-01', 'amplicon', pm.prod > 100 ? 'FAIL' : 'INFO', {amplicon_bp: pm.prod}, {fail:'> 100 bp'}, 'ctDNA profili', null);
   }
@@ -180,12 +190,9 @@ function evidenceFor(pm) {
     browser('CMP-03', role, ho >= 4 || s.includes('GGGG') ? 'FAIL' : 'INFO', {longest_homopolymer: ho}, {fail:'≥ 4 veya GGGG'}, '', null);
     browser('CMP-04', role, rp >= 4 ? 'FAIL' : 'INFO', {max_repeat_units: rp}, {fail:'≥ 4 ardışık birim'}, '', null); }
   if (!E['SEQ-06']) setNA('SEQ-06', 'eval0', null);
-  if (pm.kind === 'project') { E['SEQ-06'] = {status:'eval', recs:[{role:'template', src:'veri paketi', id:'SEQ-06', sev:'INFO', value:{header: D.meta.header, build:'GRCh38', patch:'p14', bases: TPL.length}, thr:{warn:'FASTA SHA-256 hesaplanamadı'}, note:'FASTA SHA-256 sequence_qc.py çıktısında; bu pakete yalnız başlık alındı'}]}; }
-  else E['SEQ-06'] = {status:'eval', recs:[{role:'template', src:'tarayıcı', id:'SEQ-06', sev: pm.tplName ? 'INFO' : 'WARN', value:{header: pm.tplName || null, bases: pm.tpl.length}, thr:{warn:'referans kimliği beyan edilmedi'}, note:'Yapıştırılan şablonun başlığı'}]};
+  if (pm.kind === 'project' && !E['SEQ-06']?.recs.length) { E['SEQ-06'] = {status:'eval', recs:[{role:'template', src:'veri paketi', id:'SEQ-06', sev:'INFO', value:{header: D.meta.header, build:'GRCh38', patch:'p14', bases: TPL.length}, thr:{}, note:'Kayıtlı FASTA başlığı ve uzunluğu'}]}; }
+  else if (!E['SEQ-06']?.recs.length) E['SEQ-06'] = {status:'eval', recs:[{role:'template', src:'tarayıcı', id:'SEQ-06', sev: pm.tplName ? 'INFO' : 'WARN', value:{header: pm.tplName || null, bases: pm.tpl.length}, thr:{warn:'referans kimliği beyan edilmedi'}, note:'Yapıştırılan şablonun başlığı'}]};
   // rapor
-  E['REP-01'] = {status:'eval', recs:[{role:'panel', src:'veri paketi', id:'REP-01', sev:'INFO', value:{param_set_sha256: D.meta.seqpair_param_sha.slice(0,16)+'…', registry_digest: (D.engine_params.registry_digest||'').slice(0,16)+'…', same: D.meta.seqpair_param_sha === D.engine_params.registry_digest}, thr:{}, note:'Kayıtların parametre digest’i ile params.registry_digest() aynı'}]};
-  E['REP-02'] = {status:'eval', recs:[{role:'panel', src:'veri paketi', id:'REP-02', sev:'INFO', value:{alanlar:'id, value, threshold, severity, model, conditions, param_set_sha256, note'}, thr:{}, note:'Her kayıt kanıt şemasında'}]};
-  E['REP-03'] = {status:'eval', recs:[{role:'panel', src:'veri paketi', id:'REP-03', sev:'WARN', value:{calibration_status:'REP-03 / KALİBRE DEĞİL', parameter_tables_verified:false, ranking_score_calibrated:false}, thr:{}, note:'Eşikler literatür başlangıç değeri; ıslak-lab kalibrasyonu bekliyor (22 yer)'}]};
   // kalan kurallar: durum ataması
   for (const r of CAT) {
     if (E[r.id]) { const e = E[r.id]; if (e.recs.length) { const s = e.recs.filter(x => !x.ne).map(x => x.sev).filter(Boolean); e.sev = s.length ? worst(s) : null; if (!s.length) { e.status = 'ne'; e.reason = e.recs[0].note; } } continue; }
@@ -197,7 +204,7 @@ function evidenceFor(pm) {
 }
 const NE_REASON = {
   'SEQ-03':'Dejenere baz yok', 'DIM-05':'Bu çift için prob tanımlanmadı (Prob & Blocker sayfası)', 'DIM-07':'Adaptör/M13 kuyruğu tanımlanmadı (sequence_qc.py --tails)',
-  'SPC-08':'--contigs verilmedi (chrM Python; ALT/rDNA C++ bekliyor)', 'TH-06':'Katkı maddesi beyan edilmedi', 'AMP-02':'Erime profili qPCR koşusunda (qPCR Erime sayfası)',
+  'SPC-08':'Ek referans dizileri değerlendirilmedi', 'TH-06':'Katkı maddesi beyan edilmedi', 'AMP-02':'Erime profili qPCR koşusunda (qPCR Erime sayfası)',
   'VAR-05':'Varyant-farkında indeks gerekir', 'SS-05':'Prob yok'
 };
 
@@ -262,17 +269,24 @@ function localVar(pm, role, browser) {
 const VIEWS = [
   {id:'genel', t:'Genel Bakış', i:'home', grp:'Proje'},
   {id:'tasarla', t:'Primer Tasarla', i:'design', grp:'Proje'},
+  {id:'multipleks', t:'Multipleks Tasarla', i:'mpx', grp:'Proje'},
   {id:'cift', t:'Çift İnceleme', i:'pair', grp:'Proje'},
-  {id:'multipleks', t:'Multipleks', i:'mpx', grp:'Panel'},
-  {id:'prob', t:'Prob & Blocker', i:'probe', grp:'Panel'},
-  {id:'erime', t:'qPCR Erime', i:'melt', grp:'Panel'},
+  {id:'yerel', t:'Yerel Analiz', i:'target', grp:'Analiz'},
   {id:'katalog', t:'QC Kataloğu', i:'cat', grp:'Motor'},
-  {id:'dogrulama', t:'Doğrulama', i:'check', grp:'Motor'}
+  {id:'dokumantasyon', t:'Dokümantasyon', i:'list', grp:'Destek'},
+  {id:'iletisim', t:'İletişim', i:'info', grp:'Destek'}
 ];
 const RENDER = {};
 function route() {
-  const h = (location.hash || '').replace('#', '');
-  STATE.view = VIEWS.some(v => v.id === h) ? h : 'genel';
+  const [page, section, key, tab] = location.hash.slice(1).split('/');
+  const examples = ['panel', 'prob', 'erime', 'dogrulama'];
+  STATE.docSection = examples.includes(page) ? page :
+    page === 'dokumantasyon' && [...examples, 'multipleks', 'cift'].includes(section) ? section : 'rehber';
+  if (STATE.docSection === 'cift') {
+    if (PROJ.some(p => p.key === key)) STATE.docPair = key;
+    STATE.ptab = PTABS.some(t => t.id === tab) ? tab : 'harita';
+  }
+  STATE.view = examples.includes(page) ? 'dokumantasyon' : VIEWS.some(v => v.id === page) ? page : 'genel';
   rerender(true);
 }
 function go(view, opts={}) { Object.assign(STATE, opts); if (location.hash !== '#' + view) location.hash = view; else rerender(true); }
@@ -285,13 +299,13 @@ function rerender(scrollTop) {
   if (scrollTop) window.scrollTo(0, 0);
 }
 const SUBT = {
-  genel:`${CHR}:${(OFF+1).toLocaleString('tr-TR')}–${(OFF+TPL.length).toLocaleString('tr-TR')} · GRCh38.p14 · ctDNA profili`,
-  tasarla:'Primer-BLAST akışı · referans motorun birebir tarayıcı portu',
-  cift:'Harita, özgüllük, varyant, yapı, termodinamik ve 91 kuralın kanıtı',
-  multipleks:'Çiftler arası dimer matrisi, çapraz ürünler ve havuz kurucu',
-  prob:'ddPCR hidroliz probları ve CT-05 alel ayrım reaktifleri',
-  erime:'Amplikon erime profili · Poland tipi model · QPCR-02',
-  katalog:`19 aile · 91 kural · ${CAT_IMPL} uygulanmış`,
-  dogrulama:'Tarayıcı ↔ Python ↔ C++ ↔ primer3 denetimleri'
+  genel:'Primer tasarımı, genom özgüllüğü ve kanıt kayıtları',
+  yerel:'GRCh38.p14 üzerinde özgüllük, varyant ve kalite analizleri',
+  tasarla:'İnsan referansından hedef bölge ve aday primer seçimi',
+  multipleks:'Birden fazla hedef için primer tasarımı ve birlikte çalışabilecek panel seçimi',
+  cift:'Harita, özgüllük, varyant, yapı, termodinamik ve kanıtlar',
+  katalog:`${CAT.length} kural · ${FAMORDER.length} aile`,
+  dokumantasyon:'Adım adım kullanım, giriş biçimleri ve incelenebilir örnek sonuçlar',
+  iletisim:'Proje ekibi ve geri bildirim'
 };
 window.addEventListener('hashchange', route);

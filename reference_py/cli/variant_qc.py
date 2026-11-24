@@ -53,37 +53,46 @@ def read_tsv(path):
 # ---------------------------------------------------------------------------
 # gnomAD erisimi ve onbellek
 # ---------------------------------------------------------------------------
-def fetch_region(chrom, start, stop, dataset, retries=3):
-    """gnomAD v4 bolge sorgusu. Konumlar 1-tabanli, kapsayici."""
+def request_region(chrom, start, stop, dataset, timeout=120):
+    """Read one 1-based inclusive interval from the gnomAD GraphQL API."""
     payload = {"query": QUERY,
                "variables": {"chrom": var.normalize_chrom(chrom),
                              "start": int(start), "stop": int(stop),
                              "ds": dataset}}
     req = urllib.request.Request(
         GNOMAD_URL, data=json.dumps(payload).encode("utf-8"),
-        headers={"Content-Type": "application/json"})
+        headers={"Content-Type": "application/json", "Accept": "application/json"})
+    with urllib.request.urlopen(req, timeout=timeout) as response:
+        body = json.load(response)
+    if body.get("errors"):
+        raise RuntimeError(body["errors"][0].get("message", "gnomAD hatası"))
+    rows = body["data"]["region"]["variants"]
+    if not isinstance(rows, list):
+        raise RuntimeError("gnomAD bölge yanıtı eksik.")
+    return rows
+
+
+def fetch_region(chrom, start, stop, dataset, retries=3):
+    """gnomAD v4 bolge sorgusu. Konumlar 1-tabanli, kapsayici."""
     last = None
     for attempt in range(retries):
         try:
-            with urllib.request.urlopen(req, timeout=120) as r:
-                body = json.load(r)
-            if body.get("errors"):
-                raise RuntimeError(body["errors"][0].get("message", "gnomAD hatasi"))
-            return body["data"]["region"]["variants"]
-        except Exception as exc:                      # ag/limit hatalari
+            return request_region(chrom, start, stop, dataset)
+        except Exception as exc:
             last = exc
             time.sleep(2 * (attempt + 1))
-    raise SystemExit(f"gnomAD sorgusu basarisiz ({chrom}:{start}-{stop}): {last}\n"
+    raise SystemExit(f"gnomAD sorgusu basarisiz ({chrom}:{start}-{stop}): {last}\\n"
                      "Cevrimdisi calismak icin --offline verin (onbellek kullanilir).")
 
 
-def parse_variants(rows, chrom):
+def parse_variants(rows, chrom, *, highest_af=False):
     out = []
     for r in rows:
-        src = r.get("genome") or r.get("exome")
-        if not src or src.get("af") is None:
+        cohorts = [(key, r[key]) for key in ("genome", "exome")
+                   if r.get(key) and r[key].get("af") is not None]
+        if not cohorts:
             continue
-        which = "genome" if r.get("genome") else "exome"
+        which, src = max(cohorts, key=lambda item: item[1]["af"]) if highest_af else cohorts[0]
         pops = {}
         for p in (src.get("populations") or []):
             an = p.get("an") or 0

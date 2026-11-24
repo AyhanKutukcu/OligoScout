@@ -147,9 +147,14 @@ def enumerate_candidates(
     cons: DesignConstraints,
     cond: salt.Conditions,
     region: tuple[int, int] | None = None,
+    *,
+    salt_model: str = "owczarzy_2008",
+    candidate_filter=None,
 ) -> tuple[list[Candidate], list[Rejection]]:
     """Verilen bolgedeki tum uzunluklarda aday uretir ve sert filtreleri uygular."""
-    seq = nn.validate(target)
+    seq = target.strip().upper()
+    if not seq or set(seq) - set("ACGTN"):
+        nn.validate(seq)
     lo, hi = region or (0, len(seq))
     lo = max(0, lo)
     hi = min(len(seq), hi)
@@ -163,13 +168,21 @@ def enumerate_candidates(
             if end > hi:
                 break
             window = seq[start:end]
-            primer = window if orientation == "F" else nn.reverse_complement(window)
+            primer = window if orientation == "F" else window.translate(str.maketrans("ACGTN", "TGCAN"))[::-1]
 
             def reject(rule: str, reason: str, value) -> None:
                 rejected.append(
                     Rejection(primer, start, orientation, rule, reason, str(value))
                 )
 
+            if "N" in window:
+                reject("SEQ-04", "referans penceresi N içeriyor", window.count("N"))
+                continue
+            if candidate_filter is not None:
+                filtered = candidate_filter(start, end, orientation)
+                if filtered is not None:
+                    reject(*filtered)
+                    continue
             gc = nn.gc_fraction(primer)
             if not (cons.gc_min <= gc <= cons.gc_max):
                 reject("CMP-01", "GC penceresi disi", f"{100 * gc:.1f}%")
@@ -195,7 +208,7 @@ def enumerate_candidates(
                 reject("CMP-04", "di/tri-nukleotit tekrar", max(rep2, rep3))
                 continue
 
-            model = concentration.build(primer, cond=cond)
+            model = concentration.build(primer, cond=cond, salt_model=salt_model)
             tm = model.tm_c
             if not (cons.tm_min <= tm <= cons.tm_max):
                 reject("TH-01", "Tm penceresi disi", f"{tm:.2f} C")
@@ -256,6 +269,8 @@ def build_pairs(
     lefts: list[Candidate],
     rights: list[Candidate],
     cons: DesignConstraints,
+    *,
+    must_cover: tuple[int, int] | None = None,
 ) -> tuple[list[PairCandidate], list[Rejection]]:
     pairs: list[PairCandidate] = []
     rejected: list[Rejection] = []
@@ -271,6 +286,8 @@ def build_pairs(
             if length > cons.product_max:
                 break
 
+            if must_cover is not None and (left.start > must_cover[0] or right.end < must_cover[1]):
+                continue
             dtm = abs(left.tm_c - right.tm_c)
             if dtm > cons.max_delta_tm:
                 rejected.append(Rejection(
@@ -382,7 +399,7 @@ def design(
     pairs = rank_pairs(pairs, cons)
 
     return {
-        "target_length": len(nn.validate(target)),
+        "target_length": len(target.strip()),
         "left_candidates": lefts,
         "right_candidates": rights,
         "pairs": pairs,

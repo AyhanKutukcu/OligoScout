@@ -1,0 +1,6 @@
+method,binding_precision,binding_recall,product_recall,intended_recall,bindings_found,bindings_missed,search_s,end_to_end_s,search_rss_gib
+Bağımsız oracle (tam tarama),1.0,1.0,1.0,1.0,8262803,0,194.1,379.5,0.24
+OligoScout,1.0,1.0,1.0,1.0,8262803,0,111.8,255.9,0.65
+Bowtie 1 + filtre,1.0,1.0,1.0,1.0,8262803,0,148.6,479.5,3.65
+BWA-aln + filtre,1.0,1.0,1.0,1.0,8262803,0,141.1,419.2,5.03
+BLASTN-short + filtre,1.0,0.999175,0.999995,1.0,8255989,6814,3065.4,3558.7,10.98

@@ -19,6 +19,12 @@ katmandan gelir: (1) NN + konsantrasyon sozlesmesi, (2) tuz duzeltmesi.
 Asama A tutmuyorsa betik bunu acikca yazar ve B'yi "kesin degil" olarak
 isaretler; sessizce gecmez.
 
+KONSANTRASYON SOZLESMESI. primer3 kendine tamamlayici olmayan dizide
+C_etkin = d/4, simetrik dizide C_etkin = d kullanir; OligoScout PCR icin
+primer fazlasi (C_etkin = [P]) kullanir. Iki uygulamayi ayni C_etkin'de
+karsilastirmak icin oligotm'e `-d` olarak 4*C_etkin (simetrikte C_etkin)
+verilir. Boylece A asamasi yalniz NN katmanini olcer.
+
 Model eslesmesi: `oligotm -tp 1 -sc 2` = SantaLucia 1998 birlesik tablosu +
 Owczarzy tuz duzeltmesi. Mg yokken Python karsiligi `owczarzy_2004`,
 Mg varken `owczarzy_2008`'dir; betik ikisini de raporlar.
@@ -82,12 +88,23 @@ def oligotm_tm(binary: str, seq: str, na_mM: float, mg_mM: float,
     return None
 
 
-def python_tm(seq: str, na_mM: float, mg_mM: float, dntp_mM: float,
-              primer_nM: float, model: str) -> float:
+def python_model(seq: str, na_mM: float, mg_mM: float, dntp_mM: float,
+                 primer_nM: float, model: str):
     cond = salt.Conditions(monovalent_M=na_mM / 1e3, magnesium_M=mg_mM / 1e3,
                            dntp_M=dntp_mM / 1e3, primer_M=primer_nM / 1e9,
                            anneal_c=60.0)
-    return concentration.build(seq, cond=cond, salt_model=model).tm_c
+    return concentration.build(seq, cond=cond, salt_model=model)
+
+
+def python_tm(seq: str, na_mM: float, mg_mM: float, dntp_mM: float,
+              primer_nM: float, model: str) -> float:
+    return python_model(seq, na_mM, mg_mM, dntp_mM, primer_nM, model).tm_c
+
+
+def oligotm_dna_nm(melting) -> float:
+    """OligoScout'un etkin konsantrasyonunu primer3 sozlesmesine cevirir."""
+    c_eff_nM = melting.c_eff_M * 1e9
+    return c_eff_nM if melting.duplex.self_complementary else 4.0 * c_eff_nM
 
 
 def main() -> int:
@@ -119,15 +136,16 @@ def main() -> int:
         for label, na, mg, dntp in grid:
             model = "owczarzy_2004" if mg <= 0 else "owczarzy_2008"
             for pid, seq in sequences:
+                melting = python_model(seq, na, mg, dntp, args.primer_nm, model)
                 theirs = oligotm_tm(args.oligotm, seq, na, mg, dntp,
-                                    args.primer_nm)
+                                    oligotm_dna_nm(melting))
                 if theirs is None:
                     rows.append({"stage": stage, "kosul": label, "id": pid,
                                  "model": model, "python_tm_c": "",
                                  "oligotm_tm_c": "", "delta_c": "",
                                  "status": "ORACLE_HATASI"})
                     continue
-                ours = python_tm(seq, na, mg, dntp, args.primer_nm, model)
+                ours = melting.tm_c
                 delta = ours - theirs
                 rows.append({
                     "stage": stage, "kosul": label, "id": pid, "model": model,
@@ -174,7 +192,9 @@ def main() -> int:
         fh.write("# Tuz katmani capraz denetimi (`salt.py` <-> primer3 oligotm)\n\n")
         fh.write(f"- oracle: `{args.oligotm}` (`-tp 1 -sc 2`)\n")
         fh.write(f"- tolerans: {args.tol} C (oligotm iki ondalik basar)\n")
-        fh.write(f"- dizi: {len(sequences)}, primer {args.primer_nm} nM\n\n")
+        fh.write(f"- dizi: {len(sequences)}, primer {args.primer_nm} nM\n")
+        fh.write("- konsantrasyon sozlesmesi esitlendi: oligotm `-d` = 4 x C_etkin "
+                 "(simetrik dizide C_etkin)\n\n")
         fh.write("| Asama | Ne olcer | Karsilastirma | Sapan | Ortalama fark | "
                  "Ortalamadan sapma |\n|---|---|---:|---:|---:|---:|\n")
         fh.write(f"| A | NN + konsantrasyon sozlesmesi (1 M Na) | {a_n} | "

@@ -121,13 +121,13 @@ def check_bis04(ct_intended: int, ct_total: int,
     sayilari. intended_conversion: "CT" ust iplik, "GA" alt iplik tasarimi.
     """
     if intended_conversion.upper() == "CT":
-        intended_total, off_total = ct_total, ga_total
+        intended_exact, intended_total, off_total = ct_intended, ct_total, ga_total
     else:
-        intended_total, off_total = ga_total, ct_total
+        intended_exact, intended_total, off_total = ga_intended, ga_total, ct_total
     off_extra = off_total                      # diger donusumde herhangi urun
-    intended_extra = max(0, intended_total - 1)  # amaclanan disi fazla urun
+    intended_extra = max(0, intended_total - intended_exact)  # amaclanan disi fazla urun
     sev = "INFO"
-    if off_extra > 0:
+    if off_extra > 0 or intended_exact != 1:
         sev = "FAIL"            # yanlis donusum ipliginde urun
     elif intended_extra > 0:
         sev = "WARN"            # amaclanan iplikte fazladan urun
@@ -135,8 +135,9 @@ def check_bis04(ct_intended: int, ct_total: int,
                 {"intended_conversion": intended_conversion.upper(),
                  "ct_products_total": ct_total, "ga_products_total": ga_total,
                  "intended_products_total": intended_total,
+                 "intended_exact_products": intended_exact,
                  "offstrand_products_total": off_total},
                 {"warn": "amaclanan donusum ipliginde fazladan urun",
-                 "fail": "yanlis donusum ipliginde urun (iplik-capraz)"},
+                 "fail": "tek hedef yok veya yanlis donusum ipliginde urun"},
                 sev,
                 "donusmus genom CT/GA taramasindan; donusmemis genom ayri")

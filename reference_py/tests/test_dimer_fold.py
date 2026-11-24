@@ -143,14 +143,14 @@ class TestDimerAlignment(unittest.TestCase):
         for a, b in DIMER_PAIRS:
             for mode in align.MODES:
                 with self.subTest(a=a, b=b, mode=mode):
-                    actual = align.best_dimer(a, b, mode, allow_bulge=False)
+                    actual = align.best_dimer(a, b, mode, allow_bulge=False, end_terms=False)
                     expected = brute_contiguous(a, b, mode)
                     self.assertEqual(actual.found, expected is not None)
                     if actual.found:
                         self.assertAlmostEqual(actual.dG37_kcal, expected, places=9)
 
     def test_single_mismatch_is_marked_in_eligible_3prime_dimer(self):
-        result = align.best_dimer("CCAGCGG", "CCGTTGG", "3prime")
+        result = align.best_dimer("CCAGCGG", "CCGTTGG", "3prime", end_terms=False)
         self.assertEqual(result.match, "|||X|||")
         self.assertEqual(result.mismatch_count, 1)
         self.assertEqual(result.helix_len, 6)
@@ -197,7 +197,9 @@ class TestSingleBaseBulge(unittest.TestCase):
         baseline = align.best_dimer(self.a, self.b, allow_bulge=False)
         self.assertEqual(baseline.bulge_count, 0)
         self.assertLess(align.best_dimer(self.a, self.b).dG37_kcal, baseline.dG37_kcal)
-        self.assertEqual(align.model_metadata(False)["model"], align.MODEL_NAME_NO_BULGE)
+        self.assertEqual(align.model_metadata(False, end_terms=False)["model"], align.MODEL_NAME_NO_BULGE)
+        self.assertEqual(align.model_metadata(False)["model"],
+                         align.MODEL_NAME_NO_BULGE + align.END_TERMS_SUFFIX)
 
     def test_bulge_symmetry_in_each_mode(self):
         for mode in align.MODES:
@@ -221,10 +223,74 @@ class TestSingleBaseBulge(unittest.TestCase):
             for mode in align.MODES:
                 energies = [v for v in (brute_contiguous(a, b, mode), brute_single_bulge(a, b, mode))
                             if v is not None]
-                result = align.best_dimer(a, b, mode)
+                result = align.best_dimer(a, b, mode, end_terms=False)
                 self.assertEqual(result.found, bool(energies), (a, b, mode))
                 if energies:
                     self.assertAlmostEqual(result.dG37_kcal, min(energies), places=9)
+
+
+class TestDimerEndTerms(unittest.TestCase):
+    """Heliks uclarindaki sarkan uc / terminal uyumsuzluk terimleri."""
+
+    def test_never_destabilises(self):
+        rng = random.Random(11)
+        for _ in range(60):
+            a = "".join(rng.choices("ACGT", k=rng.randint(10, 24)))
+            b = "".join(rng.choices("ACGT", k=rng.randint(10, 24)))
+            for mode in align.MODES:
+                plain = align.best_dimer(a, b, mode, end_terms=False)
+                ends = align.best_dimer(a, b, mode)
+                self.assertEqual(plain.found, ends.found)
+                if plain.found:
+                    self.assertLessEqual(ends.dG37_kcal, plain.dG37_kcal + 1e-9)
+
+    def test_symmetry_with_end_terms(self):
+        rng = random.Random(5)
+        for _ in range(40):
+            a = "".join(rng.choices("ACGT", k=14))
+            b = "".join(rng.choices("ACGT", k=12))
+            for mode in align.MODES:
+                self.assertAlmostEqual(align.best_dimer(a, b, mode).dG37_kcal,
+                                       align.best_dimer(b, a, mode).dG37_kcal, places=9)
+
+    def test_dangling_end_value(self):
+        # a = 5'-GCGCGC T-3', b = 5'-GCGCGC-3': helis GCGCGC/CGCGCG, a'nin
+        # 3' ucunda tek sarkan T (C-G cifti uzerinde) -> D3:T:C-G.
+        a, b = "GCGCGCT", "GCGCGC"
+        plain = align.best_dimer(a, b, end_terms=False)
+        ends = align.best_dimer(a, b)
+        h, s = params.DANGLING_BOMMARITO_2000.require()["D3:T:C-G"]
+        dg = h - 310.15 * s / 1000.0
+        self.assertLess(dg, 0)
+        self.assertAlmostEqual(ends.dG37_kcal, plain.dG37_kcal + dg, places=9)
+
+    def test_terminal_mismatch_value(self):
+        # Iki iplik de heliksin sag ucunda bir baz daha tasir ve eslesmez:
+        # ust 5'-...C A-3', alt 3'-...G A-5' -> terminal uyumsuzluk "CA/GA".
+        a, b = "GCGCGCA", "AGCGCGC"
+        plain = align.best_dimer(a, b, end_terms=False)
+        ends = align.best_dimer(a, b)
+        term = params.TERMINAL_MISMATCH_SANTALUCIA_PEYRET.require()
+        dang = params.DANGLING_BOMMARITO_2000.require()
+        both = [x + y for x, y in zip(dang["D3:A:C-G"], dang["D5:A:G-C"])]
+        options = [term["CA/GA"], dang["D3:A:C-G"], dang["D5:A:G-C"], both]
+        best = min(h - 310.15 * s / 1000.0 for h, s in options)
+        # sol uc her iki iplikte de biter (ek terim yok)
+        self.assertAlmostEqual(ends.dG37_kcal, plain.dG37_kcal + min(best, 0.0), places=9)
+
+
+class TestDimerEndTermsMatchNtthal(unittest.TestCase):
+    """primer3 ntthal'dan (1 M Na+, 37 C) okunmus uc katkilari: ntthal'in
+    dG(uclu) - dG(GCGCGC/GCGCGC) farki. OligoScout ayni farki vermeli."""
+
+    NTTHAL_DELTA = {("GCGCGCT", "GCGCGC"): -0.548, ("TGCGCGC", "GCGCGC"): -0.620,
+                    ("GCGCGCA", "AGCGCGC"): -1.381, ("CGCGCGA", "CGCGCG"): -0.822}
+
+    def test_deltas(self):
+        for (a, b), want in self.NTTHAL_DELTA.items():
+            # ntthal farklari GCGCGC/GCGCGC cekirdegine gore okundu
+            got = align.best_dimer(a, b).dG37_kcal - align.best_dimer("GCGCGC", "GCGCGC").dG37_kcal
+            self.assertAlmostEqual(got, want, places=2, msg=(a, b))
 
 
 class TestFoldAgainstBruteForce(unittest.TestCase):

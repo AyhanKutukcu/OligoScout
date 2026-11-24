@@ -317,10 +317,18 @@ identical** result; the reference FASTA SHA-256 (SEQ-06) is stored with the resu
 
 | Tool | What it does | Result |
 |---|---|---|
-| Unit tests | `reference_py/tests/` | 264, all passing |
+| Unit tests | `reference_py/tests/` | 279, all passing (1 platform skip) |
 | `param_crosscheck.py` | Tables vs primer3 (independent oracle) | 373 comparisons, 0 transcription errors |
+| `salt_crosscheck.py` | Salt layer vs primer3 `oligotm` | 60/60 Tm values identical |
 | `diff_cpp.py` | Python ↔ C++ differential | 74 sequences × 17 columns, 0 differences |
 | `regresyon.py` | 21-step end-to-end | 20 PASS / 1 SKIP / 0 FAIL |
+| `benchmarks/scorecard/` | Search vs brute force, Primer-BLAST web, primer3, timings | see [`SCORECARD.md`](OligoScout/benchmarks/scorecard/SCORECARD.md) |
+
+Highlights of the v0.4.0 scorecard: the sensitive search mode (Primer-BLAST's
+terminal rule) equals a brute-force genome scan (530,861/530,861 sites); on 31
+pairs it finds all 654 products that NCBI Primer-BLAST reports under its own
+rule, plus 87 that Primer-BLAST's seeding missed; the dimer model with end terms
+differs from primer3 ntthal by −0.01 kcal/mol on average (κ 0.85 at −6 kcal/mol).
 
 The cross-check does NOT grant `verified` status; a second human transcription is
 still required.
@@ -334,7 +342,9 @@ still required.
    **LOWER BOUND**.
 3. Parameter tables are in a "transcribed, unverified" state.
 4. The A·T bulge-closure constant is a project modeling decision.
-5. Only one partial rule: SPC-08 (large ALT contigs need the C++ FM-index).
+5. All 91 catalog rules are implemented (SPC-08 scans chrM, ALT loci, patches and
+   scaffolds with `oligoscout_contig_scan`).
+6. Specificity covers GRCh38 only; other organisms need their own index and annotations.
 
 ---
 
@@ -343,7 +353,7 @@ still required.
 Thermodynamic parameters belong to their original publications (SantaLucia 1998,
 Allawi & Peyret, Bommarito 2000, SantaLucia & Hicks 2004, SantaLucia & Peyret
 2001, Sugimoto 1995); citations are in the provenance of
-`reference_py/oligoscout_thermo/params.py`. For the project license see the
-repository root.
+`reference_py/oligoscout_thermo/params.py`. OligoScout is released under the MIT license (`LICENSE`); version in `VERSION`,
+changes in `CHANGELOG.md`.
 
 <p align="center"><a href="https://oligoscout.org">oligoscout.org</a></p>

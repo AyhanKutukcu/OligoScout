@@ -3,6 +3,28 @@
 Tek giriş noktası: **`RUN_SETUP.cmd`** (çift tıklayın).
 Tüm iş WSL2 içinde, tek script olarak sırayla çalışır: `setup/00_bootstrap.sh`.
 
+## Yerel web arayüzü
+
+Windows'ta depo kökündeki `RUN_WEB.cmd` dosyasını çalıştırın. Terminalde hazır mesajı göründüğünde [yerel OligoScout](http://127.0.0.1:8765/#genel) adresini açın. Terminali kapatınca yerel servis durur.
+
+`Primer Tasarla`, yerel GRCh38.p14 FASTA'sından 1–22, X veya Y kromozomuna ait 1 tabanlı koordinatları okur. En fazla 5.000 baz seçilebilir. Tasarım, C++ özgüllük taramasını ve Python kalite kontrolünü otomatik çalıştırır. Sonuçtan `Çift İnceleme` ekranını açarak Varyant, Yapı & Dimer ve Termodinamik grafiklerini görebilirsiniz. `Yerel Analiz` birden fazla çiftle panel taraması ve multipleks çalıştırır. Bisülfit tasarımında CT veya GA seçin. Özgüllük işlemi her iki dönüşüm indeksini okur. Prob, blocker, erime, GENCODE izoformu ve varyant sonuçları aynı analiz ekranında açılabilir.
+
+[Multipleks Tasarla](http://127.0.0.1:8765/#multipleks), 2–8 GRCh38 hedefi için adayları ayrı ayrı üretip tarar. Hedef başına 1–4 aday, ortak Tm aralığı, dimer sınırları ve ürün boyu ayrımı girilebilir. Aynı havuza alınabilecek hedeflerden birer çift seçilir; kapsanamayan hedefler ve gerçek QC uyarıları belirtilir. Seçilen panel TSV olarak indirilir. Tekli ve multipleks tasarım formunun varsayılan profili Sanger'dır.
+
+[Dokümantasyon](http://127.0.0.1:8765/#dokumantasyon) sayfasında adım adım giriş ve çıktı örnekleri, eski proje şablonu, Kayıtlı Panel, Multipleks, Prob & Blocker, qPCR Erime ve motor doğrulama sonuçları bulunur.
+
+Primer tasarımı C++ özgüllük taramasını otomatik çalıştırır. Yeni liste, seçilen arama sözleşmesinde her primerin birer tam bağlanma yeri, tek beklenen ürün ve sıfır hedef dışı ürün bulunan çiftleri içerir. Bisülfit için diğer dönüşümde ürün olmaması da gerekir.
+
+Varyant katmanı insan referans bölgesini gnomAD GraphQL API üzerinden `gnomad_r4` veri kümesinde sorgular. Genom ve ekzom AF'leri ayrı gösterilir ve filtre yüksek olan değeri kullanır. Başarılı sorgular `reference_py/out/gnomad_api/` altında 30 gün geçerli bir önbelleğe yazılır. WSL ortamında `OLIGOSCOUT_GNOMAD_API=0` ile çevrimiçi sorguyu kapatabilirsiniz. `OLIGOSCOUT_VARIANT_CACHE` başka bir JSONL önbelleğini seçer. Tam çevrimdışı kurulum için resmî GRCh38 genom ve ekzom VCF dosyaları ve TBI indeksleri geniş bir sürücüye indirilebilir. [gnomAD indirmeleri](https://gnomad.broadinstitute.org/downloads) RT-05, DNA/RNA parametre tablosu eklenene kadar bekler. Canlı sonuçlar tarayıcı oturumunda tutulur. Analiz ekranından JSON olarak indirilebilir.
+
+WSL/Linux'ta aynı akış:
+
+```bash
+python3 web/build_web_data.py
+python3 web/build_site.py
+python3 web/local_server.py
+```
+
 ## Neden WSL
 
 Deponun `README.md` dosyası gereksinimleri açıkça yazıyor: Linux veya WSL2,

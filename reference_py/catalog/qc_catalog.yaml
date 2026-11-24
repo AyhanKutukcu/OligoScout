@@ -1,0 +1,3125 @@
+# OligoScout QC katalogu — TEK DOGRULUK KAYNAGI.
+# Uretilen dosyalar: python3 reference_py/cli/catalog_yaml.py export
+schema: oligoscout-qc-catalog/1
+rules:
+- id: AMP-01
+  family: Amplikon
+  status: etiketli_uygulandi
+  spec_title: amplikon / Amplikon GC / %GC ve 50-nt kayan pencere maksimumu
+  where: reference_py/oligoscout_thermo/seqpair.py; reference_py/cli/sequence_qc.py
+  evidence_level: regression
+  evidence:
+    regression:
+    - seqpair/seqpair_qc.tsv
+    - seqpair/seqpair_qc_records.jsonl
+    archive:
+    - _bis_test/seqpair_qc.tsv
+    - _bis_test/seqpair_qc_records.jsonl
+    - _newqc_test/seqpair_qc.tsv
+    - _newqc_test/seqpair_qc_records.jsonl
+    - design_ctdna/seqpair_qc.tsv
+    - design_ctdna/seqpair_qc_records.jsonl
+    - seqpair/seqpair_qc.tsv
+    - seqpair/seqpair_qc_records.jsonl
+    unit_test:
+    - reference_py/tests/test_seqpair.py:102
+    code:
+    - reference_py/oligoscout_thermo/seqpair.py:16
+    - web/src/core.js:247
+    - web/src/views2.js:73
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Ürünün GC oranı
+    en: Product GC content
+  check:
+    tr: Ürünün tamamında ve kısa pencerelerde G ve C oranını ölçer.
+    en: Measures the fraction of G and C across the product and in short windows.
+  why:
+    tr: GC bakımından yoğun bir bölge, ortalama normal görünse bile ürünün ayrılmasını zorlaştırabilir.
+    en: A GC-rich stretch can make the product harder to denature even when the average looks normal.
+- id: AMP-02
+  family: Amplikon
+  status: etiketli_uygulandi
+  spec_title: amplikon / Erime profili (tahmini) / Kendi Poland tipi istatistiksel mekanik erime algoritması; dθ/dT
+    pik sayı
+  where: reference_py/cli/amplicon_melt.py (QPCR-02 ile ayni hesap)
+  evidence_level: regression
+  evidence:
+    regression:
+    - melt/amplicon_melt.tsv [amp02]
+    archive: []
+    unit_test: []
+    code:
+    - reference_py/cli/amplicon_melt.py:110
+    - web/src/core.js:207
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Ürünün erime profili
+    en: Product melting profile
+  check:
+    tr: Ürünün ısınırken hangi sıcaklıklarda ayrılacağını tahmin eder.
+    en: Predicts the temperatures at which the product separates as it heats.
+  why:
+    tr: Tek ürünün farklı bölgeleri ayrı eriyebilir; bu, birden çok piki yorumlamaya yardım eder.
+    en: Regions of a single product may melt separately, which helps explain multiple peaks.
+- id: AMP-03
+  family: Amplikon
+  status: etiketli_uygulandi
+  spec_title: amplikon / Tekrar / düşük karmaşıklık / CMP-05 ve CMP-06 amplikona
+  where: reference_py/oligoscout_thermo/seqpair.py; reference_py/cli/sequence_qc.py
+  evidence_level: regression
+  evidence:
+    regression:
+    - seqpair/seqpair_qc.tsv
+    - seqpair/seqpair_qc_records.jsonl
+    archive:
+    - _bis_test/seqpair_qc.tsv
+    - _bis_test/seqpair_qc_records.jsonl
+    - _newqc_test/seqpair_qc.tsv
+    - _newqc_test/seqpair_qc_records.jsonl
+    - design_ctdna/seqpair_qc.tsv
+    - design_ctdna/seqpair_qc_records.jsonl
+    - seqpair/seqpair_qc.tsv
+    - seqpair/seqpair_qc_records.jsonl
+    unit_test: []
+    code:
+    - reference_py/oligoscout_thermo/seqpair.py:17
+    - web/src/core.js:248
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Üründe tekrarlar
+    en: Repeats in the product
+  check:
+    tr: Üründe tekrarları, düşük baz çeşitliliğini ve G-dörtlüsü adaylarını arar.
+    en: Looks for repeats, low base diversity, and candidate G-quadruplex motifs.
+  why:
+    tr: Bu bölgeler ürünün çoğaltılmasını veya okunmasını zorlaştırabilir.
+    en: These regions can complicate amplification or sequencing.
+- id: BIS-01
+  family: Bisulfit
+  status: etiketli_uygulandi
+  spec_title: primer / CpG içeriği / Primerde CpG sayısı ve 3′'e uzaklığı (MSP hariç)
+  where: reference_py\oligoscout_thermo\bisulfite.py:check_bis01; cli\sequence_qc.py (--profile bisulfite, --msp)
+  evidence_level: unit_test
+  evidence:
+    regression: []
+    archive:
+    - _bis_test/seqpair_qc.tsv
+    - _bis_test/seqpair_qc_records.jsonl
+    unit_test:
+    - reference_py/tests/test_bisulfite.py:1
+    code:
+    - reference_py/cli/sequence_qc.py:84
+    - reference_py/oligoscout_thermo/bisulfite.py:1
+    - reference_py/oligoscout_thermo/profiles.py:168
+    - web/local_engine.py:543
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Primerde CpG konumu
+    en: CpG positions in the primer
+  check:
+    tr: CpG konumlarını sayar ve 3′ uca uzaklıklarını inceler.
+    en: Counts CpG positions and measures how close they are to the 3′ end.
+  why:
+    tr: Metilasyon durumuyla değişen bazlar, metilasyondan bağımsız ölçümlerde sonucu yanlılaştırabilir.
+    en: Bases that vary with methylation can bias assays meant to be independent of methylation.
+- id: BIS-02
+  family: Bisulfit
+  status: etiketli_uygulandi
+  spec_title: primer / Dönüşüm seçiciliği / CpG dışı C (→T) sayısı
+  where: reference_py\oligoscout_thermo\bisulfite.py:check_bis02 (orijinal footprint CpG-disi C); cli\sequence_qc.py
+  evidence_level: unit_test
+  evidence:
+    regression: []
+    archive:
+    - _bis_test/seqpair_qc.tsv
+    - _bis_test/seqpair_qc_records.jsonl
+    unit_test:
+    - reference_py/tests/test_bisulfite.py:47
+    code:
+    - reference_py/cli/sequence_qc.py:179
+    - reference_py/oligoscout_thermo/bisulfite.py:9
+    - web/local_engine.py:543
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Dönüşmüş kalıbı ayırt etme
+    en: Discrimination of converted template
+  check:
+    tr: Dönüşüm öncesi bağlanma bölgesindeki CpG dışı sitozinleri sayar.
+    en: Counts non-CpG cytosines in the binding region before conversion.
+  why:
+    tr: Bu konumlar, primerin dönüşmüş kalıbı dönüşmemiş kalıptan ayırt etmesine yardımcı olabilir.
+    en: These positions can help distinguish converted from unconverted templates.
+- id: BIS-03
+  family: Bisulfit
+  status: etiketli_uygulandi
+  spec_title: primer / Dönüşüm sonrası karmaşıklık / CMP-05 dönüşmüş dizide
+  where: reference_py\oligoscout_thermo\bisulfite.py:check_bis03 (donusmus dizide entropi); cli\sequence_qc.py
+  evidence_level: unit_test
+  evidence:
+    regression: []
+    archive:
+    - _bis_test/seqpair_qc.tsv
+    - _bis_test/seqpair_qc_records.jsonl
+    unit_test:
+    - reference_py/tests/test_bisulfite.py:57
+    code:
+    - reference_py/cli/sequence_qc.py:189
+    - reference_py/oligoscout_thermo/bisulfite.py:10
+    - web/local_engine.py:543
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Dönüşüm sonrası dizi çeşitliliği
+    en: Sequence diversity after conversion
+  check:
+    tr: Dönüşmüş primer dizisinin baz çeşitliliğini inceler.
+    en: Assesses base diversity in the converted primer sequence.
+  why:
+    tr: Dönüşümden sonra diziler daha benzer hale gelirse tek bir hedefi ayırt etmek zorlaşabilir.
+    en: If conversion makes sequences more alike, it can be harder to distinguish a single target.
+- id: BIS-04
+  family: Bisulfit
+  status: etiketli_uygulandi
+  spec_title: çift / İplik özgüllüğü / 4 dönüşmüş genom ipliğinde OligoScout taraması
+  where: reference_py\oligoscout_thermo\bisulfite.py:check_bis04; cli\bisulfite_qc.py + setup\run_bisulfite_panel.sh
+    (CT/GA indeksi kuruldu)
+  evidence_level: unit_test
+  evidence:
+    regression: []
+    archive:
+    - _bisqc_test/bisulfite_qc_records.jsonl
+    unit_test:
+    - reference_py/tests/test_bisulfite.py:1
+    code:
+    - reference_py/cli/bisulfite_qc.py:2
+    - reference_py/oligoscout_thermo/bisulfite.py:1
+    - reference_py/oligoscout_thermo/profiles.py:169
+    - web/local_engine.py:625
+    - web/src/views2.js:39
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Dönüşmüş ipliklere özgüllük
+    en: Specificity to converted strands
+  check:
+    tr: Uygun indeksler verildiğinde dönüşmüş ipliklerdeki olası ürünleri karşılaştırır.
+    en: Compares possible products across converted strands when indexes are available.
+  why:
+    tr: İstenmeyen iplikte oluşan ürünler metilasyon ölçümünü karıştırabilir.
+    en: Products from unintended strands can confound a methylation measurement.
+- id: CMP-01
+  family: Kompozisyon
+  status: etiketli_uygulandi
+  spec_title: primer / GC içeriği / %GC
+  where: reference_py\oligoscout_thermo\design.py; reference_py\oligoscout_thermo\probe.py
+  evidence_level: regression
+  evidence:
+    regression:
+    - design_ctdna/design_rejections.tsv
+    archive:
+    - _design/design_rejections.tsv
+    - design/design_rejections.tsv
+    - design_ctdna/design_rejections.tsv
+    - design_ddpcr/design_rejections.tsv
+    - design_qpcr_sybr/design_rejections.tsv
+    - web_design_check/design_rejections.tsv
+    unit_test: []
+    code:
+    - reference_py/oligoscout_thermo/design.py:188
+    - reference_py/oligoscout_thermo/probe.py:90
+    - web/src/core.js:187
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Primerin GC oranı
+    en: Primer GC content
+  check:
+    tr: Primerdeki G ve C bazlarının oranını ölçer.
+    en: Measures the fraction of primer bases that are G or C.
+  why:
+    tr: Aşırı düşük veya yüksek oranlar seçili koşullardaki bağlanmayı etkileyebilir.
+    en: Extreme values can affect binding under the selected conditions.
+- id: CMP-02
+  family: Kompozisyon
+  status: etiketli_uygulandi
+  spec_title: primer / 3′ GC clamp / 3′ son 5 nt içindeki G/C sayısı
+  where: reference_py\oligoscout_thermo\design.py
+  evidence_level: regression
+  evidence:
+    regression:
+    - design_ctdna/design_rejections.tsv
+    archive:
+    - _design/design_rejections.tsv
+    - design/design_rejections.tsv
+    - design_ctdna/design_rejections.tsv
+    - design_ddpcr/design_rejections.tsv
+    - design_qpcr_sybr/design_rejections.tsv
+    - web_design_check/design_rejections.tsv
+    unit_test: []
+    code:
+    - reference_py/oligoscout_thermo/design.py:193
+    - web/src/core.js:189
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: 3′ uç yakınındaki G ve C sayısı
+    en: G and C count near the 3′ end
+  check:
+    tr: Primerin son beş bazında kaç G veya C olduğunu sayar.
+    en: Counts G and C bases in the primer’s last five positions.
+  why:
+    tr: Polimeraz bu uçtan uzatır. Bölgenin bileşimi primerin hedefe tutunmasını etkileyebilir.
+    en: Polymerase extends from this end, so its composition can affect binding to the target.
+- id: CMP-03
+  family: Kompozisyon
+  status: etiketli_uygulandi
+  spec_title: primer / Homopolimer / En uzun tek-baz koşusu
+  where: reference_py\oligoscout_thermo\design.py; reference_py\oligoscout_thermo\probe.py
+  evidence_level: regression
+  evidence:
+    regression:
+    - design_ctdna/design_rejections.tsv
+    archive:
+    - _design/design_rejections.tsv
+    - design/design_rejections.tsv
+    - design_ctdna/design_rejections.tsv
+    - design_ddpcr/design_rejections.tsv
+    - design_qpcr_sybr/design_rejections.tsv
+    - web_design_check/design_rejections.tsv
+    unit_test: []
+    code:
+    - reference_py/oligoscout_thermo/design.py:198
+    - reference_py/oligoscout_thermo/probe.py:92
+    - web/src/core.js:190
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Ardışık aynı bazlar
+    en: Runs of identical bases
+  check:
+    tr: Aynı bazın kesintisiz en uzun tekrarını bulur.
+    en: Finds the longest uninterrupted run of a single base.
+  why:
+    tr: Uzun tek baz tekrarları çoğaltma veya okumada kaymaya yol açabilir.
+    en: Long runs can cause slippage during amplification or sequencing.
+- id: CMP-04
+  family: Kompozisyon
+  status: etiketli_uygulandi
+  spec_title: primer / Di/tri-nükleotid tekrar / Ardışık tekrar birimi sayısı
+  where: reference_py\oligoscout_thermo\design.py
+  evidence_level: regression
+  evidence:
+    regression:
+    - design_ctdna/design_rejections.tsv
+    archive:
+    - design/design_rejections.tsv
+    - design_ctdna/design_rejections.tsv
+    - design_ddpcr/design_rejections.tsv
+    - design_qpcr_sybr/design_rejections.tsv
+    - web_design_check/design_rejections.tsv
+    unit_test: []
+    code:
+    - reference_py/oligoscout_thermo/design.py:208
+    - web/src/core.js:191
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Kısa tekrar dizileri
+    en: Short sequence repeats
+  check:
+    tr: İki veya üç bazlık örüntülerin art arda tekrarını arar.
+    en: Looks for consecutive repeats of two- or three-base motifs.
+  why:
+    tr: Tekrarlanan diziler yanlış hizalanabilir.
+    en: Repeated sequences can misalign.
+- id: CMP-05
+  family: Kompozisyon
+  status: etiketli_uygulandi
+  spec_title: primer/amplikon / Düşük karmaşıklık / Shannon entropisi (k=1,2) + DUST benzeri skor (kendi uygulamamız)
+  where: reference_py/oligoscout_thermo/seqpair.py; reference_py/cli/sequence_qc.py
+  evidence_level: regression
+  evidence:
+    regression:
+    - seqpair/seqpair_qc.tsv
+    - seqpair/seqpair_qc_records.jsonl
+    archive:
+    - _bis_test/seqpair_qc.tsv
+    - _bis_test/seqpair_qc_records.jsonl
+    - _newqc_test/seqpair_qc.tsv
+    - _newqc_test/seqpair_qc_records.jsonl
+    - design_ctdna/seqpair_qc.tsv
+    - design_ctdna/seqpair_qc_records.jsonl
+    - seqpair/seqpair_qc.tsv
+    - seqpair/seqpair_qc_records.jsonl
+    unit_test:
+    - reference_py/tests/test_seqpair.py:61
+    code:
+    - reference_py/oligoscout_thermo/bisulfite.py:10
+    - reference_py/oligoscout_thermo/seqpair.py:8
+    - web/src/core.js:220
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Dizi karmaşıklığı
+    en: Sequence complexity
+  check:
+    tr: Baz çeşitliliğini ve tekrar yoğunluğunu değerlendirir.
+    en: Assesses base diversity and repeat density.
+  why:
+    tr: Düşük çeşitliliğe sahip bir dizinin genomdaki başka bölgelere benzemesi daha olasıdır.
+    en: Low-diversity sequences are more likely to resemble other parts of the genome.
+- id: CMP-06
+  family: Kompozisyon
+  status: etiketli_uygulandi
+  spec_title: primer/amplikon / G-quadruplex motifi / G≥3 N1–7 G≥3 N1–7 G≥3 N1–7 G≥3 regex taraması (her iki iplik)
+  where: reference_py/oligoscout_thermo/seqpair.py; reference_py/cli/sequence_qc.py
+  evidence_level: regression
+  evidence:
+    regression:
+    - seqpair/seqpair_qc.tsv
+    - seqpair/seqpair_qc_records.jsonl
+    archive:
+    - _bis_test/seqpair_qc.tsv
+    - _bis_test/seqpair_qc_records.jsonl
+    - _newqc_test/seqpair_qc.tsv
+    - _newqc_test/seqpair_qc_records.jsonl
+    - design_ctdna/seqpair_qc.tsv
+    - design_ctdna/seqpair_qc_records.jsonl
+    - seqpair/seqpair_qc.tsv
+    - seqpair/seqpair_qc_records.jsonl
+    unit_test:
+    - reference_py/tests/test_seqpair.py:75
+    code:
+    - reference_py/oligoscout_thermo/seqpair.py:9
+    - web/src/core.js:221
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: G-dörtlüsü adayları
+    en: Potential G-quadruplex motifs
+  check:
+    tr: Dizide G-dörtlüsü oluşturabilecek G bakımından zengin motifleri arar.
+    en: Looks for G-rich motifs that could form a G-quadruplex.
+  why:
+    tr: Böyle bir yapı bağlanmayı etkileyebilir. Motif tek başına yapının oluştuğunu göstermez.
+    en: The structure can affect binding if it forms. A motif alone does not prove formation.
+- id: CMP-07
+  family: Kompozisyon
+  status: etiketli_uygulandi
+  spec_title: primer / 5′/3′ stabilite dengesi / ΔG(3′ yarı) − ΔG(5′ yarı)
+  where: reference_py/oligoscout_thermo/seqpair.py; reference_py/cli/sequence_qc.py
+  evidence_level: regression
+  evidence:
+    regression:
+    - seqpair/seqpair_qc.tsv
+    - seqpair/seqpair_qc_records.jsonl
+    archive:
+    - _bis_test/seqpair_qc.tsv
+    - _bis_test/seqpair_qc_records.jsonl
+    - _newqc_test/seqpair_qc.tsv
+    - _newqc_test/seqpair_qc_records.jsonl
+    - design_ctdna/seqpair_qc.tsv
+    - design_ctdna/seqpair_qc_records.jsonl
+    - seqpair/seqpair_qc.tsv
+    - seqpair/seqpair_qc_records.jsonl
+    unit_test:
+    - reference_py/tests/test_seqpair.py:76
+    code:
+    - reference_py/oligoscout_thermo/seqpair.py:10
+    - web/src/core.js:222
+    - web/src/views2.js:365
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Primer uçlarının bağlanma dengesi
+    en: Binding balance across primer ends
+  check:
+    tr: Primerin 5′ ve 3′ yarılarının tahmini bağlanma enerjilerini karşılaştırır.
+    en: Compares estimated binding energies of the 5′ and 3′ halves.
+  why:
+    tr: Genel bağlanma gücü, bir ucun çok daha zayıf olduğunu gizleyebilir.
+    en: Overall binding strength can hide a much weaker end.
+- id: CMP-08
+  family: Kompozisyon
+  status: etiketli_uygulandi
+  spec_title: primer / 3′ terminal baz / Son baz kimliği
+  where: reference_py/oligoscout_thermo/seqpair.py; reference_py/cli/sequence_qc.py
+  evidence_level: regression
+  evidence:
+    regression:
+    - seqpair/seqpair_qc.tsv
+    - seqpair/seqpair_qc_records.jsonl
+    archive:
+    - _bis_test/seqpair_qc.tsv
+    - _bis_test/seqpair_qc_records.jsonl
+    - _newqc_test/seqpair_qc.tsv
+    - _newqc_test/seqpair_qc_records.jsonl
+    - design_ctdna/seqpair_qc.tsv
+    - design_ctdna/seqpair_qc_records.jsonl
+    - seqpair/seqpair_qc.tsv
+    - seqpair/seqpair_qc_records.jsonl
+    unit_test:
+    - reference_py/tests/test_seqpair.py:67
+    code:
+    - reference_py/oligoscout_thermo/seqpair.py:11
+    - web/src/core.js:223
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Primerin son bazı
+    en: Primer terminal base
+  check:
+    tr: Primerin 3′ ucundaki bazın kimliğini kaydeder.
+    en: Records the base at the primer’s 3′ end.
+  why:
+    tr: Uzamanın başladığı bu konum, uçtaki kararlılığı ve uyumsuzlukları yorumlamaya yardım eder.
+    en: Extension begins here, so its identity helps explain end stability and mismatches.
+- id: COND-01
+  family: Kosul
+  status: etiketli_uygulandi
+  spec_title: girdi / Reaksiyon koşulları / Na⁺, K⁺, Mg²⁺, dNTP, primer/prob konsantrasyonu, Ta, katkılar
+  where: reference_py\cli\panel_qc.py (COND-01 reaksiyon kosullari beyani); salt.Conditions
+  evidence_level: regression
+  evidence:
+    regression:
+    - panel_qc/panel_qc_records.jsonl
+    archive:
+    - _newpanel_test/panel_qc_records.jsonl
+    - web_panel_ctdna/panel_qc_records.jsonl
+    unit_test: []
+    code:
+    - reference_py/cli/panel_qc.py:465
+    - reference_py/oligoscout_thermo/salt.py:4
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Reaksiyon koşullarının kaydı
+    en: Reaction conditions record
+  check:
+    tr: Sıcaklığı, iyon ve reaktif derişimlerini ve bildirilen katkıları kaydeder.
+    en: Records temperature, ion and reagent concentrations, and declared additives.
+  why:
+    tr: Aynı dizi farklı koşullarda farklı davranabilir; kayıt, sonuçları karşılaştırmayı sağlar.
+    en: The same sequence can behave differently under different conditions; recording them enables comparisons.
+- id: COND-02
+  family: Kosul
+  status: etiketli_uygulandi
+  spec_title: girdi / Serbest Mg²⁺ / [Mg]serbest ≈ [Mg] − [dNTP]
+  where: reference_py\cli\panel_qc.py (COND-02 serbest Mg beyani); salt.free_magnesium_M
+  evidence_level: regression
+  evidence:
+    regression:
+    - panel_qc/panel_qc_records.jsonl
+    archive:
+    - _newpanel_test/panel_qc_records.jsonl
+    - web_panel_ctdna/panel_qc_records.jsonl
+    unit_test: []
+    code:
+    - reference_py/cli/panel_qc.py:520
+    - reference_py/oligoscout_thermo/salt.py:4
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Serbest magnezyum tahmini
+    en: Estimated free magnesium
+  check:
+    tr: dNTP’lere bağlanan kısmı hesaba katarak serbest magnezyumu yaklaşık hesaplar.
+    en: Estimates free magnesium after accounting for the portion bound to dNTPs.
+  why:
+    tr: Erime sıcaklığını etkileyen serbest miktar, toplam magnezyumdan farklı olabilir.
+    en: The free amount that affects melting temperature can differ from the total magnesium.
+- id: CT-01
+  family: ctDNA
+  status: etiketli_uygulandi
+  spec_title: amplikon / Kısa amplikon / bp
+  where: reference_py\oligoscout_thermo\profiles.py
+  evidence_level: regression
+  evidence:
+    regression:
+    - design_ctdna/design_pairs.tsv [product_length]
+    archive: []
+    unit_test: []
+    code:
+    - reference_py/oligoscout_thermo/profiles.py:136
+    - web/src/core.js:172
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: ctDNA için ürün boyu
+    en: Product size for ctDNA
+  check:
+    tr: Ürünün uzunluğunu seçili ctDNA profiline göre değerlendirir.
+    en: Evaluates product length against the selected ctDNA profile.
+  why:
+    tr: Daha kısa hedeflerin iki ucunun aynı fragmanda bulunma olasılığı daha yüksektir.
+    en: Both ends of a shorter target are more likely to be in the same fragment.
+- id: CT-02
+  family: ctDNA
+  status: etiketli_uygulandi
+  spec_title: amplikon / Bütün fragman olasılığı / P = Σ f(L)·max(0, L−A+1)/L, fragman dağılımı üzerinden
+  where: reference_py\cli\design_primers.py; reference_py\cli\multiplex_qc.py; reference_py\oligosc
+  evidence_level: regression
+  evidence:
+    regression:
+    - design_ctdna/ctdna_detectability.tsv [p_intact_fragment]
+    archive: []
+    unit_test:
+    - reference_py/tests/test_multiplex.py:130
+    code:
+    - reference_py/cli/design_primers.py:212
+    - reference_py/cli/multiplex_qc.py:43
+    - reference_py/oligoscout_thermo/profiles.py:48
+    - web/src/core.js:169
+    - web/src/views2.js:373
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Hedefin fragmanda bütün kalması
+    en: Chance the target stays intact
+  check:
+    tr: Fragman boylarından tüm PCR hedefinin tek bir fragmanda bulunma olasılığını tahmin eder.
+    en: Uses fragment sizes to estimate the chance of spanning the entire PCR target.
+  why:
+    tr: Hedefin bir ucu eksikse o molekül beklenen ürünü veremez.
+    en: A molecule cannot yield the expected product if either end of the target is missing.
+- id: CT-03
+  family: ctDNA
+  status: etiketli_uygulandi
+  spec_title: çift / Tespit edilebilirlik (Poisson) / λ = GE × VAF × P_bütün; P(≥1 kopya)=1−e^−λ
+  where: reference_py\cli\design_primers.py; reference_py\oligoscout_thermo\profiles.py; reference_
+  evidence_level: regression
+  evidence:
+    regression:
+    - design_ctdna/ctdna_detectability.tsv [p_detect]
+    archive: []
+    unit_test:
+    - reference_py/tests/test_multiplex.py:138
+    code:
+    - reference_py/cli/design_primers.py:212
+    - reference_py/oligoscout_thermo/profiles.py:48
+    - web/src/core.js:170
+    - web/src/views2.js:373
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: En az bir hedef kopyası olasılığı
+    en: Chance of at least one target copy
+  check:
+    tr: Girdi miktarından ve varyant oranından örnekte en az bir kullanılabilir kopya bulunma olasılığını tahmin
+      eder.
+    en: Uses input quantity and variant fraction to estimate the chance that the sample contains at least one usable
+      copy.
+  why:
+    tr: Nadir bir varyant, primerler uygun olsa bile örnekleme nedeniyle tüpte bulunmayabilir.
+    en: A rare variant can be absent through sampling alone, even with suitable primers.
+- id: CT-04
+  family: ctDNA
+  status: etiketli_uygulandi
+  spec_title: primer / Allel-spesifik (ARMS) ayrım / 3′ terminal varyant + −2/−3 kasıtlı uyumsuzluk; ΔΔG(mut vs
+    wt) ve θ_wt(
+  where: RUN_KONTROL.cmd; reference_py\cli\terminal_table_audit.py; reference_py\cli\thermo_report.
+  evidence_level: unit_test
+  evidence:
+    regression: []
+    archive: []
+    unit_test:
+    - reference_py/tests/test_ct04.py:1
+    code:
+    - reference_py/cli/terminal_table_audit.py:2
+    - reference_py/cli/thermo_report.py:80
+    - reference_py/oligoscout_thermo/concentration.py:144
+    - reference_py/oligoscout_thermo/engine.py:118
+    - reference_py/oligoscout_thermo/nn.py:164
+    - reference_py/oligoscout_thermo/profiles.py:138
+    - web/src/core.js:173
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Alele özgü primer ayrımı
+    en: Allele-specific primer discrimination
+  check:
+    tr: Primerin referans ve alternatif alellere tahmini bağlanmasını karşılaştırır.
+    en: Compares estimated primer binding to reference and alternate alleles.
+  why:
+    tr: İki alel benzer biçimde bağlanırsa sinyali doğru alele atamak zorlaşabilir.
+    en: If both alleles bind similarly, assigning the signal to the right allele becomes harder.
+- id: CT-05
+  family: ctDNA
+  status: etiketli_uygulandi
+  spec_title: prob / Wild-type blocker / ddPCR prob ayrımı / ΔTm(mut vs wt prob)
+  where: reference_py/oligoscout_thermo/seqpair.py; cli/blocker_qc.py (LNA modellenmiyor)
+  evidence_level: unit_test
+  evidence:
+    regression: []
+    archive:
+    - blocker/ct05_qc.tsv
+    - blocker/ct05_qc_records.jsonl
+    unit_test:
+    - reference_py/tests/test_seqpair.py:385
+    code:
+    - reference_py/cli/blocker_qc.py:2
+    - reference_py/oligoscout_thermo/seqpair.py:21
+    - web/local_engine.py:766
+    - web/src/core.js:174
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Alel ayıran problar ve engelleyiciler
+    en: Allele-discriminating probes and blockers
+  check:
+    tr: Alelleri ayıran probların tahmini erime sıcaklıklarını ve varsa engelleyiciyi değerlendirir.
+    en: Evaluates estimated melting temperatures of allele-discriminating probes and a blocker, if supplied.
+  why:
+    tr: Yakın değerler sinyalleri ayırmayı zorlaştırabilir. Bazı modifikasyonlar bu hesapta modellenmez.
+    en: Similar values can make signals harder to separate. Some modifications are not modeled here.
+- id: CT-06
+  family: ctDNA
+  status: etiketli_uygulandi
+  spec_title: hedef / CHIP geni uyarısı / Hedef DNMT3A, TET2, ASXL1, JAK2, TP53, PPM1D vb.
+  where: reference_py/oligoscout_thermo/seqpair.py; reference_py/cli/sequence_qc.py
+  evidence_level: regression
+  evidence:
+    regression:
+    - seqpair/seqpair_qc.tsv
+    - seqpair/seqpair_qc_records.jsonl
+    archive:
+    - _bis_test/seqpair_qc.tsv
+    - _bis_test/seqpair_qc_records.jsonl
+    - _newqc_test/seqpair_qc.tsv
+    - _newqc_test/seqpair_qc_records.jsonl
+    - design_ctdna/seqpair_qc.tsv
+    - design_ctdna/seqpair_qc_records.jsonl
+    - seqpair/seqpair_qc.tsv
+    - seqpair/seqpair_qc_records.jsonl
+    unit_test: []
+    code:
+    - reference_py/cli/sequence_qc.py:81
+    - reference_py/oligoscout_thermo/seqpair.py:353
+    - web/src/core.js:175
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Klonal hematopoez uyarısı
+    en: Clonal hematopoiesis flag
+  check:
+    tr: Hedef genin klonal hematopoez ile ilişkili genler listesinde olup olmadığına bakar.
+    en: Checks whether the target gene is listed as associated with clonal hematopoiesis.
+  why:
+    tr: Bir varyant kan hücrelerinden kaynaklanabilir; bu işaret tek başına kaynağı belirlemez.
+    en: A variant may come from blood cells; the flag alone cannot determine its origin.
+- id: DIM-01
+  family: Dimer
+  status: etiketli_uygulandi
+  spec_title: primer / Self-dimer (genel) / Kendi termodinamik hizalama DP'si (iç döngü/bulge dahil); Tm_dimer ve
+    θ_dimer(Ta
+  where: reference_py\cli\bulge_compare.py; reference_py\cli\thermo_report.py; reference_py\oligosc
+  evidence_level: regression
+  evidence:
+    regression:
+    - bulge/bulge_detay.tsv
+    - design_ctdna/design_rejections.tsv
+    - panel_qc/panel_qc_records.jsonl
+    - thermo/thermo_records.jsonl
+    archive:
+    - _design/design_rejections.tsv
+    - _newpanel_test/panel_qc_records.jsonl
+    - _smoke/panel_qc_records.jsonl
+    - bulge/bulge_detay.tsv
+    - chr22_panel/thermo_records.jsonl
+    - demo/thermo_records.jsonl
+    - design/design_rejections.tsv
+    - design_ctdna/design_rejections.tsv
+    - design_ddpcr/design_rejections.tsv
+    - design_qpcr_sybr/design_rejections.tsv
+    - panel/panel_qc_records.jsonl
+    - panel_design_ctdna/panel_qc_records.jsonl
+    - panel_design_panel/panel_qc_records.jsonl
+    - panel_design_qpcr_sybr/panel_qc_records.jsonl
+    - panel_qc_dene/panel_qc_records.jsonl
+    - web_design_check/design_rejections.tsv
+    - web_panel_ctdna/panel_qc_records.jsonl
+    unit_test:
+    - reference_py/tests/test_thermo.py:247
+    code:
+    - reference_py/cli/bulge_compare.py:57
+    - reference_py/cli/thermo_report.py:188
+    - reference_py/oligoscout_thermo/align.py:3
+    - reference_py/oligoscout_thermo/design.py:242
+    - reference_py/oligoscout_thermo/engine.py:39
+    - reference_py/oligoscout_thermo/params.py:507
+    - web/src/core.js:157
+    - web/src/views2.js:189
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Primerin kendisiyle dimeri
+    en: Primer self-dimer
+  check:
+    tr: Aynı primerin iki kopyasının birbirine nasıl bağlanabileceğini tahmin eder.
+    en: Predicts how two copies of the same primer could bind to each other.
+  why:
+    tr: Dimere bağlanan primerin hedefe bağlanma olasılığı azalabilir.
+    en: Primer held in a dimer may be less available to bind the target.
+- id: DIM-02
+  family: Dimer
+  status: etiketli_uygulandi
+  spec_title: primer / Self-dimer (3′ uçlu) / 3′ uç eşleşmiş ve uzatılabilir dimer
+  where: reference_py\cli\bulge_compare.py; reference_py\cli\thermo_report.py; reference_py\oligosc
+  evidence_level: regression
+  evidence:
+    regression:
+    - bulge/bulge_detay.tsv
+    - design_ctdna/design_rejections.tsv
+    - panel_qc/panel_qc_records.jsonl
+    - thermo/thermo_records.jsonl
+    archive:
+    - _design/design_rejections.tsv
+    - _newpanel_test/panel_qc_records.jsonl
+    - _smoke/panel_qc_records.jsonl
+    - bulge/bulge_detay.tsv
+    - chr22_panel/thermo_records.jsonl
+    - demo/thermo_records.jsonl
+    - panel/panel_qc_records.jsonl
+    - panel_design_ctdna/panel_qc_records.jsonl
+    - panel_design_panel/panel_qc_records.jsonl
+    - panel_design_qpcr_sybr/panel_qc_records.jsonl
+    - panel_qc_dene/panel_qc_records.jsonl
+    - web_design_check/design_rejections.tsv
+    - web_panel_ctdna/panel_qc_records.jsonl
+    unit_test:
+    - reference_py/tests/test_thermo.py:247
+    code:
+    - reference_py/cli/bulge_compare.py:57
+    - reference_py/cli/thermo_report.py:188
+    - reference_py/oligoscout_thermo/design.py:246
+    - reference_py/oligoscout_thermo/engine.py:41
+    - web/src/core.js:158
+    - web/src/views2.js:189
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Kendisiyle uzayabilen dimer
+    en: Extendable self-dimer
+  check:
+    tr: Aynı primerin iki kopyası bağlandığında eşleşen 3′ uçları arar.
+    en: Looks for paired 3′ ends when two copies of a primer bind.
+  why:
+    tr: Eşleşmiş uç uzatılırsa istenmeyen bir primer dimeri ürünü oluşabilir.
+    en: Extension from a paired end can create an unwanted primer-dimer product.
+- id: DIM-03
+  family: Dimer
+  status: etiketli_uygulandi
+  spec_title: çift / Hetero-dimer F×R (genel) / DIM-01 ile aynı
+  where: reference_py\cli\bulge_compare.py; reference_py\cli\thermo_report.py; reference_py\oligosc
+  evidence_level: regression
+  evidence:
+    regression:
+    - bulge/bulge_detay.tsv
+    archive:
+    - _design/design_rejections.tsv
+    - bulge/bulge_detay.tsv
+    - chr22_panel/thermo_records.jsonl
+    - design/design_rejections.tsv
+    - design_qpcr_sybr/design_rejections.tsv
+    unit_test: []
+    code:
+    - reference_py/cli/bulge_compare.py:58
+    - reference_py/cli/thermo_report.py:197
+    - reference_py/oligoscout_thermo/design.py:305
+    - reference_py/oligoscout_thermo/engine.py:39
+    - web/src/core.js:157
+    - web/src/views2.js:189
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: İleri ve geri primer dimeri
+    en: Forward–reverse primer dimer
+  check:
+    tr: İleri ve geri primerin birbirine bağlanma eğilimini tahmin eder.
+    en: Estimates how readily forward and reverse primers can bind together.
+  why:
+    tr: Primerlerin birbirine tutunması, hedefe tutunmalarıyla rekabet edebilir.
+    en: Primer-to-primer binding can compete with target binding.
+- id: DIM-04
+  family: Dimer
+  status: etiketli_uygulandi
+  spec_title: çift / Hetero-dimer F×R (3′ uçlu) / DIM-02 ile aynı; öngörülen primer-dimer ürün dizisi ve uzunluğu
+    raporlanır
+  where: reference_py\cli\bulge_compare.py; reference_py\cli\thermo_report.py; reference_py\oligosc
+  evidence_level: regression
+  evidence:
+    regression:
+    - bulge/bulge_detay.tsv
+    archive:
+    - _design/design_rejections.tsv
+    - bulge/bulge_detay.tsv
+    - chr22_panel/thermo_records.jsonl
+    - design/design_rejections.tsv
+    - design_qpcr_sybr/design_rejections.tsv
+    unit_test: []
+    code:
+    - reference_py/cli/bulge_compare.py:58
+    - reference_py/cli/thermo_report.py:197
+    - reference_py/oligoscout_thermo/align.py:3
+    - reference_py/oligoscout_thermo/design.py:310
+    - reference_py/oligoscout_thermo/engine.py:41
+    - reference_py/oligoscout_thermo/params.py:507
+    - web/src/core.js:158
+    - web/src/views2.js:189
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: İleri ve geri primerde uzayabilen dimer
+    en: Extendable forward–reverse dimer
+  check:
+    tr: İki primerin 3′ uçtan uzamaya elverişli bir yapı oluşturup oluşturamayacağını inceler.
+    en: Checks whether the two primers can form a structure that allows extension from a 3′ end.
+  why:
+    tr: Böyle bir dimer çoğalırsa hedef ürüne rakip istenmeyen bir ürün oluşturabilir.
+    en: Amplifying such a dimer can create an unwanted product that competes with the target.
+- id: DIM-05
+  family: Dimer
+  status: etiketli_uygulandi
+  spec_title: prob / Primer × prob / Tüm kombinasyonlar
+  where: reference_py/oligoscout_thermo/seqpair.py; reference_py/cli/sequence_qc.py
+  evidence_level: unit_test
+  evidence:
+    regression: []
+    archive:
+    - _newqc_test/seqpair_qc.tsv
+    - _newqc_test/seqpair_qc_records.jsonl
+    - blocker/ct05_qc.tsv
+    - blocker/ct05_qc_records.jsonl
+    unit_test:
+    - reference_py/tests/test_seqpair.py:220
+    code:
+    - reference_py/cli/blocker_qc.py:8
+    - reference_py/cli/bulge_compare.py:120
+    - reference_py/cli/sequence_qc.py:86
+    - reference_py/oligoscout_thermo/seqpair.py:22
+    - web/src/core.js:206
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Primer ve prob etkileşimi
+    en: Primer–probe interactions
+  check:
+    tr: Probların veya verilen diğer oligonükleotidlerin primerlerle dimerleşmesini değerlendirir.
+    en: Assesses potential dimers between primers and supplied probes or other oligonucleotides.
+  why:
+    tr: Bu etkileşim hedef çoğaltmayı veya sinyal üretimini azaltabilir.
+    en: These interactions can reduce target amplification or signal generation.
+- id: DIM-06
+  family: Dimer
+  status: etiketli_uygulandi
+  spec_title: panel / Multipleks matris / n(n+1)/2 kombinasyon; ısı haritası; en kötü 3′-uçlu çift
+  where: reference_py\cli\bulge_compare.py; reference_py\cli\compare_profiles.py; reference_py\cli\
+  evidence_level: regression
+  evidence:
+    regression:
+    - multiplex/multiplex_summary.tsv
+    archive:
+    - panel_design_panel/multiplex_summary.tsv
+    unit_test: []
+    code:
+    - reference_py/cli/bulge_compare.py:77
+    - reference_py/cli/compare_profiles.py:74
+    - reference_py/cli/multiplex_qc.py:195
+    - reference_py/oligoscout_thermo/align.py:3
+    - reference_py/oligoscout_thermo/params.py:507
+    - web/src/core.js:182
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Panelde çiftler arası dimerler
+    en: Dimer interactions across the panel
+  check:
+    tr: Paneldeki kombinasyonları inceler ve riskli 3′ uç eşleşmelerini belirler.
+    en: Compares panel combinations and identifies risky 3′ interactions.
+  why:
+    tr: Tek başına uygun görünen primerler aynı tüpte birbirleriyle etkileşebilir.
+    en: Primers that work individually may interact in the same tube.
+- id: DIM-07
+  family: Dimer
+  status: etiketli_uygulandi
+  spec_title: primer / Kuyruk dahil analiz / M13/NGS adaptör kuyrukları dahil DIM/SS yeniden hesaplanır
+  where: reference_py\oligoscout_thermo\seqpair.py:check_dim07; cli\sequence_qc.py (--tails)
+  evidence_level: unit_test
+  evidence:
+    regression: []
+    archive:
+    - _newqc_test/seqpair_qc.tsv
+    - _newqc_test/seqpair_qc_records.jsonl
+    unit_test:
+    - reference_py/tests/test_seqpair.py:440
+    code:
+    - reference_py/cli/bulge_compare.py:120
+    - reference_py/cli/sequence_qc.py:92
+    - reference_py/oligoscout_thermo/profiles.py:159
+    - reference_py/oligoscout_thermo/seqpair.py:812
+    - web/src/core.js:206
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Kuyruklu primerin tam dizisi
+    en: Full sequence of a tailed primer
+  check:
+    tr: Kuyruk veya adaptör eklenmiş tam diziyle dimer ve katlanma kontrollerini tekrarlar.
+    en: Repeats dimer and folding checks on the full sequence including the tail or adapter.
+  why:
+    tr: Eklenen bölüm yeni etkileşimler oluşturabilir.
+    en: The added sequence can introduce new interactions.
+- id: DIM-08
+  family: Dimer
+  status: etiketli_uygulandi
+  spec_title: simetri testi / Hesaplama tutarlılığı / dimer(A,B) = dimer(B,A); ters-tamamlayıcı değişmezlikleri
+  where: reference_py\cli\bulge_compare.py; reference_py\oligoscout_thermo\align.py; reference_py\o
+  evidence_level: unit_test
+  evidence:
+    regression: []
+    archive: []
+    unit_test:
+    - reference_py/tests/test_dimer_fold.py:127
+    code:
+    - reference_py/cli/bulge_compare.py:63
+    - reference_py/oligoscout_thermo/align.py:3
+    - reference_py/oligoscout_thermo/params.py:507
+    - web/src/core.js:160
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Dimer hesabının tutarlılığı
+    en: Dimer calculation consistency
+  check:
+    tr: Primerlerin sırası değiştiğinde aynı etkileşim için sonucun tutarlı kalmasını sınar.
+    en: Checks whether swapping primer order preserves the result for the same interaction.
+  why:
+    tr: Girdinin yazılış sırasına bağlı sonuçlar güvenilir biçimde karşılaştırılamaz.
+    en: Results that depend on input order cannot be compared reliably.
+- id: MPX-01
+  family: Multipleks
+  status: etiketli_uygulandi
+  spec_title: panel / Tm homojenliği / Paneldeki Tm aralığı
+  where: reference_py\cli\compare_profiles.py; reference_py\cli\multiplex_qc.py; reference_py\oligo
+  evidence_level: regression
+  evidence:
+    regression:
+    - multiplex/multiplex_summary.tsv
+    archive:
+    - panel_design_panel/multiplex_summary.tsv
+    unit_test: []
+    code:
+    - reference_py/cli/compare_profiles.py:71
+    - reference_py/cli/multiplex_qc.py:2
+    - reference_py/oligoscout_thermo/__init__.py:15
+    - reference_py/oligoscout_thermo/multiplex.py:1
+    - web/src/core.js:182
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Panelde erime sıcaklığı uyumu
+    en: Melting temperature consistency across the panel
+  check:
+    tr: Paneldeki en düşük ve en yüksek primer Tm değerleri arasındaki farkı ölçer.
+    en: Measures the gap between the lowest and highest primer Tm in the panel.
+  why:
+    tr: Ortak koşullarda büyük farklar bazı hedeflerin diğerlerinden daha verimli çoğalmasına yol açabilir.
+    en: Under shared conditions, large gaps can make some targets amplify more efficiently than others.
+- id: MPX-02
+  family: Multipleks
+  status: etiketli_uygulandi
+  spec_title: panel / Çapraz ürünler / Tüm primer kombinasyonları ile tüm-tüme özgüllük
+  where: RUN_PANEL.cmd; reference_py\cli\compare_profiles.py; reference_py\cli\multiplex_qc.py
+  evidence_level: regression
+  evidence:
+    regression:
+    - multiplex/multiplex_summary.tsv
+    archive:
+    - panel_design_panel/multiplex_summary.tsv
+    unit_test: []
+    code:
+    - reference_py/cli/compare_profiles.py:51
+    - reference_py/cli/multiplex_qc.py:2
+    - reference_py/oligoscout_thermo/multiplex.py:1
+    - web/src/core.js:177
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Panelde beklenmeyen çapraz ürünler
+    en: Unexpected cross-products in the panel
+  check:
+    tr: Farklı hedeflere ait primerlerin birlikte istenmeyen bir genomik ürün oluşturup oluşturamayacağını inceler.
+    en: Checks whether primers for different targets could form an unintended genomic product together.
+  why:
+    tr: Çapraz ürünler hedef ürünlerle rekabet edebilir veya yanlış hedefe sinyal atfedilmesine yol açabilir.
+    en: Cross-products can compete with intended products or lead to signals being assigned to the wrong target.
+- id: MPX-03
+  family: Multipleks
+  status: etiketli_uygulandi
+  spec_title: panel / Amplikon boy ayrımı (CE) / Komşu ürün boy farkı
+  where: reference_py\cli\multiplex_qc.py; reference_py\oligoscout_thermo\multiplex.py; reference_p
+  evidence_level: regression
+  evidence:
+    regression:
+    - multiplex/multiplex_summary.tsv
+    archive:
+    - panel_design_panel/multiplex_summary.tsv
+    unit_test: []
+    code:
+    - reference_py/cli/multiplex_qc.py:2
+    - reference_py/oligoscout_thermo/__init__.py:15
+    - reference_py/oligoscout_thermo/multiplex.py:1
+    - web/src/core.js:182
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Ürünlerin boylarına göre ayrımı
+    en: Product separation by size
+  check:
+    tr: Birbirine uzunlukça en yakın ürünler arasındaki farkı ölçer.
+    en: Measures the gap between products closest in length.
+  why:
+    tr: Okuma ürün boyuna dayanıyorsa benzer uzunluktaki ürünleri ayırmak zor olabilir.
+    en: Similarly sized products can be hard to tell apart when the readout depends on size.
+- id: NGS-01
+  family: NGS
+  status: etiketli_uygulandi
+  spec_title: primer / Adaptör dahil analiz / DIM-07 zorunlu
+  where: reference_py\oligoscout_thermo\profiles.py
+  evidence_level: code_reference
+  evidence:
+    regression: []
+    archive: []
+    unit_test: []
+    code:
+    - reference_py/oligoscout_thermo/profiles.py:158
+    - reference_py/oligoscout_thermo/seqpair.py:859
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Dizileme adaptörüyle birlikte kontrol
+    en: Check with sequencing adapters
+  check:
+    tr: Adaptörlü primerin tamamı için dimer ve katlanma kontrolünün gerekli olduğunu belirtir.
+    en: Flags the need for dimer and folding checks on the full adapter-containing primer.
+  why:
+    tr: Adaptörün getirdiği etkileşimler dizileme kütüphanesinin kalitesini etkileyebilir.
+    en: Adapter interactions can affect sequencing library quality.
+- id: PAIR-01
+  family: Cift uyumu
+  status: etiketli_uygulandi
+  spec_title: çift / ΔTm (F−R) / \
+  where: reference_py\cli\thermo_report.py; reference_py\oligoscout_thermo\design.py; reference_py\
+  evidence_level: regression
+  evidence:
+    regression:
+    - design_ctdna/design_pairs.tsv [delta_tm_c]
+    archive:
+    - _design/design_rejections.tsv
+    - chr22_panel/thermo_records.jsonl
+    - design/design_rejections.tsv
+    - design_ctdna/design_rejections.tsv
+    - design_ddpcr/design_rejections.tsv
+    - design_qpcr_sybr/design_rejections.tsv
+    - web_design_check/design_rejections.tsv
+    unit_test: []
+    code:
+    - reference_py/cli/thermo_report.py:197
+    - reference_py/oligoscout_thermo/design.py:295
+    - reference_py/oligoscout_thermo/engine.py:43
+    - web/src/core.js:163
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Primerlerin erime sıcaklığı farkı
+    en: Melting temperature difference between primers
+  check:
+    tr: İleri ve geri primerin erime sıcaklıklarını karşılaştırır.
+    en: Compares forward and reverse primer melting temperatures.
+  why:
+    tr: Benzer sıcaklıklar iki primerin ortak bağlanma koşullarında çalışmasını kolaylaştırır.
+    en: Similar values help both primers work under the same annealing conditions.
+- id: PAIR-02
+  family: Cift uyumu
+  status: etiketli_uygulandi
+  spec_title: çift / Ürün boyutu / Profil penceresi
+  where: reference_py/oligoscout_thermo/seqpair.py; reference_py/cli/sequence_qc.py
+  evidence_level: regression
+  evidence:
+    regression:
+    - seqpair/seqpair_qc.tsv
+    - seqpair/seqpair_qc_records.jsonl
+    archive:
+    - _bis_test/seqpair_qc.tsv
+    - _bis_test/seqpair_qc_records.jsonl
+    - _newqc_test/seqpair_qc.tsv
+    - _newqc_test/seqpair_qc_records.jsonl
+    - design_ctdna/seqpair_qc.tsv
+    - design_ctdna/seqpair_qc_records.jsonl
+    - seqpair/seqpair_qc.tsv
+    - seqpair/seqpair_qc_records.jsonl
+    unit_test:
+    - reference_py/tests/test_seqpair.py:88
+    code:
+    - reference_py/oligoscout_thermo/seqpair.py:13
+    - web/src/core.js:243
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Ürün boyunun profile uygunluğu
+    en: Product size for the selected profile
+  check:
+    tr: Beklenen ürün uzunluğunu seçili uygulamanın aralığıyla karşılaştırır.
+    en: Compares expected product length with the selected application’s range.
+  why:
+    tr: Bir uygulamada uygun ürün boyu başka bir okuma türünde uygun olmayabilir.
+    en: A suitable size for one application may not suit another readout.
+- id: PAIR-03
+  family: Cift uyumu
+  status: etiketli_uygulandi
+  spec_title: çift / Primer çakışması / F ve R bölgeleri örtüşüyor mu / arası mesafe
+  where: reference_py/oligoscout_thermo/seqpair.py; reference_py/cli/sequence_qc.py
+  evidence_level: regression
+  evidence:
+    regression:
+    - seqpair/seqpair_qc.tsv
+    - seqpair/seqpair_qc_records.jsonl
+    archive:
+    - _bis_test/seqpair_qc.tsv
+    - _bis_test/seqpair_qc_records.jsonl
+    - _newqc_test/seqpair_qc.tsv
+    - _newqc_test/seqpair_qc_records.jsonl
+    - design_ctdna/seqpair_qc.tsv
+    - design_ctdna/seqpair_qc_records.jsonl
+    - seqpair/seqpair_qc.tsv
+    - seqpair/seqpair_qc_records.jsonl
+    unit_test:
+    - reference_py/tests/test_seqpair.py:92
+    code:
+    - reference_py/oligoscout_thermo/seqpair.py:14
+    - web/src/core.js:245
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Primer bölgelerinin yerleşimi
+    en: Placement of primer binding regions
+  check:
+    tr: İki primerin bağlanma bölgelerinin konumunu ve örtüşmesini inceler.
+    en: Checks the relative positions of the two binding regions and whether they overlap.
+  why:
+    tr: Yanlış yerleşim hedefin iki primer arasında kalmasını engelleyebilir.
+    en: Incorrect placement can leave the target outside the two primers.
+- id: PAIR-04
+  family: Cift uyumu
+  status: etiketli_uygulandi
+  spec_title: çift / Ürün Tm ve primer Tm farkı / Tm(ürün) − Tm(primer)
+  where: reference_py/oligoscout_thermo/seqpair.py; reference_py/cli/sequence_qc.py
+  evidence_level: regression
+  evidence:
+    regression:
+    - seqpair/seqpair_qc.tsv
+    - seqpair/seqpair_qc_records.jsonl
+    archive:
+    - _bis_test/seqpair_qc.tsv
+    - _bis_test/seqpair_qc_records.jsonl
+    - _newqc_test/seqpair_qc.tsv
+    - _newqc_test/seqpair_qc_records.jsonl
+    - design_ctdna/seqpair_qc.tsv
+    - design_ctdna/seqpair_qc_records.jsonl
+    - seqpair/seqpair_qc.tsv
+    - seqpair/seqpair_qc_records.jsonl
+    unit_test:
+    - reference_py/tests/test_seqpair.py:108
+    code:
+    - reference_py/oligoscout_thermo/seqpair.py:15
+    - web/src/core.js:164
+    - web/src/views2.js:367
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Ürün ve primer erime farkı
+    en: Melting gap between product and primer
+  check:
+    tr: Ürünün erime sıcaklığı ile primerin erime sıcaklığı arasındaki farkı hesaplar.
+    en: Calculates the difference between product and primer melting temperatures.
+  why:
+    tr: Bu fark ürünün ayrılmasıyla primerin bağlanmasını birlikte yorumlamayı sağlar.
+    en: The gap helps interpret product separation alongside primer binding.
+- id: PRB-01
+  family: Prob
+  status: etiketli_uygulandi
+  spec_title: prob / Prob Tm farkı / Tm(prob) − ort. Tm(primer)
+  where: RUN_DESIGN.cmd; reference_py\cli\probe_qc.py; reference_py\oligoscout_thermo\probe.py
+  evidence_level: regression
+  evidence:
+    regression:
+    - probe/probe_qc.tsv
+    - probe/probe_qc_records.jsonl
+    archive:
+    - design_ddpcr/probe_qc.tsv
+    - design_ddpcr/probe_qc_records.jsonl
+    - design_qpcr_sybr/probe_qc.tsv
+    - design_qpcr_sybr/probe_qc_records.jsonl
+    - probe_design/probe_qc.tsv
+    - probe_design/probe_qc_records.jsonl
+    unit_test:
+    - reference_py/tests/test_probe.py:1
+    code:
+    - reference_py/cli/probe_qc.py:2
+    - reference_py/oligoscout_thermo/__init__.py:17
+    - reference_py/oligoscout_thermo/probe.py:1
+    - reference_py/oligoscout_thermo/profiles.py:143
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Prob ve primer erime farkı
+    en: Melting gap between probe and primers
+  check:
+    tr: Probun erime sıcaklığını primerlerin ortalama erime sıcaklığıyla karşılaştırır.
+    en: Compares probe melting temperature with the primers’ average.
+  why:
+    tr: Probun bağlı kalması, ürün oluştuğunda tutarlı sinyal üretmesine yardımcı olur.
+    en: A bound probe helps produce a consistent signal when product forms.
+- id: PRB-02
+  family: Prob
+  status: etiketli_uygulandi
+  spec_title: prob / 5′ G / Florofor yanındaki G
+  where: reference_py\oligoscout_thermo\probe.py; reference_py\oligoscout_thermo\profiles.py; refer
+  evidence_level: regression
+  evidence:
+    regression:
+    - probe/probe_qc.tsv
+    - probe/probe_qc_records.jsonl
+    archive:
+    - design_ddpcr/probe_qc.tsv
+    - design_ddpcr/probe_qc_records.jsonl
+    - design_qpcr_sybr/probe_qc.tsv
+    - design_qpcr_sybr/probe_qc_records.jsonl
+    - probe_design/probe_qc.tsv
+    - probe_design/probe_qc_records.jsonl
+    unit_test:
+    - reference_py/tests/test_probe.py:52
+    code:
+    - reference_py/oligoscout_thermo/probe.py:9
+    - reference_py/oligoscout_thermo/profiles.py:144
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Floresan etiketine yakın 5′ G
+    en: 5′ G near the fluorescent label
+  check:
+    tr: Probun 5′ ucundaki ilk bazın G olup olmadığına bakar.
+    en: Checks whether the first base at the probe’s 5′ end is G.
+  why:
+    tr: Yakındaki bir G bazı floresan işaretleyicilerin sinyalini zayıflatabilir.
+    en: A nearby G can weaken the signal from some fluorescent labels.
+- id: PRB-03
+  family: Prob
+  status: etiketli_uygulandi
+  spec_title: prob / G > C / Prob ipliğinde G sayısı > C sayısı
+  where: reference_py\oligoscout_thermo\probe.py; reference_py\oligoscout_thermo\profiles.py; refer
+  evidence_level: regression
+  evidence:
+    regression:
+    - probe/probe_qc.tsv
+    - probe/probe_qc_records.jsonl
+    archive:
+    - design_ddpcr/probe_qc.tsv
+    - design_ddpcr/probe_qc_records.jsonl
+    - design_qpcr_sybr/probe_qc.tsv
+    - design_qpcr_sybr/probe_qc_records.jsonl
+    - probe_design/probe_qc.tsv
+    - probe_design/probe_qc_records.jsonl
+    unit_test:
+    - reference_py/tests/test_probe.py:52
+    code:
+    - reference_py/oligoscout_thermo/probe.py:12
+    - reference_py/oligoscout_thermo/profiles.py:144
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Prob dizisinde G ve C dengesi
+    en: G and C balance in the probe
+  check:
+    tr: Prob dizisindeki G ve C bazlarını sayar ve karşılaştırır.
+    en: Counts and compares G and C bases in the probe.
+  why:
+    tr: Bu kontrol hangi ipliğin prob için daha uygun olabileceğini değerlendirmeye yardımcı olur.
+    en: This helps assess which strand may be more suitable for a probe.
+- id: PRB-04
+  family: Prob
+  status: etiketli_uygulandi
+  spec_title: prob / Primer–prob konumu / Primerle örtüşme / mesafe
+  where: reference_py\cli\probe_qc.py; reference_py\oligoscout_thermo\probe.py; reference_py\oligos
+  evidence_level: regression
+  evidence:
+    regression:
+    - probe/probe_qc.tsv
+    - probe/probe_qc_records.jsonl
+    archive:
+    - design_ddpcr/probe_qc.tsv
+    - design_ddpcr/probe_qc_records.jsonl
+    - design_qpcr_sybr/probe_qc.tsv
+    - design_qpcr_sybr/probe_qc_records.jsonl
+    - probe_design/probe_qc.tsv
+    - probe_design/probe_qc_records.jsonl
+    unit_test:
+    - reference_py/tests/test_probe.py:42
+    code:
+    - reference_py/cli/probe_qc.py:131
+    - reference_py/oligoscout_thermo/probe.py:15
+    - reference_py/oligoscout_thermo/profiles.py:145
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Probun primerlere göre konumu
+    en: Probe position relative to primers
+  check:
+    tr: Probun bağlandığı yerin primer bölgelerine uzaklığını ve örtüşmesini inceler.
+    en: Checks the distance and overlap between the probe site and primer regions.
+  why:
+    tr: Primerle çakışan veya ürün dışında kalan bir prob beklenen sinyali veremeyebilir.
+    en: A probe that overlaps a primer or sits outside the product may not give the expected signal.
+- id: PRB-05
+  family: Prob
+  status: etiketli_uygulandi
+  spec_title: prob / LNA/MGB modifiyeli prob / LNA NN parametreleri ile Tm (McTigue 2004)
+  where: RUN_DESIGN.cmd; reference_py\cli\probe_qc.py; reference_py\oligoscout_thermo\probe.py
+  evidence_level: regression
+  evidence:
+    regression:
+    - probe/probe_qc.tsv
+    - probe/probe_qc_records.jsonl
+    archive:
+    - design_ddpcr/probe_qc.tsv
+    - design_ddpcr/probe_qc_records.jsonl
+    - design_qpcr_sybr/probe_qc.tsv
+    - design_qpcr_sybr/probe_qc_records.jsonl
+    - probe_design/probe_qc.tsv
+    - probe_design/probe_qc_records.jsonl
+    unit_test:
+    - reference_py/tests/test_probe.py:1
+    code:
+    - reference_py/cli/probe_qc.py:2
+    - reference_py/oligoscout_thermo/__init__.py:17
+    - reference_py/oligoscout_thermo/probe.py:1
+    - reference_py/oligoscout_thermo/profiles.py:146
+    - reference_py/oligoscout_thermo/seqpair.py:465
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Modifiye probun erime sıcaklığı
+    en: Melting temperature of a modified probe
+  check:
+    tr: Prob modifikasyonlarını tanır ve modelin desteklediklerini erime sıcaklığı hesabına katar.
+    en: Recognizes probe modifications and includes supported ones in the melting estimate.
+  why:
+    tr: Modifikasyonlar bağlanmayı değiştirebilir. Desteklenmeyen etkiler varsa tahmin sınırlı kalır.
+    en: Modifications can alter binding. Unsupported effects limit the estimate.
+- id: QPCR-01
+  family: qPCR
+  status: etiketli_uygulandi
+  spec_title: amplikon / Amplikon uzunluğu / bp
+  where: reference_py\oligoscout_thermo\profiles.py
+  evidence_level: code_reference
+  evidence:
+    regression: []
+    archive: []
+    unit_test: []
+    code:
+    - reference_py/oligoscout_thermo/profiles.py:119
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: qPCR ürün boyu
+    en: qPCR product size
+  check:
+    tr: Ürün uzunluğunu seçili qPCR profiliyle karşılaştırır.
+    en: Compares product length with the selected qPCR profile.
+  why:
+    tr: Ürün boyu çoğaltma verimini ve nicel ölçümlerin karşılaştırılabilirliğini etkileyebilir.
+    en: Product length can affect amplification efficiency and comparability of quantitative results.
+- id: QPCR-02
+  family: qPCR
+  status: etiketli_uygulandi
+  spec_title: amplikon / Tek erime piki / AMP-02 sonucu
+  where: RUN_MELT.cmd; reference_py\cli\amplicon_melt.py; reference_py\oligoscout_thermo\amplicon.p
+  evidence_level: regression
+  evidence:
+    regression:
+    - melt/amplicon_melt.tsv [qpcr02]
+    archive: []
+    unit_test:
+    - reference_py/tests/test_amplicon.py:1
+    code:
+    - reference_py/cli/amplicon_melt.py:2
+    - reference_py/cli/regresyon.py:128
+    - reference_py/oligoscout_thermo/__init__.py:16
+    - reference_py/oligoscout_thermo/amplicon.py:1
+    - reference_py/oligoscout_thermo/profiles.py:120
+    - web/local_engine.py:719
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: qPCR erime piki sayısı
+    en: qPCR melt peak count
+  check:
+    tr: Ürünün tahmini erime eğrisindeki pikleri sayar.
+    en: Counts peaks in the product’s predicted melt curve.
+  why:
+    tr: Birden çok pik, farklı ürünlere veya tek ürünün ayrı eriyen bölgelerine işaret edebilir.
+    en: Multiple peaks can suggest different products or separate melting regions within one product.
+- id: REP-01
+  family: Rapor
+  status: etiketli_uygulandi
+  spec_title: rapor / Determinizm / Aynı girdi → aynı çıktı hash'i
+  where: reference_py\cli\diff_cpp.py; reference_py\cli\diff_cpp_sequences.py; reference_py\cli\par
+  evidence_level: unit_test
+  evidence:
+    regression: []
+    archive: []
+    unit_test:
+    - reference_py/tests/test_thermo.py:282
+    code:
+    - reference_py/cli/diff_cpp.py:32
+    - reference_py/cli/diff_cpp_sequences.py:11
+    - reference_py/cli/param_crosscheck.py:22
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Aynı girdinin tekrarlanabilirliği
+    en: Repeatability with identical inputs
+  check:
+    tr: Girdi ve ayarlar aynı kaldığında ilgili çıktıların aynı kalmasını sınar.
+    en: Checks that relevant outputs stay the same when inputs and settings are unchanged.
+  why:
+    tr: Sonuç değişirse bunun girdiden, ayarlardan ya da analizden kaynaklanıp kaynaklanmadığını araştırmayı kolaylaştırır.
+    en: If a result changes, this helps trace the difference to inputs, settings, or the analysis.
+- id: REP-02
+  family: Rapor
+  status: etiketli_uygulandi
+  spec_title: 'rapor / Kanıt kaydı / Her kontrol: değer, eşik, model, parametre seti sürümü, kaynak'
+  where: reference_py\cli\panel_qc.py; reference_py\cli\thermo_report.py; reference_py\oligoscout_t
+  evidence_level: unit_test
+  evidence:
+    regression: []
+    archive: []
+    unit_test:
+    - reference_py/tests/test_thermo.py:331
+    code:
+    - reference_py/cli/bisulfite_qc.py:7
+    - reference_py/cli/isoform_qc.py:8
+    - reference_py/cli/panel_qc.py:7
+    - reference_py/cli/sequence_qc.py:12
+    - reference_py/cli/thermo_report.py:11
+    - reference_py/oligoscout_thermo/__init__.py:11
+    - reference_py/oligoscout_thermo/align.py:60
+    - reference_py/oligoscout_thermo/engine.py:3
+    - reference_py/oligoscout_thermo/params.py:7
+    - reference_py/oligoscout_thermo/probe.py:117
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Kararın dayandığı kanıt
+    en: Evidence behind the decision
+  check:
+    tr: Ölçülen değeri, karar eşiğini ve hesaplama bilgilerini sonuçla birlikte kaydeder.
+    en: Records the measured value, threshold, and calculation information with the result.
+  why:
+    tr: Bir uyarının neden çıktığını anlamayı ve sonucu sonradan incelemeyi sağlar.
+    en: This explains why a flag appeared and lets someone review the result later.
+- id: REP-03
+  family: Rapor
+  status: etiketli_uygulandi
+  spec_title: ''
+  where: reference_py\cli\amplicon_melt.py; reference_py\cli\compare_profiles.py; reference_py\cli\
+  evidence_level: regression
+  evidence:
+    regression:
+    - kalibrasyon/esik_karar_notu.md
+    archive: []
+    unit_test: []
+    code:
+    - reference_py/cli/amplicon_melt.py:153
+    - reference_py/cli/blocker_qc.py:106
+    - reference_py/cli/compare_profiles.py:228
+    - reference_py/cli/probe_qc.py:14
+    - reference_py/cli/rerank.py:186
+    - reference_py/cli/sequence_qc.py:14
+    - reference_py/cli/threshold_evidence.py:82
+    - reference_py/cli/variant_qc.py:15
+    - reference_py/oligoscout_thermo/bisulfite.py:15
+    - reference_py/oligoscout_thermo/design.py:14
+    - reference_py/oligoscout_thermo/engine.py:152
+    - reference_py/oligoscout_thermo/params.py:513
+    - reference_py/oligoscout_thermo/seqpair.py:25
+    - web/src/core.js:91
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Eşiklerin dayanağı ve sınırları
+    en: Origin and limits of thresholds
+  check:
+    tr: Karar eşiklerinin kaynağını ve deneysel verilerle karşılaştırılıp karşılaştırılmadığını bildirir.
+    en: Reports where decision thresholds come from and whether they have been compared with experimental data.
+  why:
+    tr: Hesabın çalışması, aynı eşiğin her örnek türü veya laboratuvar için güvenilir olduğunu göstermez.
+    en: A working calculation does not establish that the same threshold is reliable for every sample type or laboratory.
+- id: RT-01
+  family: mRNA/RT
+  status: etiketli_uygulandi
+  spec_title: çift / Ekson-ekson kavşağı / Primer kavşağı kesiyorsa 5′ tarafta ≥7, 3′ tarafta ≥4 nt eşleşme
+  where: reference_py\oligoscout_thermo\profiles.py
+  evidence_level: code_reference
+  evidence:
+    regression: []
+    archive: []
+    unit_test: []
+    code:
+    - reference_py/oligoscout_thermo/profiles.py:128
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Ekson birleşiminde primer yerleşimi
+    en: Primer placement at an exon junction
+  check:
+    tr: Primer bir ekson birleşimini kesiyorsa iki tarafta ne kadarının bağlandığını inceler.
+    en: When a primer spans an exon junction, checks how much of it binds on each side.
+  why:
+    tr: Birleşimi hedeflemek, RNA’dan gelen cDNA’yı genomik DNA’dan ayırt etmeye yardımcı olabilir.
+    en: Targeting a junction can help distinguish RNA-derived cDNA from genomic DNA.
+  scope_note: Bu kurulumda ekson birleşimi bir profil önerisi olarak kayıtlı. Birleşimin iki yanını ölçen ayrı bir
+    sonuç doğrulanamadı.
+- id: RT-02
+  family: mRNA/RT
+  status: etiketli_uygulandi
+  spec_title: çift / gDNA ürünü / Aynı çiftle genom taraması; gDNA ürün boyu
+  where: reference_py\oligoscout_thermo\profiles.py
+  evidence_level: code_reference
+  evidence:
+    regression: []
+    archive: []
+    unit_test: []
+    code:
+    - reference_py/oligoscout_thermo/profiles.py:129
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Genomik DNA’dan istenmeyen ürün
+    en: Unwanted product from genomic DNA
+  check:
+    tr: Aynı çiftin genomik DNA’dan olası bir ürün verip vermediğini ve ürün boyunu değerlendirir.
+    en: Assesses whether the same pair could produce a product from genomic DNA and its possible size.
+  why:
+    tr: Örnekte genomik DNA varsa istenmeyen ürün RNA’dan gelen sinyalle karışabilir.
+    en: If genomic DNA is present, the unwanted product can be confused with RNA-derived signal.
+  scope_note: Profil ayrı bir genomik DNA taraması önerir. RT profiline özgü bir sonuç kaydı doğrulanamadı.
+- id: RT-03
+  family: mRNA/RT
+  status: etiketli_uygulandi
+  spec_title: çift / İzoform kapsamı / Hedeflenen/hedeflenmeyen transkript listesi
+  where: reference_py\oligoscout_thermo\isoform.py:check_rt03; cli\isoform_qc.py; cli\build_annotations.py (transcript_exons.tsv,
+    GENCODE) — transkriptom FM-index gerekmez
+  evidence_level: unit_test
+  evidence:
+    regression: []
+    archive:
+    - _iso_test/isoform_qc_records.jsonl
+    unit_test:
+    - reference_py/tests/test_isoform.py:1
+    code:
+    - reference_py/cli/build_annotations.py:83
+    - reference_py/cli/isoform_qc.py:2
+    - reference_py/oligoscout_thermo/isoform.py:1
+    - reference_py/oligoscout_thermo/profiles.py:130
+    - web/local_engine.py:747
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Transkript izoformlarının kapsamı
+    en: Transcript isoform coverage
+  check:
+    tr: Anotasyon verisiyle hangi transkript izoformlarının primer çifti tarafından kapsandığını belirler.
+    en: Uses annotations to identify transcript isoforms covered by the primer pair.
+  why:
+    tr: Bir genin birden çok izoformu olabilir. Sonucu yorumlamak için hangilerinin ölçüldüğünü bilmek gerekir.
+    en: A gene may have several isoforms; interpreting the result requires knowing which are measured.
+- id: RT-04
+  family: mRNA/RT
+  status: etiketli_uygulandi
+  spec_title: primer / RNA kalıp erişilebilirliği / RNA parametreleri (Turner 2004) ile RT sıcaklığında SS-03
+  where: reference_py\oligoscout_thermo\profiles.py
+  evidence_level: code_reference
+  evidence:
+    regression: []
+    archive: []
+    unit_test: []
+    code:
+    - reference_py/oligoscout_thermo/profiles.py:131
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: RNA hedefinin erişilebilirliği
+    en: RNA target accessibility
+  check:
+    tr: RNA’daki primer bağlanma bölgesinin ters transkripsiyon sıcaklığında açık kalma olasılığını tahmin eder.
+    en: Estimates whether the RNA binding site stays exposed at the reverse transcription temperature.
+  why:
+    tr: RNA katlanırsa primerin bağlanacağı bölge kısmen gizlenebilir.
+    en: RNA folding can partly hide the binding site.
+  scope_note: RNA katlanması için gereken parametreler profil kaydında eksik olarak belirtiliyor.
+- id: RT-05
+  family: mRNA/RT
+  status: etiketli_uygulandi
+  spec_title: primer / RT primeri DNA/RNA hibrit Tm / Sugimoto 1995 hibrit NN
+  where: reference_py\oligoscout_thermo\params.py:HYBRID_SUGIMOTO_1995 (Biopython R_DNA_NN1'den aktarildi, Sugimoto
+    1995; init terimi; transcribed_unverified) + seqpair.hybrid_duplex_dh_ds/check_rt05
+  evidence_level: unit_test
+  evidence:
+    regression: []
+    archive: []
+    unit_test:
+    - reference_py/tests/test_seqpair.py:283
+    code:
+    - reference_py/cli/sequence_qc.py:177
+    - reference_py/oligoscout_thermo/params.py:397
+    - reference_py/oligoscout_thermo/seqpair.py:493
+    - web/local_engine.py:537
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: DNA–RNA çiftinin erime sıcaklığı
+    en: Melting temperature of the DNA–RNA duplex
+  check:
+    tr: DNA primer ile RNA kalıbının oluşturduğu çiftin erime sıcaklığını tahmin eder.
+    en: Estimates the melting temperature of a duplex formed by a DNA primer and RNA template.
+  why:
+    tr: DNA–RNA bağlanması DNA–DNA bağlanmasından farklıdır; uygun model tahmini daha anlamlı kılar.
+    en: DNA–RNA and DNA–DNA binding differ, so the appropriate model makes the estimate more meaningful.
+- id: SAN-01
+  family: Sanger
+  status: etiketli_uygulandi
+  spec_title: çift / Hedefe mesafe / İlgi bölgesinin primere uzaklığı
+  where: reference_py\oligoscout_thermo\profiles.py
+  evidence_level: code_reference
+  evidence:
+    regression: []
+    archive: []
+    unit_test: []
+    code:
+    - reference_py/oligoscout_thermo/profiles.py:152
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Okuma başlangıcından hedefe uzaklık
+    en: Distance from the read start to the target
+  check:
+    tr: Sanger okumasını başlatan primerle incelenecek bölge arasındaki mesafeyi değerlendirir.
+    en: Checks the gap between the Sanger sequencing primer and the region of interest.
+  why:
+    tr: Okumanın başlangıcındaki bazlar daha düşük kalitede olabilir. Hedefin konumu bu yüzden önemlidir.
+    en: Bases at the start of a read may have lower quality, so target placement matters.
+  scope_note: Sanger profilinde hedefe uzaklık önerisi bulunur. Otomatik bir uzaklık kontrolü doğrulanamadı.
+- id: SAN-02
+  family: Sanger
+  status: etiketli_uygulandi
+  spec_title: amplikon / Uzunluk / bp
+  where: reference_py\oligoscout_thermo\profiles.py
+  evidence_level: code_reference
+  evidence:
+    regression: []
+    archive: []
+    unit_test: []
+    code:
+    - reference_py/oligoscout_thermo/profiles.py:153
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Sanger için ürün boyu
+    en: Product size for Sanger sequencing
+  check:
+    tr: Ürün uzunluğunu seçili Sanger profilinin aralığına göre değerlendirir.
+    en: Checks product length against the selected Sanger profile.
+  why:
+    tr: Ürün çok uzun olursa hedefin tamamı güvenilir okuma aralığına sığmayabilir.
+    en: If the product is too long, the full target may fall outside the reliable reading range.
+- id: SEQ-01
+  family: Dizi butunlugu
+  status: etiketli_uygulandi
+  spec_title: primer / Alfabe / Yalnız A/C/G/T; IUPAC yalnız dejenere modda; modifikasyon notasyonu ayrıştırılır
+  where: reference_py\oligoscout_thermo\seqpair.py:check_seq01; cli\sequence_qc.py
+  evidence_level: regression
+  evidence:
+    regression:
+    - seqpair/seqpair_qc.tsv
+    - seqpair/seqpair_qc_records.jsonl
+    archive:
+    - _bis_test/seqpair_qc.tsv
+    - _bis_test/seqpair_qc_records.jsonl
+    - _newqc_test/seqpair_qc.tsv
+    - _newqc_test/seqpair_qc_records.jsonl
+    unit_test:
+    - reference_py/tests/test_seqpair.py:402
+    - reference_py/tests/test_thermo.py:8
+    code:
+    - reference_py/cli/sequence_qc.py:161
+    - reference_py/oligoscout_thermo/nn.py:30
+    - reference_py/oligoscout_thermo/seqpair.py:740
+    - web/local_engine.py:527
+    - web/src/core.js:186
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Dizide geçerli bazlar ve işaretler
+    en: Valid bases and notation
+  check:
+    tr: Primerdeki baz harflerinin ve modifikasyon işaretlerinin giriş biçimine uygunluğunu denetler.
+    en: Checks primer base letters and modification marks against the input format.
+  why:
+    tr: Yazım hataları ya da yanlış yorumlanan işaretler sonraki hesapları değiştirebilir.
+    en: Typos or misinterpreted notation can alter downstream calculations.
+- id: SEQ-02
+  family: Dizi butunlugu
+  status: etiketli_uygulandi
+  spec_title: primer / Uzunluk / nt sayısı (kuyruk/adaptör hariç ve dahil ayrı raporlanır)
+  where: reference_py/oligoscout_thermo/seqpair.py; reference_py/cli/sequence_qc.py
+  evidence_level: regression
+  evidence:
+    regression:
+    - seqpair/seqpair_qc.tsv
+    - seqpair/seqpair_qc_records.jsonl
+    archive:
+    - _bis_test/seqpair_qc.tsv
+    - _bis_test/seqpair_qc_records.jsonl
+    - _newqc_test/seqpair_qc.tsv
+    - _newqc_test/seqpair_qc_records.jsonl
+    - design_ctdna/seqpair_qc.tsv
+    - design_ctdna/seqpair_qc_records.jsonl
+    - seqpair/seqpair_qc.tsv
+    - seqpair/seqpair_qc_records.jsonl
+    unit_test:
+    - reference_py/tests/test_seqpair.py:52
+    code:
+    - reference_py/oligoscout_thermo/seqpair.py:6
+    - web/src/core.js:217
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Primerin bağlanan ve toplam uzunluğu
+    en: Binding and total primer length
+  check:
+    tr: Hedefe bağlanan diziyi ve varsa adaptör dahil tam diziyi ayrı ayrı ölçer.
+    en: Measures the target-binding region separately from the full sequence, including any adapter.
+  why:
+    tr: Bağlanma ve sentez gibi değerlendirmeler farklı uzunlukları kullanır.
+    en: Binding and synthesis assessments use different lengths.
+- id: SEQ-03
+  family: Dizi butunlugu
+  status: etiketli_uygulandi
+  spec_title: primer / Dejenerasyon katsayısı / Π(her IUPAC konumundaki baz sayısı)
+  where: reference_py/oligoscout_thermo/seqpair.py; reference_py/cli/sequence_qc.py
+  evidence_level: regression
+  evidence:
+    regression:
+    - seqpair/seqpair_qc.tsv
+    - seqpair/seqpair_qc_records.jsonl
+    archive:
+    - _bis_test/seqpair_qc.tsv
+    - _bis_test/seqpair_qc_records.jsonl
+    - _newqc_test/seqpair_qc.tsv
+    - _newqc_test/seqpair_qc_records.jsonl
+    - design_ctdna/seqpair_qc.tsv
+    - design_ctdna/seqpair_qc_records.jsonl
+    - seqpair/seqpair_qc.tsv
+    - seqpair/seqpair_qc_records.jsonl
+    unit_test:
+    - reference_py/tests/test_seqpair.py:59
+    code:
+    - reference_py/oligoscout_thermo/seqpair.py:7
+    - web/src/core.js:206
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Dejenere primerde olası diziler
+    en: Possible sequences in a degenerate primer
+  check:
+    tr: Belirsiz konumlardaki baz seçeneklerinden toplam olası primer dizisi sayısını hesaplar.
+    en: Counts possible primer sequences from the base options at ambiguous positions.
+  why:
+    tr: Karışım büyüdükçe her bir dizinin payı azalabilir ve özgüllük değişebilir.
+    en: As the mixture grows, each sequence can make up a smaller share and specificity can change.
+- id: SEQ-04
+  family: Dizi butunlugu
+  status: etiketli_uygulandi
+  spec_title: kalıp / Kalıpta belirsiz baz / Hedef bölgede N / soft-mask oranı
+  where: reference_py/oligoscout_thermo/seqpair.py; reference_py/cli/sequence_qc.py
+  evidence_level: regression
+  evidence:
+    regression:
+    - seqpair/seqpair_qc.tsv
+    - seqpair/seqpair_qc_records.jsonl
+    archive:
+    - _bis_test/seqpair_qc.tsv
+    - _bis_test/seqpair_qc_records.jsonl
+    - _newqc_test/seqpair_qc.tsv
+    - _newqc_test/seqpair_qc_records.jsonl
+    - design_ctdna/seqpair_qc.tsv
+    - design_ctdna/seqpair_qc_records.jsonl
+    - seqpair/seqpair_qc.tsv
+    - seqpair/seqpair_qc_records.jsonl
+    unit_test:
+    - reference_py/tests/test_seqpair.py:128
+    code:
+    - reference_py/cli/sequence_qc.py:50
+    - reference_py/oligoscout_thermo/design.py:179
+    - reference_py/oligoscout_thermo/seqpair.py:20
+    - web/src/core.js:250
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Kalıpta belirsiz ve maskeli bazlar
+    en: Ambiguous or masked template bases
+  check:
+    tr: Hedef kalıp bölgesindeki belirsiz bazları ve maskelenmiş dizileri sayar.
+    en: Counts ambiguous bases and masked sequence in the target region.
+  why:
+    tr: Eksik ya da işaretlenmiş dizi, o bölge için bağlanma tahmininin yorumunu sınırlayabilir.
+    en: Missing or flagged sequence can limit how binding predictions there should be interpreted.
+- id: SEQ-05
+  family: Dizi butunlugu
+  status: etiketli_uygulandi
+  spec_title: girdi / Koordinat–dizi tutarlılığı / Kullanıcı koordinatı → referans dizisi ↔ verilen dizi karşılaştırması
+  where: reference_py/oligoscout_thermo/seqpair.py; reference_py/cli/sequence_qc.py
+  evidence_level: regression
+  evidence:
+    regression:
+    - seqpair/seqpair_qc.tsv
+    - seqpair/seqpair_qc_records.jsonl
+    archive:
+    - _bis_test/seqpair_qc.tsv
+    - _bis_test/seqpair_qc_records.jsonl
+    - _newqc_test/seqpair_qc.tsv
+    - _newqc_test/seqpair_qc_records.jsonl
+    - design_ctdna/seqpair_qc.tsv
+    - design_ctdna/seqpair_qc_records.jsonl
+    - seqpair/seqpair_qc.tsv
+    - seqpair/seqpair_qc_records.jsonl
+    unit_test:
+    - reference_py/tests/test_seqpair.py:128
+    code:
+    - reference_py/oligoscout_thermo/seqpair.py:291
+    - web/src/core.js:251
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Koordinat ile dizinin eşleşmesi
+    en: Coordinate and sequence agreement
+  check:
+    tr: Verilen koordinatlardaki referans dizisini girilen diziyle karşılaştırır.
+    en: Compares reference sequence at the supplied coordinates with the entered sequence.
+  why:
+    tr: Yanlış genom sürümü, koordinat veya yön tasarımı yanlış bölgeye kaydırabilir.
+    en: A wrong build, coordinate, or orientation can shift the design to the wrong region.
+- id: SEQ-06
+  family: Dizi butunlugu
+  status: etiketli_uygulandi
+  spec_title: girdi / Referans kimliği / Build + yama + FASTA SHA-256 raporlanır
+  where: reference_py\oligoscout_thermo\seqpair.py:check_seq06; cli\sequence_qc.py (FASTA sha256)
+  evidence_level: regression
+  evidence:
+    regression:
+    - seqpair/seqpair_qc.tsv
+    - seqpair/seqpair_qc_records.jsonl
+    archive:
+    - _bis_test/seqpair_qc.tsv
+    - _bis_test/seqpair_qc_records.jsonl
+    - _newqc_test/seqpair_qc.tsv
+    - _newqc_test/seqpair_qc_records.jsonl
+    unit_test:
+    - reference_py/tests/test_seqpair.py:454
+    code:
+    - reference_py/cli/sequence_qc.py:118
+    - reference_py/oligoscout_thermo/seqpair.py:862
+    - web/local_engine.py:534
+    - web/src/core.js:192
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Referans genom sürümü
+    en: Reference genome version
+  check:
+    tr: Kullanılan genomun sürümünü, yamasını ve varsa dosya kimliğini kaydeder.
+    en: Records the genome build, patch, and file identity when available.
+  why:
+    tr: Aynı görünen koordinatlar farklı referanslarda aynı DNA bölgesini göstermeyebilir.
+    en: Identical-looking coordinates can point to different DNA regions in different references.
+- id: SPC-01
+  family: Ozgulluk
+  status: etiketli_uygulandi
+  spec_title: primer / Hedef tekilliği / Tam eşleşmeli hedef sitesi sayısı
+  where: reference_py\cli\panel_qc.py (SPC-01 primer tam eslesme sayimi)
+  evidence_level: regression
+  evidence:
+    regression:
+    - panel_qc/panel_qc_records.jsonl
+    archive:
+    - _newpanel_test/panel_qc_records.jsonl
+    - web_panel_ctdna/panel_qc_records.jsonl
+    unit_test: []
+    code:
+    - reference_py/cli/panel_qc.py:207
+    - reference_py/cli/rerank.py:12
+    - web/src/core.js:181
+    - web/src/views2.js:39
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Tam eşleşen bağlanma yerleri
+    en: Exact binding sites
+  check:
+    tr: Primerin aranan referansta kaç bağlanma yerine tam eşleştiğini sayar.
+    en: Counts how many binding sites in the searched reference match the primer exactly.
+  why:
+    tr: Birden fazla eşleşme, istenmeyen bir bölgede de bağlanma olabileceğini gösterir.
+    en: Multiple matches suggest the primer could bind to an unintended region.
+- id: SPC-02
+  family: Ozgulluk
+  status: etiketli_uygulandi
+  spec_title: primer / Off-target bağlanma yerleri / Uyumsuzluk sınıfı × 3′-çapa durumu histogramı
+  where: reference_py/cli/panel_qc.py (bindings histogram)
+  evidence_level: regression
+  evidence:
+    regression:
+    - panel_qc/panel_qc_records.jsonl
+    archive:
+    - _newpanel_test/panel_qc_records.jsonl
+    - panel/panel_qc_records.jsonl
+    - panel_qc_dene/panel_qc_records.jsonl
+    - web_panel_ctdna/panel_qc_records.jsonl
+    unit_test: []
+    code:
+    - reference_py/cli/panel_qc.py:225
+    - web/src/core.js:181
+    - web/src/views2.js:129
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Uyumsuzluklu hedef dışı bağlanma
+    en: Off-target binding with mismatches
+  check:
+    tr: Hedef dışı bağlanma yerlerini uyumsuzluk sayısı ve 3′ uç durumuna göre gruplar.
+    en: Groups off-target binding sites by mismatch count and the state of the 3′ end.
+  why:
+    tr: Tam eşleşme olmasa da bağlanma gerçekleşebilir. Ucun durumu bu riski yorumlamaya yardım eder.
+    en: Binding can occur without an exact match. The state of the end helps interpret that risk.
+- id: SPC-03
+  family: Ozgulluk
+  status: etiketli_uygulandi
+  spec_title: çift / Off-target ürünler / F–R, F–F, R–R ürünleri; genişletilmiş boy aralığı (örn. 50–5000 bp) ayrıca
+  where: reference_py\cli\panel_qc.py (SPC-03 cift duzeyi hedef disi urun)
+  evidence_level: regression
+  evidence:
+    regression:
+    - panel_qc/panel_qc_records.jsonl
+    archive:
+    - _newpanel_test/panel_qc_records.jsonl
+    - web_panel_ctdna/panel_qc_records.jsonl
+    unit_test:
+    - reference_py/tests/test_panel_qc_single_primer.py:79
+    code:
+    - reference_py/cli/panel_qc.py:353
+    - reference_py/cli/rerank.py:13
+    - web/src/core.js:181
+    - web/src/views2.js:39
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Beklenmeyen PCR ürünleri
+    en: Unexpected PCR products
+  check:
+    tr: Primerlerin uygun yön ve mesafedeki hedef dışı yerlerden ürün oluşturup oluşturamayacağını inceler.
+    en: Checks whether primers could form off-target products from sites at compatible orientations and distances.
+  why:
+    tr: Tek bir bağlanma yeri ürün için yeterli değildir; iki primerin uygun yerleşimi gerekir.
+    en: A single binding site is insufficient to form a product; both primers must be positioned appropriately.
+- id: SPC-04
+  family: Ozgulluk
+  status: etiketli_uygulandi
+  spec_title: primer / Off-target termodinamik ağırlığı / Her site için uyumsuzluk NN parametreleriyle θ_off(Ta)
+  where: reference_py\cli\panel_qc.py; reference_py\oligoscout_thermo\engine.py; reference_py\oligo
+  evidence_level: regression
+  evidence:
+    regression:
+    - panel_qc/panel_qc_records.jsonl
+    archive:
+    - _newpanel_test/panel_qc_records.jsonl
+    - panel/panel_qc_records.jsonl
+    - panel_design_ctdna/panel_qc_records.jsonl
+    - panel_design_qpcr_sybr/panel_qc_records.jsonl
+    - panel_qc_dene/panel_qc_records.jsonl
+    - web_panel_ctdna/panel_qc_records.jsonl
+    unit_test:
+    - reference_py/tests/test_thermo.py:266
+    code:
+    - reference_py/cli/panel_qc.py:9
+    - reference_py/oligoscout_thermo/engine.py:319
+    - reference_py/oligoscout_thermo/nn.py:127
+    - web/src/core.js:181
+    - web/src/views2.js:188
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Hedef dışı bağlanmanın tahmini gücü
+    en: Estimated strength of off-target binding
+  check:
+    tr: Hedef dışı eşleşmelerin seçilen sıcaklıkta ne kadar kararlı kalabileceğini tahmin eder.
+    en: Estimates how stable off-target matches may be at the selected temperature.
+  why:
+    tr: Aynı sayıda uyumsuzluğu olan iki bölgenin bağlanma riski farklı olabilir.
+    en: Two sites with the same mismatch count may still pose different binding risks.
+- id: SPC-05
+  family: Ozgulluk
+  status: etiketli_uygulandi
+  spec_title: primer / 3′ terminal uyumsuzluk tipi / Son 1–3 konumdaki uyumsuzluk tipi (G·T/T·G toleranslı; A·A,
+    C·C, G·A yı
+  where: reference_py/cli/panel_qc.py (3' terminal tip)
+  evidence_level: regression
+  evidence:
+    regression:
+    - panel_qc/panel_qc_records.jsonl
+    archive:
+    - _newpanel_test/panel_qc_records.jsonl
+    - panel/panel_qc_records.jsonl
+    - panel_qc_dene/panel_qc_records.jsonl
+    - web_panel_ctdna/panel_qc_records.jsonl
+    unit_test:
+    - reference_py/tests/test_seqpair.py:249
+    code:
+    - reference_py/cli/panel_qc.py:46
+    - web/src/core.js:181
+    - web/src/views2.js:129
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: 3′ uçta uyumsuzluk türü
+    en: Mismatch type at the 3′ end
+  check:
+    tr: Primerin 3′ ucuna yakın uyumsuz baz çiftlerinin türünü inceler.
+    en: Examines the types of mismatched base pairs near the primer’s 3′ end.
+  why:
+    tr: Her uyumsuzluk uzamayı aynı ölçüde engellemez; baz çiftinin türü risk yorumunu değiştirir.
+    en: Mismatches do not hinder extension equally; the base pair type changes how risk is interpreted.
+- id: SPC-06
+  family: Ozgulluk
+  status: etiketli_uygulandi
+  spec_title: primer / Paralog / psödogen / Off-target'ın gen/psödogen anotasyonuyla örtüşmesi
+  where: reference_py/cli/panel_qc.py + annotations.py (GENCODE psodogen)
+  evidence_level: regression
+  evidence:
+    regression:
+    - panel_qc/panel_qc_records.jsonl
+    archive:
+    - _newpanel_test/panel_qc_records.jsonl
+    - panel/panel_qc_records.jsonl
+    - panel_qc_dene/panel_qc_records.jsonl
+    - web_panel_ctdna/panel_qc_records.jsonl
+    unit_test:
+    - reference_py/tests/test_annotations.py:1
+    code:
+    - reference_py/cli/build_annotations.py:2
+    - reference_py/cli/panel_qc.py:145
+    - reference_py/oligoscout_thermo/annotations.py:1
+    - web/src/core.js:181
+    - web/src/views2.js:129
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Benzer genler ve psödogenler
+    en: Similar genes and pseudogenes
+  check:
+    tr: Hedef dışı eşleşmelerin gen ve psödogen anotasyonlarıyla örtüşmesini inceler.
+    en: Checks whether off-target matches overlap gene or pseudogene annotations.
+  why:
+    tr: Benzer bir gen bölgesi çoğalırsa sinyal yanlış gene ait sanılabilir.
+    en: If a similar gene region amplifies, the signal can be attributed to the wrong gene.
+- id: SPC-07
+  family: Ozgulluk
+  status: etiketli_uygulandi
+  spec_title: primer / Segmental duplikasyon / tekrar / Bağlanma yerinin SD / tekrar anotasyonu
+  where: reference_py/cli/panel_qc.py + annotations.py (UCSC segdup)
+  evidence_level: regression
+  evidence:
+    regression:
+    - panel_qc/panel_qc_records.jsonl
+    archive:
+    - _newpanel_test/panel_qc_records.jsonl
+    - panel/panel_qc_records.jsonl
+    - panel_qc_dene/panel_qc_records.jsonl
+    - web_panel_ctdna/panel_qc_records.jsonl
+    unit_test: []
+    code:
+    - reference_py/cli/build_annotations.py:2
+    - reference_py/cli/panel_qc.py:145
+    - reference_py/oligoscout_thermo/annotations.py:1
+    - web/src/core.js:181
+    - web/src/views2.js:129
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Tekrarlar ve kopyalanmış genom bölgeleri
+    en: Repeats and duplicated genomic regions
+  check:
+    tr: Bağlanma yerlerinin tekrar ve kopyalanmış bölge anotasyonlarıyla örtüşmesini inceler.
+    en: Checks whether binding sites overlap annotations for repeats or duplicated regions.
+  why:
+    tr: Birbirine benzeyen genom bölgeleri, hedefin benzersiz olmasını zorlaştırabilir.
+    en: Similar genomic regions can make it harder to target a unique site.
+- id: SPC-08
+  family: Ozgulluk
+  status: etiketli_uygulandi
+  spec_title: çift / Mitokondriyal / alt contig / rRNA / chrM, ALT, rDNA ayrıca taranır
+  where: reference_py/oligoscout_thermo/seqpair.py check_spc08_scan + OligoScout/tools/oligoscout_contig_scan.cpp
+    (chrM, 260 ALT, 254 yama, 166 iskele; GRCh38.p14 rDNA kopyalari dahil, KY962518 tam 45S birimi derlemede yok)
+  evidence_level: regression
+  evidence:
+    regression:
+    - seqpair/seqpair_qc.tsv
+    - seqpair/seqpair_qc_records.jsonl
+    archive:
+    - _newqc_test/seqpair_qc.tsv
+    - _newqc_test/seqpair_qc_records.jsonl
+    unit_test:
+    - reference_py/tests/test_seqpair.py:322
+    code:
+    - reference_py/cli/build_extra_contigs.py:2
+    - reference_py/cli/sequence_qc.py:89
+    - reference_py/oligoscout_thermo/seqpair.py:580
+    - web/local_engine.py:545
+    - web/src/core.js:207
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Mitokondri ve ek referans dizileri
+    en: Mitochondrial and supplementary reference sequences
+  check:
+    tr: Kural mitokondri DNA’sında, alternatif referans dizilerinde ve ribozomal DNA’da olası ürünleri kapsar.
+    en: The rule covers possible products in mitochondrial DNA, alternate reference sequences, and ribosomal DNA.
+  why:
+    tr: Ana kromozomlarla sınırlı bir arama, ek dizilerde oluşabilecek ürünleri gözden kaçırabilir.
+    en: A search limited to primary chromosomes can miss products in supplementary sequences.
+  scope_note: 'Yerel iş akışı birincil 24 kromozom dışındaki tüm GRCh38.p14 dizilerini tarar: chrM, 260 ALT lokus,
+    254 yama ve 166 iskele (rDNA kopyaları dahil). Ayrı 45S rDNA referansı (KY962518) derlemede yoktur; ALT/yama
+    bağlanmaları alternatif haplotip kopyası olarak bilgi düzeyinde raporlanır.'
+- id: SPC-09
+  family: Ozgulluk
+  status: etiketli_uygulandi
+  spec_title: rapor / Sözleşme beyanı / Çapa uzunluğu, maks. uyumsuzluk, ürün aralığı, indeks sürümü ve checksum
+  where: reference_py\cli\panel_qc.py (SPC-09 sozlesme beyani + manifest sha256 indeks digest)
+  evidence_level: regression
+  evidence:
+    regression:
+    - panel_qc/panel_qc_records.jsonl
+    archive:
+    - _newpanel_test/panel_qc_records.jsonl
+    - web_panel_ctdna/panel_qc_records.jsonl
+    unit_test: []
+    code:
+    - reference_py/cli/panel_qc.py:465
+    - web/src/core.js:181
+    - web/src/views2.js:139
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Özgüllük taramasının kapsamı
+    en: Scope of the specificity search
+  check:
+    tr: Taramada kullanılan referans indeksini, eşleşme kurallarını ve ürün sınırlarını kaydeder.
+    en: Records the reference index, matching rules, and product limits used by the search.
+  why:
+    tr: Hedef dışı ürün bulunmaması yalnızca taranan veri ve arama sınırları içinde yorumlanabilir.
+    en: An absence of off-target products applies only within the searched data and limits.
+- id: SS-01
+  family: Ikincil yapi
+  status: etiketli_uygulandi
+  spec_title: primer / Hairpin (genel) / Kendi Zuker MFE + McCaskill fonksiyonu; hairpin Tm (=ΔH/ΔS) ve θ_hairpin(Ta)
+  where: reference_py\oligoscout_thermo\align.py; reference_py\oligoscout_thermo\engine.py; referen
+  evidence_level: regression
+  evidence:
+    regression:
+    - panel_qc/panel_qc_records.jsonl
+    - thermo/thermo_records.jsonl
+    archive:
+    - _newpanel_test/panel_qc_records.jsonl
+    - panel/panel_qc_records.jsonl
+    - panel_design_ctdna/panel_qc_records.jsonl
+    - panel_design_qpcr_sybr/panel_qc_records.jsonl
+    - panel_qc_dene/panel_qc_records.jsonl
+    - web_panel_ctdna/panel_qc_records.jsonl
+    unit_test:
+    - reference_py/tests/test_thermo.py:247
+    code:
+    - reference_py/oligoscout_thermo/align.py:446
+    - reference_py/oligoscout_thermo/engine.py:295
+    - web/src/core.js:234
+    - web/src/views2.js:280
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Primerin kendi üzerine katlanması
+    en: Primer hairpin formation
+  check:
+    tr: Primerin saç tokası biçiminde katlanma eğilimini ve yapının tahmini kararlılığını inceler.
+    en: Estimates the primer’s tendency to form a hairpin and the structure’s stability.
+  why:
+    tr: Katlanan bir primerin hedefe bağlanabilecek kısmı azalabilir.
+    en: Folding can make less of the primer available to bind its target.
+- id: SS-02
+  family: Ikincil yapi
+  status: etiketli_uygulandi
+  spec_title: primer / 3′ uçlu hairpin / 3′ terminal baz eşleşmiş ve uzatılabilir yapı var mı
+  where: reference_py/oligoscout_thermo/seqpair.py; reference_py/cli/sequence_qc.py
+  evidence_level: regression
+  evidence:
+    regression:
+    - seqpair/seqpair_qc.tsv
+    - seqpair/seqpair_qc_records.jsonl
+    archive:
+    - _bis_test/seqpair_qc.tsv
+    - _bis_test/seqpair_qc_records.jsonl
+    - _newqc_test/seqpair_qc.tsv
+    - _newqc_test/seqpair_qc_records.jsonl
+    - design_ctdna/seqpair_qc.tsv
+    - design_ctdna/seqpair_qc_records.jsonl
+    - seqpair/seqpair_qc.tsv
+    - seqpair/seqpair_qc_records.jsonl
+    unit_test:
+    - reference_py/tests/test_seqpair.py:76
+    code:
+    - reference_py/cli/sequence_qc.py:2
+    - reference_py/oligoscout_thermo/seqpair.py:12
+    - web/src/core.js:233
+    - web/src/views2.js:280
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Saç tokasında primerin 3′ ucu
+    en: Primer 3′ end in a hairpin
+  check:
+    tr: Primer katlandığında 3′ ucunun eşleşip eşleşmediğini inceler.
+    en: Checks whether the 3′ end pairs when the primer folds.
+  why:
+    tr: Ucun kapanması hedefe bağlanmayı aksatabilir. Bazı yapılar istenmeyen uzamaya da elverişlidir.
+    en: A paired end can interfere with binding. Some structures also allow unwanted extension.
+- id: SS-03
+  family: Ikincil yapi
+  status: etiketli_uygulandi
+  spec_title: kalıp / Bağlanma bölgesi erişilebilirliği / Kalıbın Ta'da eşleşmemiş olma olasılığı (bölge ortalaması,
+    McCaski
+  where: reference_py\oligoscout_thermo\engine.py; reference_py\oligoscout_thermo\fold.py; referenc
+  evidence_level: regression
+  evidence:
+    regression:
+    - panel_qc/panel_qc_records.jsonl
+    - thermo/thermo_records.jsonl
+    archive:
+    - _newpanel_test/panel_qc_records.jsonl
+    - panel/panel_qc_records.jsonl
+    - panel_design_ctdna/panel_qc_records.jsonl
+    - panel_design_qpcr_sybr/panel_qc_records.jsonl
+    - panel_qc_dene/panel_qc_records.jsonl
+    - web_panel_ctdna/panel_qc_records.jsonl
+    unit_test:
+    - reference_py/tests/test_thermo.py:247
+    code:
+    - reference_py/oligoscout_thermo/engine.py:295
+    - reference_py/oligoscout_thermo/fold.py:392
+    - web/src/views2.js:288
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Kalıpta primer bölgesinin açıklığı
+    en: Accessibility of the primer site
+  check:
+    tr: Kalıptaki primer bağlanma bölgesinin açık kalma olasılığını tahmin eder.
+    en: Estimates how likely the primer binding site is to remain exposed on the template.
+  why:
+    tr: Doğru dizi seçilse bile kalıp katlanırsa primerin hedefe erişmesi zorlaşabilir.
+    en: Even with the right sequence, template folding can obstruct the target.
+- id: SS-04
+  family: Ikincil yapi
+  status: etiketli_uygulandi
+  spec_title: amplikon / Amplikon yapısı / Tek iplik amplikon MFE ve en kararlı yapının Tm'si
+  where: reference_py/oligoscout_thermo/seqpair.py; reference_py/cli/sequence_qc.py
+  evidence_level: regression
+  evidence:
+    regression:
+    - seqpair/seqpair_qc.tsv
+    - seqpair/seqpair_qc_records.jsonl
+    archive:
+    - _bis_test/seqpair_qc.tsv
+    - _bis_test/seqpair_qc_records.jsonl
+    - _newqc_test/seqpair_qc.tsv
+    - _newqc_test/seqpair_qc_records.jsonl
+    - design_ctdna/seqpair_qc.tsv
+    - design_ctdna/seqpair_qc_records.jsonl
+    - seqpair/seqpair_qc.tsv
+    - seqpair/seqpair_qc_records.jsonl
+    unit_test:
+    - reference_py/tests/test_seqpair.py:192
+    code:
+    - reference_py/oligoscout_thermo/seqpair.py:380
+    - web/src/views2.js:289
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: PCR ürününün tek iplik yapısı
+    en: Single-stranded product structure
+  check:
+    tr: Tek iplikli ürünün oluşturabileceği en kararlı katlanmayı tahmin eder.
+    en: Predicts the most stable fold the single-stranded product could form.
+  why:
+    tr: Kararlı yapılar ürünün sonraki okuma veya bağlanma işlemlerini etkileyebilir.
+    en: Stable structures can affect later reading or binding on the product.
+- id: SS-05
+  family: Ikincil yapi
+  status: etiketli_uygulandi
+  spec_title: prob / Prob yapısı / Prob hairpin Tm ve θ
+  where: reference_py\oligoscout_thermo\seqpair.py:check_ss05; cli\sequence_qc.py (--probes)
+  evidence_level: unit_test
+  evidence:
+    regression: []
+    archive:
+    - _newqc_test/seqpair_qc.tsv
+    - _newqc_test/seqpair_qc_records.jsonl
+    unit_test:
+    - reference_py/tests/test_seqpair.py:425
+    code:
+    - reference_py/cli/sequence_qc.py:199
+    - reference_py/oligoscout_thermo/seqpair.py:771
+    - web/src/core.js:208
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Probun kendi üzerine katlanması
+    en: Probe hairpin formation
+  check:
+    tr: Probun saç tokası oluşturma eğilimini ve yapının kararlılığını tahmin eder.
+    en: Estimates the probe’s tendency to form a hairpin and the structure’s stability.
+  why:
+    tr: Katlanan bir prob hedefe daha zor bağlanabilir ve sinyali zayıflayabilir.
+    en: A folded probe may bind its target less readily and give a weaker signal.
+- id: TH-01
+  family: Termodinamik
+  status: etiketli_uygulandi
+  spec_title: primer / Tm (NN) / İki-hal modeli; SantaLucia 1998 parametreleri; konsantrasyon modeli açıkça beyan
+    edilir
+  where: reference_py\oligoscout_thermo\concentration.py; reference_py\oligoscout_thermo\design.py;
+  evidence_level: regression
+  evidence:
+    regression:
+    - design_ctdna/design_rejections.tsv
+    - panel_qc/panel_qc_records.jsonl
+    - thermo/thermo_records.jsonl
+    archive:
+    - _design/design_rejections.tsv
+    - _newpanel_test/panel_qc_records.jsonl
+    - _smoke/panel_qc_records.jsonl
+    - chr22_panel/thermo_records.jsonl
+    - demo/thermo_records.jsonl
+    - design/design_rejections.tsv
+    - design_ctdna/design_rejections.tsv
+    - design_ddpcr/design_rejections.tsv
+    - design_qpcr_sybr/design_rejections.tsv
+    - panel/panel_qc_records.jsonl
+    - panel_design_ctdna/panel_qc_records.jsonl
+    - panel_design_panel/panel_qc_records.jsonl
+    - panel_design_qpcr_sybr/panel_qc_records.jsonl
+    - panel_qc_dene/panel_qc_records.jsonl
+    - web_design_check/design_rejections.tsv
+    - web_panel_ctdna/panel_qc_records.jsonl
+    unit_test:
+    - reference_py/tests/test_design.py:137
+    - reference_py/tests/test_thermo.py:246
+    code:
+    - reference_py/oligoscout_thermo/concentration.py:3
+    - reference_py/oligoscout_thermo/design.py:214
+    - reference_py/oligoscout_thermo/engine.py:193
+    - reference_py/oligoscout_thermo/salt.py:4
+    - web/src/core.js:224
+    - web/src/views2.js:189
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Primerin erime sıcaklığı
+    en: Primer melting temperature
+  check:
+    tr: Dizi ve bildirilen koşullardan primer–hedef çiftinin erime sıcaklığını tahmin eder.
+    en: Estimates primer–target melting temperature from sequence and declared conditions.
+  why:
+    tr: Tm, primerleri karşılaştırmayı ve ortak bağlanma koşullarını değerlendirmeyi sağlar.
+    en: Tm helps compare primers and assess shared annealing conditions.
+- id: TH-02
+  family: Termodinamik
+  status: etiketli_uygulandi
+  spec_title: primer / Tuz modeli duyarlılığı / Tm'nin Owczarzy 2004 / 2008 (Mg²⁺) / von Ahsen 2001 Na-eşdeğeri
+    altında yayı
+  where: RUN_REGRESYON.cmd; reference_py\cli\thermo_report.py; reference_py\cli\threshold_evidence.
+  evidence_level: regression
+  evidence:
+    regression:
+    - panel_qc/panel_qc_records.jsonl
+    - thermo/thermo_records.jsonl
+    archive:
+    - _newpanel_test/panel_qc_records.jsonl
+    - _smoke/panel_qc_records.jsonl
+    - chr22_panel/thermo_records.jsonl
+    - demo/thermo_records.jsonl
+    - panel/panel_qc_records.jsonl
+    - panel_design_ctdna/panel_qc_records.jsonl
+    - panel_design_panel/panel_qc_records.jsonl
+    - panel_design_qpcr_sybr/panel_qc_records.jsonl
+    - panel_qc_dene/panel_qc_records.jsonl
+    - web_panel_ctdna/panel_qc_records.jsonl
+    unit_test:
+    - reference_py/tests/test_thermo.py:174
+    code:
+    - reference_py/cli/thermo_report.py:187
+    - reference_py/cli/threshold_evidence.py:2
+    - reference_py/oligoscout_thermo/engine.py:213
+    - reference_py/oligoscout_thermo/salt.py:4
+    - web/src/core.js:225
+    - web/src/views2.js:189
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Tuz modeline göre Tm değişimi
+    en: Tm sensitivity to the salt model
+  check:
+    tr: Aynı primer için farklı tuz modellerinin verdiği Tm tahminlerini karşılaştırır.
+    en: Compares Tm estimates given by different salt models for the same primer.
+  why:
+    tr: Tahminler çok ayrışırsa tek bir Tm değerine dayanmak yanıltıcı olabilir.
+    en: If the estimates differ widely, relying on one Tm can be misleading.
+- id: TH-03
+  family: Termodinamik
+  status: etiketli_uygulandi
+  spec_title: 'primer / Hedefe bağlı fraksiyon θ(Ta) / Primer fazlası varsayımı: θ = K[P]/(1+K[P])'
+  where: RUN_DESIGN.cmd; reference_py\cli\design_primers.py; reference_py\cli\panel_qc.py
+  evidence_level: regression
+  evidence:
+    regression:
+    - panel_qc/panel_qc_records.jsonl
+    - thermo/thermo_records.jsonl
+    archive:
+    - _newpanel_test/panel_qc_records.jsonl
+    - _smoke/panel_qc_records.jsonl
+    - chr22_panel/thermo_records.jsonl
+    - demo/thermo_records.jsonl
+    - panel/panel_qc_records.jsonl
+    - panel_design_ctdna/panel_qc_records.jsonl
+    - panel_design_panel/panel_qc_records.jsonl
+    - panel_design_qpcr_sybr/panel_qc_records.jsonl
+    - panel_qc_dene/panel_qc_records.jsonl
+    - web_panel_ctdna/panel_qc_records.jsonl
+    unit_test:
+    - reference_py/tests/test_design.py:91
+    - reference_py/tests/test_thermo.py:246
+    code:
+    - reference_py/cli/design_primers.py:94
+    - reference_py/cli/panel_qc.py:386
+    - reference_py/cli/thermo_report.py:184
+    - reference_py/oligoscout_thermo/concentration.py:3
+    - reference_py/oligoscout_thermo/design.py:219
+    - reference_py/oligoscout_thermo/engine.py:230
+    - web/src/core.js:226
+    - web/src/views2.js:189
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Bağlanma sıcaklığında hedefe tutunma
+    en: Target binding at the annealing temperature
+  check:
+    tr: Seçilen sıcaklıkta hedefe bağlı primer oranını tahmin eder.
+    en: Estimates the bound fraction at the selected annealing temperature.
+  why:
+    tr: Tm değerleri benzer olsa bile seçilen sıcaklıktaki bağlanma oranları farklı olabilir.
+    en: Similar Tm values do not guarantee similar bound fractions at the selected temperature.
+- id: TH-04
+  family: Termodinamik
+  status: etiketli_uygulandi
+  spec_title: primer / 3′ uç stabilitesi / 3′ son 5 bp ΔG°37
+  where: RUN_REGRESYON.cmd; reference_py\cli\thermo_report.py; reference_py\cli\threshold_evidence.
+  evidence_level: regression
+  evidence:
+    regression:
+    - panel_qc/panel_qc_records.jsonl
+    - thermo/thermo_records.jsonl
+    archive:
+    - _newpanel_test/panel_qc_records.jsonl
+    - _smoke/panel_qc_records.jsonl
+    - chr22_panel/thermo_records.jsonl
+    - demo/thermo_records.jsonl
+    - panel/panel_qc_records.jsonl
+    - panel_design_ctdna/panel_qc_records.jsonl
+    - panel_design_panel/panel_qc_records.jsonl
+    - panel_design_qpcr_sybr/panel_qc_records.jsonl
+    - panel_qc_dene/panel_qc_records.jsonl
+    - web_panel_ctdna/panel_qc_records.jsonl
+    unit_test:
+    - reference_py/tests/test_thermo.py:246
+    code:
+    - reference_py/cli/diff_cpp.py:121
+    - reference_py/cli/thermo_report.py:185
+    - reference_py/cli/threshold_evidence.py:2
+    - reference_py/oligoscout_thermo/engine.py:92
+    - web/src/core.js:227
+    - web/src/views2.js:189
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Primerin 3′ uç kararlılığı
+    en: Primer 3′ end stability
+  check:
+    tr: Primerin son beş baz çiftinin tahmini bağlanma enerjisini hesaplar.
+    en: Estimates binding energy for the last five base pairs.
+  why:
+    tr: Polimerazın uzatmaya başladığı ucun kararlılığı, primerin genel kararlılığından farklı olabilir.
+    en: The stability of the end where polymerase starts extension can differ from overall stability.
+- id: TH-05
+  family: Termodinamik
+  status: etiketli_uygulandi
+  spec_title: primer / Erime eğrisi / θ(T) eğrisi 40–80 °C, 0.1 °C adım; Tm'de θ=0.5 iç tutarlılık testi
+  where: reference_py\oligoscout_thermo\concentration.py; reference_py\oligoscout_thermo\engine.py;
+  evidence_level: regression
+  evidence:
+    regression:
+    - panel_qc/panel_qc_records.jsonl
+    - thermo/thermo_records.jsonl
+    archive:
+    - _newpanel_test/panel_qc_records.jsonl
+    - _smoke/panel_qc_records.jsonl
+    - chr22_panel/thermo_records.jsonl
+    - demo/thermo_records.jsonl
+    - panel/panel_qc_records.jsonl
+    - panel_design_ctdna/panel_qc_records.jsonl
+    - panel_design_panel/panel_qc_records.jsonl
+    - panel_design_qpcr_sybr/panel_qc_records.jsonl
+    - panel_qc_dene/panel_qc_records.jsonl
+    - web_panel_ctdna/panel_qc_records.jsonl
+    unit_test:
+    - reference_py/tests/test_thermo.py:246
+    code:
+    - reference_py/oligoscout_thermo/concentration.py:3
+    - reference_py/oligoscout_thermo/engine.py:265
+    - web/src/core.js:228
+    - web/src/views2.js:189
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Sıcaklığa göre bağlanma eğrisi
+    en: Binding curve across temperatures
+  check:
+    tr: Sıcaklık değiştikçe primer–hedef çiftinin bağlı kalma oranını hesaplar.
+    en: Calculates how much of the primer–target duplex remains bound as temperature changes.
+  why:
+    tr: Eğri, sıcaklıktaki küçük değişimlerin bağlanmayı ne kadar etkileyebileceğini gösterir.
+    en: The curve shows how strongly small temperature changes may affect binding.
+- id: TH-06
+  family: Termodinamik
+  status: etiketli_uygulandi
+  spec_title: koşul / Katkı maddesi düzeltmesi / DMSO/betain/formamid Tm düşürme (beyan edilen yaklaşık katsayı)
+  where: reference_py\oligoscout_thermo\engine.py
+  evidence_level: code_reference
+  evidence:
+    regression: []
+    archive: []
+    unit_test: []
+    code:
+    - reference_py/oligoscout_thermo/engine.py:321
+    - web/src/core.js:207
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Katkıların erime sıcaklığına etkisi
+    en: Effect of additives on estimated Tm
+  check:
+    tr: Katkı maddelerinin erime sıcaklığına etkisini hesaba katmayı amaçlar.
+    en: Accounts for the effect of additives on melting temperature when supported.
+  why:
+    tr: Katkılar aynı dizinin erime davranışını değiştirebilir; düzeltme koşulları karşılaştırmaya yardım eder.
+    en: Additives can change how the same sequence melts; the correction helps compare conditions.
+  scope_note: Katkı maddelerine ait düzeltme katsayıları bu kurulumda kullanılmıyor.
+- id: TH-07
+  family: Termodinamik
+  status: etiketli_uygulandi
+  spec_title: 'çift / Önerilen Ta / Rychlik 1990: Ta = 0.3·Tm(primer) + 0.7·Tm(ürün) − 14.9 ve θ-tabanlı Ta karşılaştırılır'
+  where: reference_py\oligoscout_thermo\engine.py
+  evidence_level: code_reference
+  evidence:
+    regression: []
+    archive: []
+    unit_test: []
+    code:
+    - reference_py/oligoscout_thermo/engine.py:322
+    - web/src/core.js:162
+    - web/src/views2.js:372
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Önerilen primer bağlanma sıcaklığı
+    en: Suggested primer annealing temperature
+  check:
+    tr: Primer ve ürünün erime sıcaklıklarından bir bağlanma sıcaklığı tahmin eder.
+    en: Estimates an annealing temperature from primer and product melting temperatures.
+  why:
+    tr: Tahmin, deneysel sıcaklık taraması için başlangıç noktası sağlar.
+    en: The estimate gives a starting point for an experimental temperature gradient.
+  scope_note: Bu tahmin ancak PCR ürününün erime sıcaklığı mevcutsa gösterilir.
+- id: VAR-01
+  family: Varyant
+  status: etiketli_uygulandi
+  spec_title: primer / 3′ uçta varyant / 3′ son 5 nt içinde AF ≥ eşik (global VE her popülasyon)
+  where: RUN_VARIANT.cmd; reference_py\cli\rerank.py; reference_py\cli\variant_qc.py
+  evidence_level: regression
+  evidence:
+    regression:
+    - variant/variant_qc.tsv
+    - variant/variant_qc_records.jsonl
+    archive:
+    - variant_design_ctdna/variant_qc.tsv
+    - variant_design_ctdna/variant_qc_records.jsonl
+    - variant_design_qpcr_sybr/variant_qc.tsv
+    - variant_design_qpcr_sybr/variant_qc_records.jsonl
+    unit_test:
+    - reference_py/tests/test_variants.py:1
+    code:
+    - reference_py/cli/rerank.py:8
+    - reference_py/cli/variant_qc.py:2
+    - reference_py/oligoscout_thermo/__init__.py:18
+    - reference_py/oligoscout_thermo/variants.py:1
+    - web/src/core.js:262
+    - web/src/views2.js:190
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Primer bağlanma bölgesindeki varyantlar
+    en: Variants in the primer binding region
+  check:
+    tr: Primerin bağlandığı bölgenin tamamındaki varyantları ve mevcut verideki sıklıklarını özetler.
+    en: Summarizes variants and their available frequencies across the entire primer binding site.
+  why:
+    tr: Bir dizi farkı, bazı örneklerde primerin hedefe daha zayıf tutunmasına yol açabilir.
+    en: A sequence difference can weaken primer binding in some samples.
+- id: VAR-02
+  family: Varyant
+  status: etiketli_uygulandi
+  spec_title: primer / Gövdede varyant / Konum ağırlıklı (3′'e yakın daha ağır) skor
+  where: reference_py\oligoscout_thermo\variants.py; reference_py\out\variant_summary.tsv; referenc
+  evidence_level: regression
+  evidence:
+    regression:
+    - variant/variant_qc.tsv
+    - variant/variant_qc_records.jsonl
+    archive:
+    - variant_design_ctdna/variant_qc.tsv
+    - variant_design_ctdna/variant_qc_records.jsonl
+    - variant_design_qpcr_sybr/variant_qc.tsv
+    - variant_design_qpcr_sybr/variant_qc_records.jsonl
+    unit_test:
+    - reference_py/tests/test_variants.py:83
+    code:
+    - reference_py/oligoscout_thermo/variants.py:18
+    - web/local_engine.py:380
+    - web/src/core.js:263
+    - web/src/views2.js:190
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Primerin 3′ ucuna yakın varyantlar
+    en: Variants near the primer’s 3′ end
+  check:
+    tr: Primerin uzamaya başladığı uca yakın varyantları ayrı değerlendirir.
+    en: Evaluates variants near the primer end where extension starts.
+  why:
+    tr: Burada oluşan uyumsuzluk bir alelin diğerinden daha az çoğalmasına yol açabilir.
+    en: A mismatch here can cause one allele to amplify less than the other.
+- id: VAR-03
+  family: Varyant
+  status: etiketli_uygulandi
+  spec_title: primer / İndel / SV / Primer veya amplikonla örtüşen indel/SV; ürün boyu değişimi
+  where: reference_py\oligoscout_thermo\variants.py; reference_py\out\variant_summary.tsv; referenc
+  evidence_level: regression
+  evidence:
+    regression:
+    - variant/variant_qc.tsv
+    - variant/variant_qc_records.jsonl
+    archive:
+    - variant_design_ctdna/variant_qc.tsv
+    - variant_design_ctdna/variant_qc_records.jsonl
+    - variant_design_qpcr_sybr/variant_qc.tsv
+    - variant_design_qpcr_sybr/variant_qc_records.jsonl
+    unit_test:
+    - reference_py/tests/test_variants.py:91
+    code:
+    - reference_py/oligoscout_thermo/variants.py:19
+    - web/local_engine.py:380
+    - web/src/core.js:265
+    - web/src/views2.js:190
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Yaygın bağlanma bölgesi varyantları
+    en: Common variants at the binding site
+  check:
+    tr: Primer bağlanma bölgesinde seçili sıklık eşiğini aşan varyantları belirler.
+    en: Identifies variants above the selected frequency threshold in the primer binding region.
+  why:
+    tr: Yaygın bir dizi farkı daha fazla örnekte bağlanma sorununa yol açabilir.
+    en: A common sequence difference can affect binding in more samples.
+- id: VAR-04
+  family: Varyant
+  status: etiketli_uygulandi
+  spec_title: primer / ΔΔG etkisi / Alternatif allelde θ(Ta) yeniden hesaplanır
+  where: reference_py\cli\variant_qc.py; reference_py\oligoscout_thermo\engine.py; reference_py\oli
+  evidence_level: regression
+  evidence:
+    regression:
+    - variant/variant_qc.tsv
+    - variant/variant_qc_records.jsonl
+    archive:
+    - variant_design_ctdna/variant_qc.tsv
+    - variant_design_ctdna/variant_qc_records.jsonl
+    - variant_design_qpcr_sybr/variant_qc.tsv
+    - variant_design_qpcr_sybr/variant_qc_records.jsonl
+    unit_test:
+    - reference_py/tests/test_variants.py:106
+    code:
+    - reference_py/cli/variant_qc.py:340
+    - reference_py/oligoscout_thermo/engine.py:320
+    - reference_py/oligoscout_thermo/nn.py:127
+    - reference_py/oligoscout_thermo/variants.py:20
+    - web/src/views2.js:190
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Varyantın bağlanma enerjisine etkisi
+    en: Variant effect on binding energy
+  check:
+    tr: Hesaplanabilen tek baz değişimleri için referans ve alternatif dizilerin bağlanma enerjilerini karşılaştırır.
+    en: Compares binding energies for the reference and alternate sequences for scorable single-base changes.
+  why:
+    tr: Varyantın varlığı tek başına etkisini göstermez; enerji farkı bulguları önceliklendirmeye yardım eder.
+    en: The presence of a variant alone does not show its impact; the energy difference helps prioritize findings.
+- id: VAR-05
+  family: Varyant
+  status: etiketli_uygulandi
+  spec_title: primer / Varyantın yarattığı off-target / Alt allel yeni 3′-çapalı site oluşturuyor mu (varyant-farkında
+    indek
+  where: reference_py\oligoscout_thermo\variants.py; reference_py\out\variant_summary.tsv; referenc
+  evidence_level: unit_test
+  evidence:
+    regression: []
+    archive:
+    - variant_design_qpcr_sybr/variant_qc.tsv
+    - variant_design_qpcr_sybr/variant_qc_records.jsonl
+    unit_test:
+    - reference_py/tests/test_variants.py:124
+    code:
+    - reference_py/oligoscout_thermo/variants.py:21
+    - web/src/core.js:208
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Prob bağlanma bölgesindeki varyantlar
+    en: Variants in the probe binding region
+  check:
+    tr: Probun bağlandığı bölgedeki varyantları ve bunların sıklığını inceler.
+    en: Checks variants overlapping the probe site and their frequencies.
+  why:
+    tr: Primerler ürünü çoğaltsa bile prob zayıf bağlanırsa floresan sinyali düşebilir.
+    en: Even if primers amplify the product, weaker probe binding can reduce fluorescence.
+- id: VAR-06
+  family: Varyant
+  status: etiketli_uygulandi
+  spec_title: primer / Haplotip koruması / HPRC haplotiplerinde bağlanma yeri özdeşlik oranı
+  where: reference_py\oligoscout_thermo\variants.py; reference_py\out\variant_summary.tsv; referenc
+  evidence_level: regression
+  evidence:
+    regression:
+    - variant/variant_qc.tsv
+    - variant/variant_qc_records.jsonl
+    archive:
+    - variant_design_ctdna/variant_qc.tsv
+    - variant_design_ctdna/variant_qc_records.jsonl
+    - variant_design_qpcr_sybr/variant_qc.tsv
+    - variant_design_qpcr_sybr/variant_qc_records.jsonl
+    unit_test:
+    - reference_py/tests/test_variants.py:130
+    code:
+    - reference_py/oligoscout_thermo/variants.py:22
+    - web/src/views2.js:190
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Primer bölgesinde ekleme ve silmeler
+    en: Insertions and deletions at the primer site
+  check:
+    tr: Primer bölgesindeki baz eklemelerini ve silmelerini bulur ve sıklıklarını değerlendirir.
+    en: Finds insertions and deletions at the primer site and evaluates their frequencies.
+  why:
+    tr: Ekleme veya silme, primer ile kalıp arasındaki hizayı kaydırarak bağlanmayı zorlaştırabilir.
+    en: An insertion or deletion can shift the alignment with the template and impair binding.
+- id: VAR-07
+  family: Varyant
+  status: etiketli_uygulandi
+  spec_title: primer / Klinik varyant çakışması / Primer altında ClinVar patojenik/olası patojenik
+  where: reference_py\oligoscout_thermo\variants.py; reference_py\tests\test_variants.py
+  evidence_level: regression
+  evidence:
+    regression:
+    - variant/variant_qc.tsv
+    - variant/variant_qc_records.jsonl
+    archive:
+    - variant_design_ctdna/variant_qc.tsv
+    - variant_design_ctdna/variant_qc_records.jsonl
+    - variant_design_qpcr_sybr/variant_qc.tsv
+    - variant_design_qpcr_sybr/variant_qc_records.jsonl
+    unit_test:
+    - reference_py/tests/test_variants.py:140
+    code:
+    - reference_py/oligoscout_thermo/variants.py:23
+    - web/src/views2.js:190
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Popülasyona göre varyant sıklığı
+    en: Variant frequency by population
+  check:
+    tr: Bir popülasyonda, genel veri kümesine göre daha sık görülen bağlanma bölgesi varyantlarını arar.
+    en: Looks for binding site variants that are more frequent in one population than in the overall data.
+  why:
+    tr: Genel sıklık düşük olsa bile bağlanma sorunu bazı gruplarda daha sık görülebilir.
+    en: Even when overall frequency is low, binding problems can be more common in some groups.
+- id: VAR-08
+  family: Varyant
+  status: etiketli_uygulandi
+  spec_title: ''
+  where: RUN_VARIANT.cmd; reference_py\cli\rerank.py; reference_py\cli\variant_qc.py
+  evidence_level: regression
+  evidence:
+    regression:
+    - variant/variant_qc.tsv
+    - variant/variant_qc_records.jsonl
+    archive:
+    - variant_design_ctdna/variant_qc.tsv
+    - variant_design_ctdna/variant_qc_records.jsonl
+    - variant_design_qpcr_sybr/variant_qc.tsv
+    - variant_design_qpcr_sybr/variant_qc_records.jsonl
+    unit_test:
+    - reference_py/tests/test_variants.py:1
+    code:
+    - reference_py/cli/rerank.py:8
+    - reference_py/cli/variant_qc.py:2
+    - reference_py/oligoscout_thermo/__init__.py:18
+    - reference_py/oligoscout_thermo/variants.py:1
+    - web/src/core.js:91
+    - web/src/views2.js:190
+  calibration:
+    status: uncalibrated
+    record: REP-03
+    note: esikler literatur baslangic degerleri; islak laboratuvar kalibrasyonu yok
+  name:
+    tr: Ürün içinde boy değiştiren varyantlar
+    en: Length-changing variants inside the product
+  check:
+    tr: Primer bölgelerinin dışında ve ürünün içinde kalan yaygın ekleme ve silmeleri inceler.
+    en: Checks common insertions and deletions inside the product but outside the primer sites.
+  why:
+    tr: Ürün boyu değişirse boy farkına dayanan bir okuma yanlış yorumlanabilir.
+    en: A change in product length can mislead a readout that relies on size.

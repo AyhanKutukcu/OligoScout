@@ -1,0 +1,112 @@
+{
+  "label": "test81_first64_balanced",
+  "primers": 128,
+  "pairs": 64,
+  "contract": {
+    "max_mismatches": 3,
+    "anchor_nt": 12,
+    "pb_rule": "<=1 mismatch in 3' 5 nt",
+    "product_bp": [
+      50,
+      3000
+    ]
+  },
+  "sites": {
+    "all": 512082,
+    "anchored": 12141,
+    "pb_relevant": 498315,
+    "blind_spot": 486174,
+    "anchored_not_pb": 0,
+    "blind_spot_terminal_3p_mismatch": 60893
+  },
+  "blind_spot_fraction_of_pb_relevant": 0.9756,
+  "blind_spot_mismatch_distance_from_3p": {
+    "1": 60893,
+    "2": 25610,
+    "3": 9887,
+    "4": 19367,
+    "5": 97092,
+    "6": 94019,
+    "7": 43144,
+    "8": 205501,
+    "9": 133610,
+    "10": 57122,
+    "11": 8844,
+    "12": 35584
+  },
+  "products": {
+    "all_le3mm": 110795,
+    "single_primer_le3mm": 12994,
+    "oligoscout": 1683,
+    "anchored_single_primer": 1,
+    "primer_blast_rule": 95153,
+    "pb_not_oligoscout": 93469,
+    "pb_not_oligoscout_max1mm_per_site": 4776,
+    "pb_not_oligoscout_max2mm_per_site": 20177,
+    "oligoscout_not_pb": 0,
+    "pairs_with_pb_extra": 15,
+    "pairs_with_pb_extra_max2mm": 11
+  },
+  "verify_sites_vs_oligoscout": {
+    "oligoscout_unique_sites": 12141,
+    "exhaustive_anchored_sites": 12141,
+    "intersection": 12141,
+    "only_oligoscout": 0,
+    "only_exhaustive": 0,
+    "exact_match": true
+  },
+  "verify_products_vs_oligoscout": {
+    "oligoscout_products": 1684,
+    "exhaustive_anchored_products": 1684,
+    "includes_single_primer": true,
+    "single_primer_in_oligoscout": 1,
+    "pairs_mismatching": [],
+    "exact_match": true
+  },
+  "verify_vs_test81_oracle": {
+    "pairs": 64,
+    "binding_count_pairs_mismatching": 0,
+    "product_count_pairs_mismatching": 0,
+    "oracle_bindings": 12141,
+    "oracle_products": 1683,
+    "note": "oracle contract is hetero (F-R/R-F) products only"
+  },
+  "by_stratum": {
+    "Q1_LOW": {
+      "pairs": 16,
+      "os_offtarget_pairs": 0,
+      "pb_extra_pairs": 4,
+      "pb_extra_max2_pairs": 3,
+      "pb_extra_max1_pairs": 0,
+      "os_products": 16,
+      "pb_products": 664
+    },
+    "Q2_MEDIUM_LOW": {
+      "pairs": 16,
+      "os_offtarget_pairs": 1,
+      "pb_extra_pairs": 2,
+      "pb_extra_max2_pairs": 0,
+      "pb_extra_max1_pairs": 0,
+      "os_products": 18,
+      "pb_products": 20
+    },
+    "Q3_MEDIUM_HIGH": {
+      "pairs": 16,
+      "os_offtarget_pairs": 1,
+      "pb_extra_pairs": 2,
+      "pb_extra_max2_pairs": 1,
+      "pb_extra_max1_pairs": 1,
+      "os_products": 26,
+      "pb_products": 18456
+    },
+    "Q4_HIGH": {
+      "pairs": 16,
+      "os_offtarget_pairs": 2,
+      "pb_extra_pairs": 7,
+      "pb_extra_max2_pairs": 7,
+      "pb_extra_max1_pairs": 4,
+      "os_products": 1624,
+      "pb_products": 76013
+    }
+  }
+}

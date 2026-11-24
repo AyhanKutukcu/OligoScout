@@ -224,8 +224,11 @@ class TestPrimerProbeDimers(unittest.TestCase):
         self.rev = "TGCAATGGACCTTGCAACGT"
 
     def test_clean_probe_is_info(self):
+        # primer3 ntthal ile en kotu dG37 = -4.1 kcal/mol (1 M Na); eski
+        # ornek prob (TTACCTAGCATTACGGATCA) ntthal'da ileri primerle -8.1
+        # verdigi icin gercekte temiz degildi ve uc terimleriyle WARN olur.
         rec = seqpair.check_primer_probe_dimers(self.fwd, self.rev,
-                                                "TTACCTAGCATTACGGATCA")
+                                                "GATTTACCCACTCTGCCAAA")
         self.assertEqual(rec["severity"], "INFO")
 
     def test_sticky_probe_fails(self):
@@ -293,14 +296,36 @@ class TestRT05Hybrid(unittest.TestCase):
         t = params.HYBRID_SUGIMOTO_1995.require()
         # Biopython R_DNA_NN1 (Sugimoto 1995) ile ayni degerler
         self.assertEqual(t["CG"], [-16.3, -47.1])
-        self.assertEqual(t["AA"], [-7.8, -21.9])
-        self.assertEqual(t["TT"], [-11.5, -36.4])
+        # dAA adimi RNA'da rUU ile eslesir: rUU/dAA (-11.5, -36.4), en zayif adim
+        self.assertEqual(t["AA"], [-11.5, -36.4])
+        self.assertEqual(t["TT"], [-7.8, -21.9])
 
     def test_hybrid_duplex_includes_init(self):
-        # tek adim "AA": dH = -7.8 + init 1.9 = -5.9; dS = -21.9 + -3.9 = -25.8
+        # tek adim dAA (rUU/dAA): dH = -11.5 + 1.9 = -9.6; dS = -36.4 - 3.9 = -40.3
         dH, dS = seqpair.hybrid_duplex_dh_ds("AA")
-        self.assertAlmostEqual(dH, -5.9, places=6)
-        self.assertAlmostEqual(dS, -25.8, places=6)
+        self.assertAlmostEqual(dH, -9.6, places=6)
+        self.assertAlmostEqual(dS, -40.3, places=6)
+
+    def test_matches_biopython_with_rna_as_seq(self):
+        """Biopython R_DNA_NN1 (anahtar RNA 5'->3' / DNA 3'->5'), seq = RNA = revcomp(primer)."""
+        bp = {"TT/AA": (-11.5, -36.4), "GT/CA": (-7.8, -21.6), "CT/GA": (-7.0, -19.7),
+              "AT/TA": (-8.3, -23.9), "TG/AC": (-10.4, -28.4), "GG/CC": (-12.8, -31.9),
+              "CG/GC": (-16.3, -47.1), "AG/TC": (-9.1, -23.5), "TC/AG": (-8.6, -22.9),
+              "GC/CG": (-8.0, -17.1), "CC/GG": (-9.3, -23.2), "AC/TG": (-5.9, -12.3),
+              "TA/AT": (-7.8, -23.2), "GA/CT": (-5.5, -13.5), "CA/GT": (-9.0, -26.1),
+              "AA/TT": (-7.8, -21.9)}
+        comp = str.maketrans("ACGT", "TGCA")
+        primer = "ACGTTGCAAGGTCCATTGCA"
+        rna = primer.translate(comp)[::-1]
+        dna_3to5 = rna.translate(comp)
+        h, s = 1.9, -3.9
+        for i in range(len(rna) - 1):
+            v = bp[rna[i:i + 2] + "/" + dna_3to5[i:i + 2]]
+            h += v[0]
+            s += v[1]
+        dH, dS = seqpair.hybrid_duplex_dh_ds(primer)
+        self.assertAlmostEqual(dH, h, places=6)
+        self.assertAlmostEqual(dS, s, places=6)
 
     def test_rt05_evaluates(self):
         rec = seqpair.check_rt05("ACGTTGCAAGGTCCATTGCA")
@@ -461,3 +486,53 @@ class TestSeq06(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
+
+
+class TestSpc08ExtraContigs(unittest.TestCase):
+    """SPC-08: C++ ek dizi taramasi sonuclarinin rol bazli siniflanmasi."""
+
+    F, R = "ACGTTGCAAGGTCCATTGCA", "TGCAATGGACCTTGCAACGT"
+    ROLES = {"NC_012920.1": "mitochondrion", "NT_ALT": "alt_locus", "NT_UN": "unplaced"}
+
+    def site(self, primer, chrom, start, strand, mm=0, mask=None):
+        L = len(primer)
+        return {"primer_id": primer, "chrom": chrom, "start": str(start), "end_exclusive": str(start + L),
+                "strand": strand, "mismatches": str(mm), "mask": mask or "." * L}
+
+    def test_alt_only_is_info(self):
+        recs = seqpair.check_spc08_scan({"F": self.F, "R": self.R},
+                                        [self.site(self.F, "NT_ALT", 100, "+")], self.ROLES)
+        self.assertEqual([r["severity"] for r in recs], ["INFO", "INFO", "INFO"])
+        self.assertEqual(recs[0]["value"]["per_role"]["alt_locus"]["anchored"], 1)
+
+    def test_mito_anchored_fails_and_mismatched_3p_warns(self):
+        sites = [self.site(self.F, "NC_012920.1", 10, "+"),
+                 self.site(self.R, "NC_012920.1", 900, "+", 1, "." * 19 + "X")]
+        recs = {r["role"]: r for r in seqpair.check_spc08_scan({"F": self.F, "R": self.R}, sites, self.ROLES)}
+        self.assertEqual(recs["F"]["severity"], "FAIL")
+        self.assertEqual(recs["R"]["severity"], "WARN")
+
+    def test_product_on_unplaced_scaffold_fails(self):
+        sites = [self.site(self.F, "NT_UN", 1000, "+"), self.site(self.R, "NT_UN", 1200, "-")]
+        recs = {r["role"]: r for r in seqpair.check_spc08_scan({"F": self.F, "R": self.R}, sites, self.ROLES)}
+        self.assertEqual(recs["pair"]["severity"], "FAIL")
+        self.assertEqual(recs["pair"]["value"]["products"][0]["length"], 220)
+        self.assertEqual(recs["pair"]["value"]["products"][0]["orientation"], "F-R")
+
+    def test_sensitive_terminal_rule_admits_three_mismatches(self):
+        # 3 mm outside the 3'-terminal 5 nt: invisible to the default (<=2 mm),
+        # a product under the Primer-BLAST rule used by sensitive mode
+        mask = "X.X.X" + "." * 15
+        sites = [self.site(self.F, "NT_UN", 1000, "+", 3, mask), self.site(self.R, "NT_UN", 1060, "-", 3, mask)]
+        default = {r["role"]: r for r in seqpair.check_spc08_scan({"F": self.F, "R": self.R}, sites, self.ROLES)}
+        self.assertEqual(default["pair"]["value"]["product_count"], 0)
+        sens = {r["role"]: r for r in seqpair.check_spc08_scan({"F": self.F, "R": self.R}, sites, self.ROLES,
+                                                               max_mismatch=3, terminal=(5, 1))}
+        self.assertEqual(sens["pair"]["value"]["product_count"], 1)
+        self.assertEqual(sens["pair"]["severity"], "FAIL")
+        # two mismatches inside the terminal window break the rule
+        bad = "." * 15 + "XX..X"
+        sites2 = [self.site(self.F, "NT_UN", 1000, "+", 3, bad), self.site(self.R, "NT_UN", 1060, "-", 0)]
+        sens2 = {r["role"]: r for r in seqpair.check_spc08_scan({"F": self.F, "R": self.R}, sites2, self.ROLES,
+                                                                max_mismatch=3, terminal=(5, 1))}
+        self.assertEqual(sens2["pair"]["value"]["product_count"], 0)

@@ -417,30 +417,32 @@ HYBRID_SUGIMOTO_1995 = ParameterTable(
         verification_status="transcribed_unverified",
         notes=("DNA ipligi 5'->3' dinukleotit anahtari (RNA ters tamamlayici). "
                "Degerler Biopython Bio.SeqUtils.MeltingTemp.R_DNA_NN1 "
-               "tablosundan aktarildi; bu tablo Sugimoto et al. 1995'i "
-               "kaynak gosterir. Pay-anahtar eslemesi (ic iplik 5'->3') "
-               "Biopython'un tam-anahtar NN toplamiyla birebir dogrulandi. "
+               "tablosundan aktarildi (Sugimoto et al. 1995). Biopython anahtari "
+               "'XY/ZW' = RNA 5'-XY-3' / DNA 3'-ZW-5'; DNA adimi d icin deger "
+               "R_DNA_NN1[revcomp(d) + '/' + d[::-1]]. v0.4: onceki surum DNA adimini "
+               "RNA anahtari gibi okuyordu (iplik tersligi, ornegin dAA icin rAA/dTT); "
+               "duzeltildi, Biopython Tm_NN(seq=RNA) ile birebir test edilir. "
                "Baslatma terimi init=(dH 1.9, dS -3.9) ayrica uygulanir "
                "(HYBRID_SUGIMOTO_1995_INIT). IKINCI insan aktarimiyla birincil "
                "PDF'e karsi dogrulama HALA gerekir (verified degil)."),
     ),
     data={
-        "AA": [-7.8, -21.9],
-        "AC": [-5.9, -12.3],
-        "AG": [-9.1, -23.5],
+        "AA": [-11.5, -36.4],
+        "AC": [-7.8, -21.6],
+        "AG": [-7.0, -19.7],
         "AT": [-8.3, -23.9],
-        "CA": [-9.0, -26.1],
-        "CC": [-9.3, -23.2],
+        "CA": [-10.4, -28.4],
+        "CC": [-12.8, -31.9],
         "CG": [-16.3, -47.1],
-        "CT": [-7.0, -19.7],
-        "GA": [-5.5, -13.5],
+        "CT": [-9.1, -23.5],
+        "GA": [-8.6, -22.9],
         "GC": [-8.0, -17.1],
-        "GG": [-12.8, -31.9],
-        "GT": [-7.8, -21.6],
+        "GG": [-9.3, -23.2],
+        "GT": [-5.9, -12.3],
         "TA": [-7.8, -23.2],
-        "TC": [-8.6, -22.9],
-        "TG": [-10.4, -28.4],
-        "TT": [-11.5, -36.4],
+        "TC": [-5.5, -13.5],
+        "TG": [-9.0, -26.1],
+        "TT": [-7.8, -21.9],
     },
 )
 

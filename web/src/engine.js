@@ -1,13 +1,13 @@
 // OligoScout tarayıcı motoru — reference_py/oligoscout_thermo'nun birebir portu.
 // Parametre tabloları kopyalanmaz: veri paketindeki engine_params (params.py dışa aktarımı) kullanılır.
 const OS = (() => {
-  let WC=null, INIT=null, SYM=[0,-1.4], MM=null, LOOP=null, ATB=0.5, R=1.9872, K0=273.15;
+  let WC=null, INIT=null, SYM=[0,-1.4], MM=null, LOOP=null, DANG=null, TERM=null, ATB=0.5, R=1.9872, K0=273.15;
   const T37=310.15;
   const COMP={A:'T',T:'A',G:'C',C:'G',N:'N'};
   const PAIR=(x,y)=>(x==='A'&&y==='T')||(x==='T'&&y==='A')||(x==='G'&&y==='C')||(x==='C'&&y==='G');
   const rc=s=>{let o='';for(let i=s.length-1;i>=0;i--)o+=COMP[s[i]]||'N';return o;};
   const gcf=s=>{let n=0;for(const c of s)if(c==='G'||c==='C')n++;return s.length?n/s.length:0;};
-  function setParams(p){WC=p.wc.nn;INIT=p.wc.init;SYM=p.wc.symmetry||SYM;MM=p.mismatch;LOOP=p.loop;ATB=p.at_bulge_closure_dg37;R=p.R_cal||R;K0=p.kelvin||K0;}
+  function setParams(p){WC=p.wc.nn;INIT=p.wc.init;SYM=p.wc.symmetry||SYM;MM=p.mismatch;LOOP=p.loop;DANG=p.dangling||null;TERM=p.terminal||null;ATB=p.at_bulge_closure_dg37;R=p.R_cal||R;K0=p.kelvin||K0;}
   const step=s=>WC[s]||WC[rc(s)];
   function stackE(seg){let h=0,s=0;for(let i=0;i<seg.length-1;i++){const v=step(seg.substr(i,2));h+=v[0];s+=v[1];}return [h,s];}
   const initE=b=>INIT[(b==='A'||b==='T')?'AT':'GC'];
@@ -54,7 +54,20 @@ const OS = (() => {
       const w=step(ts),m=MM[key];if(!m)return null;dh+=m[0]-w[0];ds+=m[1]-w[1];}
     return [dh,ds];}
   function mkRes(o){return o;}
-  function scanContig(sa,rb,mode){
+  // align.py::end_terms_energy — her heliks ucunda en kararlı kenar terimi
+  // (sarkan uç, iki sarkan uç toplamı ya da terminal uyumsuzluk); veri paketi
+  // tabloları taşımıyorsa terim eklenmez.
+  const g37=v=>v[0]-T37*v[1]/1000;
+  function bestEnd(sa,rb,off,col,inner){
+    if(!DANG||!TERM)return [0,0];
+    const top=(col>=0&&col<sa.length)?sa[col]:'',bj=col-off,bot=(bj>=0&&bj<rb.length)?rb[bj]:'';
+    const pt=sa[inner],pb=rb[inner-off],right=col>inner;let best=[0,0];const offer=v=>{if(v&&g37(v)<g37(best))best=v;};
+    const dt=top?DANG[(right?'D3:':'D5:')+top+':'+pt+'-'+pb]:null,db=bot?DANG[(right?'D5:':'D3:')+bot+':'+pb+'-'+pt]:null;
+    if(top&&bot)offer(TERM[right?pt+top+'/'+pb+bot:pb+bot+'/'+pt+top]);
+    offer(dt);offer(db);if(dt&&db)offer([dt[0]+db[0],dt[1]+db[1]]);
+    return best;}
+  function endTerms(sa,rb,offL,left,offR,right){const l=bestEnd(sa,rb,offL,left-1,left),r=bestEnd(sa,rb,offR,right,right-1);return [l[0]+r[0],l[1]+r[1]];}
+  function scanContig(sa,rb,mode,ends=true){
     const na=sa.length,nb=rb.length;let best=null;
     for(let off=-(nb-1);off<na;off++){
       const lo=Math.max(0,off),hi=Math.min(na,off+nb);if(hi-lo<2)continue;
@@ -71,6 +84,7 @@ const OS = (() => {
           if(mode==='3prime'&&!terminal)continue;
           const top=sa.slice(left,rhi);let [dH,dS]=helixE(top);
           if(mm!==null){const bot=rb.slice(left-off,rhi-off);const adj=mmAdjust(top,bot,mm-left);if(!adj)continue;dH+=adj[0];dS+=adj[1];}
+          if(ends){const e=endTerms(sa,rb,off,left,off,rhi);dH+=e[0];dS+=e[1];}
           const dG=dH-310.15*dS/1000;if(best&&dG>=best.dG)continue;
           const pad=Math.max(0,-off);const tl=' '.repeat(pad)+sa,bl=' '.repeat(Math.max(0,off))+rb;const w=Math.max(tl.length,bl.length);
           const marks=Array(w).fill(' ');for(let x=pad+left;x<pad+rhi;x++)marks[x]='|';const cnt=mm!==null?1:0;if(cnt)marks[pad+mm]='X';
@@ -80,7 +94,7 @@ const OS = (() => {
     }
     return best;
   }
-  function scanBulge(sa,rb,mode){
+  function scanBulge(sa,rb,mode,ends=true){
     const na=sa.length,nb=rb.length;let best=null;const bh=0,bs=-1000*LOOP['BULGE:1'][0]/T37;
     for(let off=-(nb-1);off<na;off++){
       const lo=Math.max(0,off),hi=Math.min(na,off+nb);
@@ -99,7 +113,7 @@ const OS = (() => {
           dH+=bh;dS+=bs;
           const atc=('AT'.includes(sa[h1-1])?1:0)+('AT'.includes(sa[l2])?1:0);dS-=1000*ATB*atc/T37;
           let e;if(strand==='b')e=step(sa[h1-1]+sa[h1]);else{const j=h1-1-off;e=step(rb[j+1]+rb[j]);}
-          dH+=e[0];dS+=e[1];const dG=dH-T37*dS/1000;
+          dH+=e[0];dS+=e[1];if(ends){const t=endTerms(sa,rb,off,left,o2,h2);dH+=t[0];dS+=t[1];}const dG=dH-T37*dS/1000;
           const terminal=(h2===na)||(left===off);if(mode==='3prime'&&!terminal)continue;if(best&&dG>=best.dG)continue;
           const pad=Math.max(0,-off);let tl,bl,rs;
           if(strand==='b'){tl=' '.repeat(pad)+sa.slice(0,h1)+'-'+sa.slice(h1);bl=' '.repeat(Math.max(0,off))+rb;rs=1;}
@@ -112,9 +126,9 @@ const OS = (() => {
     }
     return best;
   }
-  function bestDimer(a,b,mode='any',allowBulge=true){
-    const rb=b.split('').reverse().join('');let best=scanContig(a,rb,mode);
-    if(allowBulge){const bu=scanBulge(a,rb,mode);if(bu&&(!best||bu.dG<best.dG))best=bu;}
+  function bestDimer(a,b,mode='any',allowBulge=true,ends=true){
+    const rb=b.split('').reverse().join('');let best=scanContig(a,rb,mode,ends);
+    if(allowBulge){const bu=scanBulge(a,rb,mode,ends);if(bu&&(!best||bu.dG<best.dG))best=bu;}
     return best;
   }
   // IDT tarzı çoklu yapı listesi: her kayma için en iyi kesintisiz/uyumsuz helis
@@ -128,7 +142,7 @@ const OS = (() => {
     let best=null;let start=null;
     for(let k=lo;k<=hi;k++){const p=k<hi&&PAIR(sa[k],rb[k-off]);
       if(p){if(start===null)start=k;continue;}
-      if(start!==null&&k-start>=2){const top=sa.slice(start,k);const [dH,dS]=helixE(top);const dG=dH-T37*dS/1000;
+      if(start!==null&&k-start>=2){const top=sa.slice(start,k);let [dH,dS]=helixE(top);const et=endTerms(sa,rb,off,start,off,k);dH+=et[0];dS+=et[1];const dG=dH-T37*dS/1000;
         if(!best||dG<best.dG){const pad=Math.max(0,-off);const tl=' '.repeat(pad)+sa,bl=' '.repeat(Math.max(0,off))+rb;const w=Math.max(tl.length,bl.length);const m=Array(w).fill(' ');for(let x=pad+start;x<pad+k;x++)m[x]='|';
           best={dG,dH,dS,offset:off,helix_len:k-start,alignment:[tl.padEnd(w),m.join(''),bl.padEnd(w)],three_prime_paired:(k===na)||(start===off),mismatch_count:0,bulge_count:0};}}
       start=null;}

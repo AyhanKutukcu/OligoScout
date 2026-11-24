@@ -558,4 +558,70 @@ assemble_primer_pair_hits(
     };
 }
 
+
+std::vector<PrimerPairHit>
+assemble_single_primer_hits(
+    const std::string_view primer,
+    const std::vector<
+        OrientedPrimerSearchHit
+    >& primer_hits,
+    const PrimerIdentity identity,
+    const std::uint64_t min_amplicon_length,
+    const std::uint64_t max_amplicon_length
+) {
+    if (
+        min_amplicon_length == 0
+    ) {
+        throw std::invalid_argument(
+            "Minimum amplicon length must be > 0."
+        );
+    }
+
+    if (
+        min_amplicon_length >
+        max_amplicon_length
+    ) {
+        throw std::invalid_argument(
+            "Minimum amplicon length cannot "
+            "exceed maximum amplicon length."
+        );
+    }
+
+    const auto forward =
+        extract_orientation(
+            primer_hits,
+            PrimerOrientation::Forward
+        );
+
+    const auto reverse =
+        extract_orientation(
+            primer_hits,
+            PrimerOrientation::Reverse
+        );
+
+    std::vector<PrimerPairHit>
+        products;
+
+    /*
+     * P --->      <--- P
+     */
+    append_pairs(
+        forward,
+        primer.size(),
+        identity,
+        reverse,
+        primer.size(),
+        identity,
+        min_amplicon_length,
+        max_amplicon_length,
+        products
+    );
+
+    normalize_products(
+        products
+    );
+
+    return products;
+}
+
 }  // namespace primerpair

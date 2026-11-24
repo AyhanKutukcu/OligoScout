@@ -1,0 +1,1039 @@
+# Navigation and shared controls
+Genel Bakış	Overview
+Primer Tasarla	Design Primers
+Primer tasarla	Design primers
+Multipleks Tasarla	Multiplex Design
+Multipleks tasarla	Design multiplex
+Çift İnceleme	Pair Review
+Yerel Analiz	Local Analysis
+QC Kataloğu	QC Catalog
+Dokümantasyon	Documentation
+İletişim	Contact
+Proje	Project
+Analiz	Analysis
+Motor	Engine
+Destek	Support
+Dil	Language
+Açık / koyu tema	Light / dark theme
+Tema değiştir	Toggle theme
+OligoScout ana sayfa	OligoScout home
+Primer tasarımı, genom özgüllüğü ve kanıt kayıtları	Primer design, genome specificity and evidence
+İnsan referansından hedef bölge ve aday primer seçimi	Design primer candidates for a human reference region
+Birden fazla hedef için primer tasarımı ve birlikte çalışabilecek panel seçimi	Design primers for multiple targets and select a compatible panel
+Harita, özgüllük, varyant, yapı, termodinamik ve kanıtlar	Map, specificity, variants, structure, thermodynamics and evidence
+GRCh38.p14 üzerinde özgüllük, varyant ve kalite analizleri	Specificity, variant and quality analysis on GRCh38.p14
+{0} kural · {1} uygulanmış	{0} rules · {1} implemented
+Adım adım kullanım, giriş biçimleri ve incelenebilir örnek sonuçlar	Step-by-step guide, input formats and example results
+Proje ekibi ve geri bildirim	Project team and feedback
+Görünüm çizilemedi.	This view could not be displayed.
+Kopyala	Copy
+Kopyalandı	Copied
+Kapat	Close
+Dizi	Sequence
+Doğrulandı	Verified
+Hazır	Ready
+Eksik	Unavailable
+Dosya	File
+Kayıt yok.	No records.
+Kanıt kaydı yok.	No evidence records.
+Bekliyor	Pending
+BEKLİYOR	PENDING
+Uygulandı	Implemented
+Kısmi	Partial
+Kısmi · tablo bekliyor	Partial · parameter table pending
+Sıra	Rank
+Ölçüm	Measurement
+Eşik	Threshold
+Aday	Candidate
+Neden	Reason
+Adaylar	Candidates
+Ürün	Product
+Çift	Pair
+Kanıt	Evidence
+Özgüllük	Specificity
+Varyant	Variant
+Varyantlar	Variants
+Harita	Map
+Yapı & Dimer	Structure & Dimers
+Termodinamik	Thermodynamics
+Tasarım	Design
+Genel	Overall
+Profil	Profile
+Tam panel	Full panel
+Değerlendirilmedi	Not assessed
+Hedef dışı	Off-target
+hedef dışı	off-target
+hedef	target
+bağlanma yeri	binding site
+konum	position
+Sıfırla	Reset
+Başlangıç	Start
+Bitiş	End
+Sonuç	Result
+Sonuçlar	Results
+Hedef	Target
+Kromozom	Chromosome
+Referans	Reference
+Alternatif	Alternate
+Değer	Value
+Durum	Status
+Kapsam	Scope
+Tür	Type
+Gerekçe	Reason
+Kural	Rule
+E-posta	Email
+Kayıtlı örnek	Saved example
+Hedef ürün	Intended product
+Tam hedef dışı	Exact off-target
+Popülasyonlar	Populations
+Alel	Allele
+SNV	SNV
+İnsersiyon	Insertion
+Delesyon	Deletion
+Tam eşleşme	Exact match
+tam eşleşme	exact match
+Ürün uzunluğu	Product length
+Pareto katmanı	Pareto tier
+# Overview
+Primer tasarımından genom kontrolüne	From primer design to genome screening
+İnsan referans genomu üzerinde PCR primerleri tasarlayın. Özgüllük, erime sıcaklığı, dimer riski ve gnomAD varyantlarını birlikte inceleyin.	Design PCR primers on the human reference genome. Review specificity, melting temperature, dimer risk and gnomAD variants together.
+GRCh38 bölgesine ve PCR koşullarına göre aday çiftler bulun.	Find primer pairs for a GRCh38 region and your PCR conditions.
+Primerlerin 24 kromozomda oluşturabileceği hedef dışı ürünleri inceleyin.	Inspect potential off-target products across 24 chromosomes.
+Termodinamik, varyant ve dimer kayıtlarını ölçüm ve eşikleriyle okuyun.	Review thermodynamics, variants and dimers alongside their measurements and thresholds.
+Analiz ve veri kaynakları	Analysis and data sources
+Referans genom	Reference genome
+Genom özgüllüğü	Genome specificity
+GRCh38 üzerinde 24 kromozom	24 GRCh38 chromosomes
+Bisülfit	Bisulfite
+CT ve GA indeksleri · BIS-04	CT and GA indexes · BIS-04
+Anotasyonlar	Annotations
+GENCODE v47 eksonları, psödogen ve segmental duplikasyon	GENCODE v47 exons, pseudogenes and segmental duplications
+GraphQL API · genom ve ekzom bölgeleri	GraphQL API · genome and exome regions
+Yerel varyant önbelleğinin bildirdiği bölgeler	Regions covered by the local variant cache
+gnomAD hedef bölgeyi sorgular ve başarılı yanıtı önbelleğe alır. Veri alınamayan bölgeler değerlendirilmemiş olarak gösterilir.	gnomAD is queried for the target region and successful responses are cached. Regions with unavailable data are marked as not assessed.
+# Design and job status
+Analiz başlatmak için RUN_WEB.cmd dosyasını çalıştırıp yerel siteyi açın.	Run RUN_WEB.cmd and open the local site to start an analysis.
+Analiz hazırlanıyor	Preparing analysis
+Analiz sürüyor	Analysis running
+Sırada	Queued
+PCR şablonu	PCR template
+Genomik bölge	Genomic region
+FASTA / dizi	FASTA / sequence
+FASTA dosyası	FASTA file
+Bölge	Region
+chrom:başlangıç-bitiş (1-tabanlı)	chrom:start-end (1-based)
+Yerel modda GRCh38.p14 üzerindeki 1–22, X veya Y kromozomundan en fazla 5.000 baz seçin.	Select up to 5,000 bases from GRCh38.p14 chromosomes 1–22, X or Y.
+Canlı modda GRCh38 koordinatlı FASTA	FASTA with GRCh38 coordinates
+Koordinat başlıklı FASTA girin	Enter FASTA with a coordinate header
+Aralık başı	Range start
+Aralık sonu	Range end
+En fazla çift	Maximum pairs
+son	end
+Ürün ve primer konumu	Product and primer positions
+Ürün min	Min. product
+Ürün max	Max. product
+F başı	F start
+F sonu	F end
+R başı	R start
+R sonu	R end
+Hedef bölge	Target region
+Hedef bölge başı	Target start
+Hedef bölge sonu	Target end
+ürün kapsamalı	product must span
+Konumlar seçilen şablon içinde 1 tabanlıdır. Genomik bölge seçildiğinde 1, o bölgenin ilk bazıdır. Boş alan kısıt koymaz.	Positions are 1-based within the selected template. For a genomic region, position 1 is its first base. Leave fields blank to omit a constraint.
+Primer parametreleri	Primer parameters
+Uygulama profili	Application profile
+Bisülfit dönüşümü	Bisulfite conversion
+Tm min	Min. Tm
+Tm opt	Optimal Tm
+Tm max	Max. Tm
+Uzunluk min	Min. length
+Uzunluk max	Max. length
+maks ΔTm	Max. ΔTm
+GC % min	Min. GC %
+GC % max	Max. GC %
+maks homopolimer	Max. homopolymer
+Dimer ve clamp eşikleri (design.py)	Dimer and clamp thresholds
+Varyant farkındalığı	Variant screening
+gnomAD varyantı taşıyan adayları ele	Exclude candidates overlapping gnomAD variants
+AF eşiği	AF threshold
+≥ %1 (yaygın)	≥ 1% (common)
+≥ %0,1	≥ 0.1%
+≥ %0,01	≥ 0.01%
+yalnız 3′ son 5 nt	only the last 5 nt at 3′
+tüm bağlanma yeri	entire binding site
+Elenen aday VAR-02 (3′ penceresi) ya da VAR-03 (gövde) koduyla kaydedilir.	Excluded candidates are recorded as VAR-02 (3′ window) or VAR-03 (primer body).
+Filtre, seçilen bölge için gnomAD API veya önbellek verisi bulunduğunda uygulanır.	The filter runs when gnomAD API or cached data are available for the selected region.
+Reaksiyon koşulları	Reaction conditions
+Tuz modeli	Salt model
+Serbest Mg²⁺	Free Mg²⁺
+— dNTP tüm Mg²⁺’u bağlıyor; tuz düzeltmesi tek değerlikliye düşer.	— dNTP binds all Mg²⁺. The salt correction uses monovalent ions.
+TASARIM AKIŞI	PRIMER DESIGN
+Bir hedef bölge seçin	Choose a target region
+Primer adayları sıralanır ve 24 kromozomda taranır. Sonuç listesi, beklenen tek ürün ve her primer için tek tam bağlanma yeri bulunan çiftleri gösterir.	Candidates are ranked and screened across 24 chromosomes. Results show pairs with one expected product and one exact binding site per primer.
+FASTA dosyasının başlığı ve dizisi GRCh38.p14 aralığıyla doğrulanır.	The FASTA header and sequence are checked against the GRCh38.p14 region.
+Giriş ve çıktı örneklerini gör	View input and output examples
+Özgüllük taramasıyla primer tasarlamak için RUN_WEB.cmd dosyasını çalıştırın.	Run RUN_WEB.cmd to design and screen primers.
+Bölgeyi kromozom:başlangıç-bitiş biçiminde girin.	Enter the region as chromosome:start-end.
+Bölge 1 tabanlı ve 1–5.000 baz uzunluğunda olmalı.	The region must be 1-based and 1–5,000 bases long.
+Tek FASTA kaydı ve başında GRCh38 koordinatı gerekli.	Provide one FASTA record with GRCh38 coordinates in the header.
+FASTA dizisinin uzunluğu ve alfabesi başlıktaki bölgeyle uyumlu olmalı.	The FASTA sequence length and alphabet must match the region in the header.
+FASTA dosyası 100 KB sınırını aşıyor.	The FASTA file exceeds the 100 KB limit.
+Dizi yapıştırın ya da dosya seçin.	Paste a sequence or choose a file.
+Bu bölgenin dizisi pakette yok (yalnız chr22:{0}–{1}). FASTA yapıştırın.	This region is unavailable in the bundled reference (chr22:{0}–{1} only). Paste a FASTA sequence.
+Tanınmayan karakter: {0} (SEQ-01)	Unrecognized character: {0} (SEQ-01)
+Kapsanacak hedefin başını ve sonunu birlikte girin.	Enter both the start and end of the target to span.
+Tarayıcı tasarımı için en fazla 60 kb; daha uzun hedefler design_primers.py ile.	Browser input supports up to 60 kb. Use design_primers.py for longer targets.
+Özgüllüğü doğrulanan çiftler	Pairs passing specificity screening
+Özgüllük filtresinden geçen çift bulunamadı	No pair passed specificity screening
+Özgüllük filtresinden geçen primer çifti bulunamadı.	No primer pair passed specificity screening.
+Ön filtreleri geçen aday yok.	No candidates passed the initial filters.
+Sıralama taranan adaylarla sınırlıdır. Aday listesi tasarım motorunun üst sınırına tabidir.	Ranking is limited to screened candidates and the design candidate cap.
+Tasarımda elenme gerekçeleri	Reasons for candidate rejection
+Dönüştürülmüş referans için varyant filtresi uygulanmadı.	Variant filtering was skipped for the converted reference.
+{0} aday tarandı · {1} aday elendi	{0} candidates screened · {1} excluded
+{0} · {1} tasarım adayı · {2} sn	{0} · {1} design candidates · {2} s
+{0} çift	{0} pairs
+{0} çiftte · {1} tam eşleşmeli	in {0} pairs · {1} exact matches
+{0} · AF filtresi uygulandı	{0} · AF filter applied
+{0} · varyant kanıtları kaydedildi	{0} · variant evidence recorded
+Grafik özet	Visual summary
+Multipleks sonuçlarını aç	Open multiplex results
+İlk çiftin grafiklerini aç	View charts for the first pair
+Varyant, Yapı & Dimer ve Termodinamik · Çift İnceleme	Variants, structure & dimers and thermodynamics · Pair Review
+Primer çifti {0}	Primer pair {0}
+Çift incelemesinde aç	Open in Pair Review
+Çift incelemeyi aç	Open Pair Review
+Panel TSV kopyala	Copy panel TSV
+Panel TSV indir	Download panel TSV
+{0} bp · GC %{1} · {2} belirsiz baz	{0} bp · {1}% GC · {2} ambiguous bases
+belirsiz baz	ambiguous bases
+aralık	range
+{0} bayt	{0} bytes
+# Profiles
+Sanger dizileme	Sanger sequencing
+Standart PCR	Standard PCR
+Kantitatif PCR (qPCR)	Quantitative PCR (qPCR)
+Gerçek zamanlı kantitatif PCR	Real-time quantitative PCR
+Bisülfit PCR	Bisulfite PCR
+# Multiplex
+ÇOK HEDEFLİ PRIMER TASARIMI	MULTI-TARGET PRIMER DESIGN
+Birlikte çalışacak primerleri seçin	Select primers for a shared pool
+Hedef bölgelerinizi girin. Her hedef için özgüllüğü kontrol edilen adaylar üretilir; çapraz ürün, dimer, Tm ve ürün boyu koşullarına uyan çiftler aynı panelde birleştirilir.	Enter target regions. Candidates are screened for specificity and combined into a panel that meets cross-product, dimer, Tm and product-size criteria.
+Örnek sonuçları gör	View example results
+Hedef bölgeler	Target regions
+2–8 hedef · GRCh38.p14	2–8 targets · GRCh38.p14
+Hedef adı	Target name
+{0}. hedef adı	Target {0} name
+{0}. hedef bölgesi	Target {0} region
+{0}. hedefi kaldır	Remove target {0}
++ Hedef ekle	+ Add target
+Koordinat biçimi: kromozom:başlangıç-bitiş. Her bölge 1 tabanlı ve en fazla 5.000 baz olmalı.	Use chromosome:start-end. Each region is 1-based and must be at most 5,000 bases.
+Hedef listesini topluca yapıştır	Paste a target list
+Her satıra hedef adı ve genomik bölge	One target name and genomic region per line
+Toplu hedef listesi	Batch target list
+Ad ile koordinat arasına sekme veya boşluk koyun.	Separate the name and coordinates with a tab or space.
+Listeyi uygula	Apply list
+2–8 hedef satırı girin.	Enter 2–8 target lines.
+{0}. satırda hedef adı ve genom bölgesini kontrol edin.	Check the target name and coordinates on line {0}.
+Hedef adları ve bölgeleri birbirinden farklı olmalı.	Target names and regions must be distinct.
+Ortak tasarım koşulları	Shared design conditions
+Ürün min (bp)	Min. product (bp)
+Ürün max (bp)	Max. product (bp)
+Hedef başına aday	Candidates per target
+gnomAD verisi varsa varyantlı adayları ele	Exclude candidates overlapping variants when gnomAD data are available
+Her hedef ayrı genom taramasından geçer. Hedef ve aday sayısı arttıkça işlem süresi uzar.	Each target is screened separately. More targets and candidates increase analysis time.
+Aynı havuza kabul koşulları	Pool compatibility criteria
+En fazla Tm aralığı (°C)	Maximum Tm spread (°C)
+En az ürün boyu farkı (bp)	Minimum product size gap (bp)
+Dimer alt sınırı (kcal/mol)	Dimer energy limit (kcal/mol)
+3′ dimer alt sınırı (kcal/mol)	3′ dimer energy limit (kcal/mol)
+Ürün boyu farkını 0 yaparsanız boy ayrımı koşulu uygulanmaz. Dimer enerjisi belirtilen sınırdan daha düşük olan çiftler aynı havuza alınmaz.	Set the product size gap to 0 to disable it. Pairs with dimer energies below the limit cannot share a pool.
+Multipleks panel tasarla	Design multiplex panel
+Paneliniz burada oluşacak	Your panel will appear here
+Hedef bölgeleri ve ortak koşulları girin.	Enter target regions and shared conditions.
+Adayları üretin ve genom özgüllüğünü tarayın.	Generate candidates and screen for genome specificity.
+Birlikte kullanılabilecek çiftleri ve etkileşim matrisini inceleyin.	Review compatible pairs and the interaction matrix.
+Multipleks örneğini incele	View multiplex example
+Tüm hedefleri kapsayan panel	Panel covers all targets
+Kısmi panel önerisi	Suggested partial panel
+Uyumlu multipleks panel bulunamadı	No compatible multiplex panel found
+Hedeflerin bir kısmı kapsandı	Some targets covered
+Hedefleri veya koşulları gözden geçirin	Review targets or conditions
+Kapsanan hedef	Targets covered
+Kontrol edilen aday	Candidates screened
+Panel Tm aralığı	Panel Tm spread
+En yakın ürün boyu	Smallest product size gap
+Seçilen havuzda arama kapsamı içinde genomik çapraz ürün bulunmadı.	No genomic cross-products were found for the selected pool within the search scope.
+Multipleks değerlendirme için en az iki hedefin birlikte seçilebilmesi gerekir.	Multiplex evaluation requires at least two compatible targets.
+{0} seçilen çiftte FAIL düzeyinde QC kaydı var. Çift İnceleme’de ilgili kuralları ve reaksiyon koşullarını kontrol edin.	{0} selected pairs have a FAIL quality record. Review the rules and reaction conditions in Pair Review.
+Çapraz ürün kapsamı: {0}–{1} bp · referans GRCh38.p14. “Tam panel”, hedeflerin tamamının havuz koşulları içinde kapsandığını belirtir.	Cross-product scope: {0}–{1} bp · GRCh38.p14 reference. “Full panel” means all targets meet the pool criteria.
+Seçim için hesaplama sınırına ulaşıldı; bulunan en geniş kısmi panel gösteriliyor. Tüm kombinasyonlar denenmedi.	The selection limit was reached. The largest partial panel found is shown. Some combinations were not evaluated.
+Tüm kanıtları JSON indir	Download all evidence as JSON
+Panele alınamayan hedefler	Targets not included in the panel
+Diğer seçilen hedeflerle tüm havuz koşullarını karşılayan kombinasyon bulunamadı.	No combination with the other selected targets met all pool criteria.
+Seçilen primer çiftleri	Selected primer pairs
+Çift incele	Review pair
+Primerler arası dimer matrisi	Primer dimer matrix
+Dimer enerjisi türü	Dimer energy type
+Genel ΔG₃₇	Overall ΔG₃₇
+3′ uç ΔG₃₇	3′ ΔG₃₇
+3′ uç	3′ end
+Hücredeki sayı kcal/mol cinsindedir. Daha düşük değer, daha güçlü dimer anlamına gelir. Çizgili hücre, seçtiğiniz dimer sınırının altındadır. “—” kararlı yapı bulunmadığını belirtir.	Values are in kcal/mol. Lower values indicate stronger dimers. Striped cells are below the selected limit. “—” indicates that no stable structure was found.
+{0} dimer enerjisi, kcal/mol · F: ileri, R: geri primer	{0} dimer energy, kcal/mol · F: forward, R: reverse
+Genel dimer enerjisi, kcal/mol · F: ileri, R: geri primer	Overall dimer energy, kcal/mol · F: forward, R: reverse
+3′ uç dimer enerjisi, kcal/mol · F: ileri, R: geri primer	3′ dimer energy, kcal/mol · F: forward, R: reverse
+{0} · dimer sınırının altında	{0} · below the dimer energy limit
+Adayların birlikte seçilememe gerekçeleri · {0} kombinasyon	Reasons for candidate incompatibility · {0} combinations
+Çapraz ürün	Cross-product
+Panel önerisi, hedef başına taranan adaylar ve seçilen koşullarla sınırlıdır. Her hedef için en fazla bir çift seçilir.	The suggested panel is limited to the candidates screened and the selected criteria. Each target contributes at most one pair.
+# Contact
+Yardım ve iletişim	Help and contact
+OligoScout ekibiyle tanışın, kampüsün konumunu görün veya bir soru iletin.	Meet the OligoScout team, find the campus or send a question.
+Proje ekibi	Project team
+Dr. Öğr. Üyesi	Assistant Professor
+Biyoinformatik araştırmacısı	Bioinformatics researcher
+Akademik profil	Academic profile
+{0} · Akademik profil	{0} · Academic profile
+{0} · E-posta	{0} · Email
+Kampüs	Campus
+Trakya Üniversitesi	Trakya University
+Ahmet Karadeniz Yerleşkesi	Ahmet Karadeniz Campus
+22020 Merkez / Edirne, Türkiye	22020 Merkez / Edirne, Türkiye
+Ahmet Karadeniz Yerleşkesi haritası	Map of Ahmet Karadeniz Campus
+Haritada aç ↗	Open in Maps ↗
+Mesaj yazın	Write a message
+Ad soyad	Full name
+Mesaj	Message
+Taslak, e-posta uygulamanızda açılır. Mesajı oradan gönderebilirsiniz.	A draft opens in your email app, where you can review and send it.
+E-posta taslağı aç	Open email draft
+OligoScout iletişim	OligoScout enquiry
+# Documentation
+Kullanım rehberi	User guide
+Kayıtlı Panel	Saved Panel
+Çift İnceleme örneği	Pair Review example
+Multipleks	Multiplex
+qPCR Erime	qPCR Melting
+Motor doğrulaması	Engine validation
+Dokümantasyon bölümleri	Documentation sections
+Arşiv örneği · {0}	Archived example · {0}
+Bu sayfa daha önce kaydedilmiş bir çalışmayı gösterir. Kendi sonuçlarınız için Primer Tasarla veya Yerel Analiz’i kullanın.	This page shows a saved analysis. For your own results, use Design Primers or Local Analysis.
+Kendi multipleks panelini tasarla	Design your own multiplex panel
+Girişten çıktıya	From input to output
+OLIGOSCOUT KULLANIM REHBERİ	OLIGOSCOUT USER GUIDE
+Girişten sonuçlara primer tasarımı	Primer design from input to results
+Bir insan genom bölgesi seçin, tasarımı çalıştırın ve otomatik özgüllük taramasından geçen çiftleri inceleyin. Aşağıdaki örnekleri formu doldurmak veya bir sonucun nasıl göründüğünü anlamak için kullanabilirsiniz.	Choose a human genome region, run a design and review pairs that pass automatic specificity screening. Use the examples to fill the form or see what a result looks like.
+Kayıtlı Paneli aç	Open the saved panel
+1 · Bir giriş biçimi seçin	1 · Choose an input format
+Genomik bölge, yapıştırılan FASTA ve yüklenen FASTA aynı hedefi tarif etmenin üç yoludur. Yerel motor GRCh38.p14 üzerinde 1–22, X ve Y kromozomlarında 1–5.000 bazlık bölgeleri kabul eder.	Enter a genomic region, paste FASTA or upload FASTA to specify the same target. The local engine accepts GRCh38.p14 regions of 1–5,000 bases on chromosomes 1–22, X and Y.
+Koordinatları 1 tabanlı yazın; ilk ve son baz dahildir. Bu örnek 320 bp seçer.	Use 1-based inclusive coordinates. This example selects 320 bp.
+Koordinatı formda aç	Use coordinates in the form
+Koordinatı kopyala	Copy coordinates
+FASTA metni veya dosyası	FASTA text or file
+Tek kayıt kullanın. Başlık genom koordinatıyla başlamalı, dizinin uzunluğu aralıkla, bazları ise referansla uyuşmalıdır. Dosya olarak	Use one record. The header must start with genome coordinates. The sequence length must match the interval and its bases must match the reference. Supported files are
+veya	or
+seçebilirsiniz.	.
+FASTA’yı formda aç	Use FASTA in the form
+FASTA metnini kopyala	Copy FASTA text
+Tam FASTA örneğini göster	Show full FASTA example
+Eski “Proje şablonu” hangi bölgeyi kullanıyordu?	Which region did the former project template use?
+Kaydedilmiş chr22 panelinin şablonu	The saved chr22 panel uses
+bölgesidir. İlk örnek, bu şablonun 320 bazlık bir kesitini kullanır.	as its template. The first example uses a 320-base segment of this region.
+Tam şablonu formda aç	Use the full template
+Kayıtlı şablon ve sonuçları incele	Review the saved template and results
+2 · Tasarımı çalıştırın	2 · Run the design
+Profilinizi seçin.	Select a profile.
+Bu örnekte ctDNA profilinin varsayılan ayarlarıyla başlayabilirsiniz. Ürün uzunluğu ve primer koşulları, seçtiğiniz profile göre doldurulur.	Start with the default ctDNA profile settings in this example. Product length and primer constraints are filled from the selected profile.
+İsteğe bağlı aralıkları girin.	Enter optional ranges.
+Şablonun ilk bazı	The first base of the template is
+olur. Örneğin hedef bölgenin başı	. If the target starts at
+, sonu	and ends at
+ise amplikonun bu aralığı kapsaması istenir. Konum kısıtı istemiyorsanız alanları boş bırakın.	, the amplicon must span that interval. Leave the fields blank to omit the positional constraint.
+Primer Tasarla’ya basın.	Select Design Primers.
+Aday üretimi, gnomAD kontrolü (veri varsa), genom özgüllüğü taraması ve seçilen çiftlerin QC analizi aynı işlemde yürütülür.	One run generates candidates, checks gnomAD when available, screens genome specificity and runs QC on selected pairs.
+Sonuç kartını açın.	Open a result card.
+Uygun çiftin F/R dizileri, ürün boyu ve Tm değerleri kartta görünür. Paneli TSV olarak kopyalayabilir veya Çift İnceleme’ye geçebilirsiniz.	The card shows the pair’s F/R sequences, product length and Tm values. Copy the panel as TSV or open Pair Review.
+Birden fazla hedef için multipleks tasarımı	Multiplex design for multiple targets
+Multipleks Tasarla’ya birden fazla bölge girin. Her hedef için en fazla bir çift seçilir; tüm primerler arasındaki dimerler ve genomik çapraz ürünler birlikte kontrol edilir.	Enter multiple regions in Multiplex Design. At most one pair is selected per target. Dimers and genomic cross-products are checked across all primers.
+Bu hedefleri multipleks formunda aç	Use these targets in the multiplex form
+Hedef başına aday sayısı, o bölgeden kaç özgül çiftin panel seçimine gireceğidir. “En fazla Tm aralığı”, paneldeki en yüksek ve en düşük primer Tm farkını sınırlar. Ürün boyu farkı 0 ise bu koşul uygulanmaz. Panel tüm hedefleri kapsamayabilir; sonucu ve gerekçeleri kontrol edin.	Candidates per target sets how many specific pairs from that region enter panel selection. Maximum Tm spread limits the difference between the highest and lowest primer Tm values. A product size gap of 0 disables that constraint. Review target coverage and the reasons shown in the results.
+Kayıtlı etkileşim raporunu incele	Review the saved interaction report
+3 · Bir çıktıyı okuyun	3 · Read the results
+Tam örnek çıktıyı aç	Open the full example result
+Karar	Verdict
+F ve R okları bağlanma yönlerini, iki okun kapsadığı alan amplikonu gösterir.	F and R arrows indicate binding orientation. The span between them is the amplicon.
+Beklenen ürün ile hedef dışı ürünleri ve kromozomlara göre bağlanma yerlerini karşılaştırın.	Compare intended and off-target products and inspect binding sites by chromosome.
+İşaretler varyant konumlarını gösterir. AF alel frekansıdır. Canlı sonuç tablosunda genom ve ekzom frekansları ayrı sütunlarda gösterilir.	Markers show variant positions. AF means allele frequency. Genome and exome frequencies are shown separately in live results.
+F×F, R×R ve F×R hizalamalarını, 3′ uç eşleşmelerini ve saç tokası çizimlerini inceleyin. ΔG₃₇ kcal/mol cinsindendir.	Inspect F×F, R×R and F×R alignments, 3′ matches and hairpin diagrams. ΔG₃₇ is measured in kcal/mol.
+İleri ve geri primerin sıcaklığa göre bağlanma eğrilerini karşılaştırın. Tm erime sıcaklığı, Ta reaksiyonun bağlanma sıcaklığıdır.	Compare the forward and reverse primer binding curves. Tm is the melting temperature and Ta is the reaction annealing temperature.
+Kural kimliğini açarak ölçümü, eşiği ve sonucu üreten motoru görün. NA, kuralın değerlendirilmediğini belirtir.	Open a rule to view its measurement, threshold and source. NA means the rule was not assessed.
+Multipleks, Prob & Blocker ve qPCR Erime örnekleri üstteki sekmelerdedir. Kendi primerlerinizle bu araçları	The tabs above contain multiplex, probe and blocker, and qPCR melting examples. To use your own primers, open
+sayfasından kullanabilirsiniz.	.
+Sık karşılaşılan durumlar	Common questions
+Yerel motor kapalı görünüyor	The local engine is unavailable
+Proje klasöründeki	Run
+dosyasını çalıştırıp	from the project folder, then open
+adresini açın.	.
+Sonuçlardaki elenme gerekçelerini açın. Ön filtrelerde kalan aday yoksa giriş aralığı ve tasarım kısıtlarını kontrol edin. Adaylar genom taramasında elendiyse hedef bölgeyi yeniden değerlendirin.	Open the rejection reasons in the results. If no candidate passed initial filters, check the input range and constraints. If genome screening excluded the candidates, reconsider the target region.
+Varyant verisi neden yok?	Why are there no variant results?
+“Varyant bulunmadı”, sorgunun tamamlandığını ve bu bölgede kayıt dönmediğini gösterir. “Değerlendirilmedi” ise veri kaynağının bölgeyi kapsamaması veya isteğin tamamlanamaması gibi farklı bir durumu gösterir.	“No variants found” means a completed query returned no records for the region. “Not assessed” indicates another condition, such as missing coverage or an incomplete request.
+Multipleks Tasarla’da en az iki hedef adı ve GRCh38 bölgesi girin. Varsayılan Sanger profili 300–800 bp ürün aralığı kullanır.	In Multiplex Design, enter at least two target names and GRCh38 regions. The default Sanger profile uses a 300–800 bp product range.
+Hedef başına aday sayısını ve aynı havuza kabul koşullarını seçip tasarımı başlatın.	Choose the candidates per target and pool criteria, then start the design.
+Her hedef genomda taranır. Birlikte kullanılabilecek çiftler seçilir; kapsanmayan hedefler varsa belirtilir. Paneli TSV olarak indirebilirsiniz. Aşağıdaki arşiv, eski çalışmanın dimer ve çapraz ürün raporunu okumak için bir örnektir.	Each target is screened across the genome. Compatible pairs are selected and uncovered targets are listed. Download the panel as TSV. The archive below shows how to read a saved dimer and cross-product report.
+Yerel Analiz’de Hidroliz probu veya Prob ve blocker QC’yi seçin.	In Local Analysis, choose Hydrolysis Probe or Probe and Blocker QC.
+Hidroliz probu için bir çift seçin ve varsa prob dizisini girin. Blocker QC için mutant ve WT prob dizileri ayrı alanlara girilir.	For a hydrolysis probe, choose a pair and optionally enter a probe sequence. For blocker QC, enter mutant and WT probe sequences in separate fields.
+Çıktı Tm, dimer ve ilgili kural kayıtlarını gösterir. Aşağıdaki örnekler kaydedilmiş ölçümleri içerir.	Results show Tm, dimer measurements and related rules. The examples below contain saved measurements.
+Yerel Analiz’de Amplikon erime profili’ni seçin.	In Local Analysis, choose Amplicon Melting Profile.
+Tasarım kaynağını ve primer çiftini seçip analizi çalıştırın.	Choose a design source and primer pair, then run the analysis.
+Sıcaklık eğrisindeki pikleri ve ilgili QC kaydını okuyun. Bu örnek, çiftlerin erime piklerini aynı grafikte karşılaştırır.	Review the temperature peaks and related QC record. The example compares melting peaks for multiple pairs in one chart.
+# Local analysis and validation
+Analiz türü	Analysis type
+Analizi çalıştır	Run analysis
+Analiz kayıtları	Analysis records
+Primer kaynağı	Primer source
+Primer kaynağı seçin	Choose a primer source
+Yerel tasarım	Local design
+Yerel tasarım · {0} · {1}	Local design · {0} · {1}
+Multipleks · {0} hedef	Multiplex · {0} targets
+Dokümantasyon · seçilen örnek	Documentation · selected example
+Bu analiz için bir primer çifti gerekir.	This analysis requires a primer pair.
+sayfasında kendi hedefinizi çalıştırın.	to run your own target.
+En az bir primer çifti seçin.	Select at least one primer pair.
+Özgüllük / Multipleks	Specificity / multiplex
+Taranacak çiftler	Pairs to screen
+Tümünü seç	Select all
+3′ çapa (nt)	3′ anchor (nt)
+En fazla uyumsuzluk	Maximum mismatches
+En kısa ürün (bp)	Shortest product (bp)
+En uzun ürün (bp)	Longest product (bp)
+24 kromozom taranır. Birden fazla çift seçilirse multipleks sonuçları da üretilir.	The scan covers 24 chromosomes. Selecting multiple pairs also produces multiplex results.
+Her iki bisülfit indeksi taranır.	Both bisulfite indexes are searched.
+{0} Tarama dizin yükleme süresine bağlı olarak birkaç dakika sürebilir.	{0} The search can take a few minutes depending on index load time.
+Dizi, dimer ve termodinamik QC	Sequence, dimer and thermodynamics QC
+gnomAD varyantları	gnomAD variants
+GENCODE izoformları	GENCODE isoforms
+GENCODE gen simgesi	GENCODE gene symbol
+Hidroliz probu	Hydrolysis probe
+Amplikon erime profili	Amplicon melting profile
+Tek primer termodinamiği	Single-primer thermodynamics
+Prob ve blocker QC	Probe and blocker QC
+Var olan prob (boş bırakılırsa aday aranır)	Existing probe (leave blank to find a candidate)
+Primer dizisi (5′ → 3′)	Primer sequence (5′ → 3′)
+Mutant prob	Mutant probe
+WT prob	WT probe
+Blocker (isteğe bağlı)	Blocker (optional)
+İleri primer (isteğe bağlı)	Forward primer (optional)
+Geri primer (isteğe bağlı)	Reverse primer (optional)
+Sonucu JSON olarak indir	Download result as JSON
+GRCh38 · Özgüllük taraması	GRCh38 · Specificity search
+Özgüllük ve varyant sonrası sıralama	Ranking after specificity and variant screening
+Multipleks · çapraz ürünler ve dimerler	Multiplex · cross-products and dimers
+Çapraz ürünler · ilk 200	Cross-products · first 200
+BIS-04 · CT ve GA taraması	BIS-04 · CT and GA screening
+Bisülfit özgüllüğü	Bisulfite specificity
+gnomAD · varyant kanıtları	gnomAD · variant evidence
+Erime eğrisi · −dθ/dT	Melting curve · −dθ/dT
+Sıcaklık (°C)	Temperature (°C)
+{0} sıcaklık noktası · amplikon modeli	{0} temperature points · amplicon model
+Hidroliz probu değerlendirmesi	Hydrolysis probe assessment
+Uygun prob adayı bulunamadı	No suitable probe candidate found
+RT-03 · GENCODE izoform kapsamı	RT-03 · GENCODE isoform coverage
+Kalite kontrolü	Quality control
+Kalite kontrolü · kanıt kayıtları	Quality control · evidence records
+Bu çift için henüz değerlendirilmedi.	Not yet assessed for this pair.
+Yerel motor isteği tamamlanamadı.	The local analysis request could not be completed.
+Motor sonuç üretemedi.	The analysis could not produce a result.
+Geçerli bir analiz seçin.	Choose a valid analysis.
+Analiz bu oturumda bulunamadı.	Analysis not found in this session.
+Önce primer tasarımının tamamlanmasını bekleyin.	Wait for the primer design to finish first.
+Analiz kaynağı geçersiz.	Invalid analysis source.
+Panelden geçerli primer çifti veya çiftleri seçin.	Choose valid primer pairs from the panel.
+Bu analiz için bir primer çifti seçin.	Select one primer pair for this analysis.
+Analiz sırası dolu. Çalışan bir analiz tamamlanınca tekrar deneyin.	The analysis queue is full. Try again after a running analysis finishes.
+Yerel motor hatası. Ayrıntı için sunucu terminaline bakın.	Local analysis error. See the server terminal for details.
+Reaksiyon koşulları geçersiz.	Invalid reaction conditions.
+Konum kısıtı iki koordinat içermeli.	A position constraint must contain two coordinates.
+Tasarım ayarları geçersiz.	Invalid design settings.
+Optimum Tm, Tm penceresi içinde olmalı.	Optimal Tm must be within the Tm window.
+Motor ayrılan süre içinde tamamlanamadı.	The analysis timed out.
+Motor çalışması başarısız ({0}): {1}	Analysis failed ({0}): {1}
+Yerel GRCh38 referansı hazır değil.	The local GRCh38 reference is unavailable.
+Kayıtlı chr22 proje paneli bulunamadı.	The saved chr22 panel was not found.
+Kayıtlı panel koordinatları yerel GRCh38 referansıyla uyuşmuyor.	The saved panel coordinates do not match the local GRCh38 reference.
+Geçerli bir uygulama profili seçin.	Choose a valid application profile.
+Bisülfit tasarımı için CT veya GA seçin.	Choose CT or GA for bisulfite design.
+FASTA dizisi girilen GRCh38.p14 aralığıyla tam eşleşmiyor.	The FASTA sequence does not exactly match the supplied GRCh38.p14 region.
+Geçerli bir tuz modeli seçin.	Choose a valid salt model.
+Primer konumu seçilen şablon aralığında yeterli alan bırakmıyor.	The primer position leaves too little room in the selected template interval.
+Kapsanacak hedef, tasarım aralığı içinde olmalı.	The target to span must be inside the design interval.
+Varyant filtre kapsamı geçersiz.	Invalid variant filter scope.
+24 kromozomluk genom taraması şu anda kullanılamıyor.	Genome screening across 24 chromosomes is currently unavailable.
+3′ çapa en kısa primerden uzun olamaz.	The 3′ anchor cannot exceed the shortest primer length.
+Amplikonda belirsiz N bazları bulundu. Bu model tam dizi gerektirir.	The amplicon contains ambiguous N bases. This model requires a complete sequence.
+Erime profili için ürün en fazla 1000 baz olmalı.	The product must be at most 1,000 bases for a melting profile.
+Prob seçimi için ürün en fazla 600 baz olmalı.	The product must be at most 600 bases for probe selection.
+İzoform kapsamı dönüşmemiş insan referansı gerektirir.	Isoform coverage requires an unconverted human reference.
+GENCODE gen simgesini girin.	Enter a GENCODE gene symbol.
+GENCODE ekson tablosu bulunamadı.	The GENCODE exon table was not found.
+Bilinmeyen analiz türü.	Unknown analysis type.
+Dimer denetimi için ileri ve geri primer birlikte girilmeli.	Enter both forward and reverse primers for dimer assessment.
+GRCh38 bölgesi gerekli.	A GRCh38 region is required.
+Bölgeyi chr22:20000550-20000870 biçiminde girin.	Enter a region in the format chr22:20000550-20000870.
+Bölge 1 tabanlı olmalı ve en fazla {0} baz içermeli.	Use a 1-based region with no more than {0} bases.
+{0} koordinatları 1–{1} aralığında olmalı.	{0} coordinates must be within 1–{1}.
+Referans bölgesi okunamadı. FASTA biçimini kontrol edin.	The reference region could not be read. Check the FASTA format.
+Multipleks tasarımı için 2–8 hedef bölge girin.	Enter 2–8 target regions for multiplex design.
+Her hedef için bir ad ve genom bölgesi gerekli.	Each target requires a name and a genomic region.
+Hedef adı 1–60 karakter olmalı.	Target names must contain 1–60 characters.
+Bu multipleks akışı dönüşmemiş GRCh38 hedefleri içindir.	This multiplex workflow requires unconverted GRCh38 targets.
+Havuz ayarları geçersiz.	Invalid pool settings.
+{0} {1}–{2} aralığında olmalı.	{0} must be within {1}–{2}.
+{0} tam sayı olmalı.	{0} must be an integer.
+{0} dizisini girin.	Enter the {0} sequence.
+{0} {1}–{2} baz olmalı.	{0} must contain {1}–{2} bases.
+{0}: alt sınır üst sınırı aşıyor.	{0}: the lower limit exceeds the upper limit.
+# Pair review
+Henüz bir primer çifti yok	No primer pair yet
+Tasarım ve otomatik özgüllük taraması tamamlandığında çiftinizi burada inceleyebilirsiniz.	Your pair will appear here after design and automatic specificity screening.
+Örnek çıktıyı gör	View example result
+Tasarım #{0}	Design #{0}
+Primer tasarımı · {0}	Primer design · {0}
+tarayıcı ön tasarımı · {0}	browser preview design · {0}
+motor çıktısı · {0}	saved analysis · {0}
+{0} primer bağlanma yeri	{0} primer binding site
+İleri primer	Forward primer
+İleri primer (F)	Forward primer (F)
+Geri primer	Reverse primer
+Geri primer (R)	Reverse primer (R)
+Geri primer (kesikli)	Reverse primer (dashed)
+Amplikonu FASTA olarak kopyala	Copy amplicon as FASTA
+Dizi haritası	Sequence map
+iki iplik · primer bağlanma yerleri · gnomAD varyantları	both strands · primer binding sites · gnomAD variants
+Şablondaki konum	Position in template
+Şablon üzerindeki primer çiftleri	Primer pairs on the template
+Baz düzeyinde dizi haritası	Base-level sequence map
+Varyant üzerine gelin: rsID, alel, AF, popülasyon	Hover a variant for rsID, allele, AF and population
+Özgüllük taraması	Specificity screening
+Yeniden tara	Screen again
+Panel ve arama ayarları	Panel and search settings
+Bu çift henüz taranmadı.	This pair has not been screened yet.
+BIS-04 hazır	BIS-04 ready
+BIS-04 · CT ve GA özgüllüğü	BIS-04 · CT and GA specificity
+CT / GA arama sözleşmeleri	CT / GA search settings
+Arama kapsamında tek hedef ürün	One intended product within the search scope
+Beklenen hedef ürün doğrulanamadı	The intended product could not be verified
+Primer tam eşleşme sayıları incelenmeli	Review the exact match counts
+{0} hedef dışı ürün bulundu	{0} off-target products found
+Genom taraması sonucu	Genome screening result
+Kayıtlı panel sonucu	Saved panel result
+{0} · {1} toplam ürün · {2} hedef · {3} hedef dışı. {4} kromozom, primer başına en fazla {5} uyumsuzluk, {6}–{7} bp ürün.	{0} · {1} total products · {2} intended · {3} off-target. {4} chromosomes, up to {5} mismatches per primer, {6}–{7} bp products.
+Uyumsuzluk sınıfı histogramı	Mismatch count histogram
+Genomdaki bağlanma yerleri	Genomic binding sites
+Yükseklik karekök ölçekli	Height uses a square-root scale
+soluk = daha çok uyumsuzluk	fainter = more mismatches
+En düşük uyumsuzluklu yerler gösteriliyor.	Sites with the fewest mismatches are shown.
+Bağlanma yeri hizalamaları	Binding-site alignments
+Primer-BLAST gösterimi · nokta = eşleşme, harf = uyumsuz baz	Primer-BLAST notation · dot = match, letter = mismatch
+en yakın 40 yer / primer	40 closest sites per primer
+3′ sağlam	3′ intact
+F 3′ sağlam	F 3′ intact
+R 3′ sağlam	R 3′ intact
+tam · hedef	exact · intended
+tam eşleşmeli	exact match
+uyumsuzluklu	with mismatches
+tam hedef dışı	exact off-target
+Hedef dışı ürünler	Off-target products
+Arama sözleşmesi	Search settings
+Arama sözleşmesi içinde hedef dışı ürün raporlanmadı. Beklenen hedef ürün sayısı {0}.	No off-target products were reported within these search settings. Expected intended products: {0}.
+{0} toplam uyumsuzluk	{0} total mismatches
+SPC-02 · tüm bağlanma yerleri 3′ {0} nt çapalı	SPC-02 · all binding sites have a {0} nt 3′ anchor
+SPC-09 · bu sonuç şu indeks ve sözleşmeyle üretildi	SPC-09 · index and settings for this result
+gnomAD · amplikon ve primer bölgeleri	gnomAD · amplicon and primer regions
+Varyant · renk AF’ye göre	Variant · colored by AF
+İşaretlerin üzerine gelerek alel ve frekans bilgisine bakabilirsiniz.	Hover markers to view alleles and frequencies.
+Sorgu tamamlandı. Bu amplikonda kayıtlı varyant bulunmadı.	Query complete. No recorded variants were found in this amplicon.
+Bu çift için gnomAD kaydı henüz alınmadı.	gnomAD records have not yet been retrieved for this pair.
+Amplikonla örtüşen varyantlar	Variants overlapping the amplicon
+Genom AF	Genome AF
+Ekzom AF	Exome AF
+Kullanılan AF	AF used
+Yaygın varyant primer altında	Common variant within a primer
+Primer altında incelenmesi gereken varyant var	Review a variant within a primer
+Primer altında anlamlı varyant yok	No relevant variant within either primer
+gnomAD v4 genom (r4) · {0} varyant amplikonda · {1} F altında · {2} R altında	gnomAD v4 genome (r4) · {0} variants in the amplicon · {1} in F · {2} in R
+Alel frekansı · primer boyunca (5′→3′)	Allele frequency along the primer (5′→3′)
+Bağlanma yerinde gnomAD varyantı yok.	No gnomAD variants in this binding site.
+Primerler arası varyantlar	Variants between the primers
+Motor kayıtları	Analysis records
+3′ uçlu, uzatılabilir yapı	Extendable 3′ structure
+En kararlı yapı (her konum)	Most stable structure at any position
+Kararlı yapı yok	No stable structure
+Kararlı yapı bulunamadı	No stable structure found
+3′ ucu eşleşen yapı yok — uzama riski düşük	No 3′-matched structure was found. Low extension risk.
+Diğer olası yapılar ({0})	Other possible structures ({0})
+Sap-ilmek yapısı	Stem-loop structure
+Eşleşmiş baz yok — doğrusal, yapısız (MFE 0)	No paired bases · unstructured (MFE 0)
+En güçlü sap adayı (align.hairpin_stem)	Strongest candidate stem
+Primer bazlarının erişilebilirliği	Primer base accessibility
+SS-03 · bazın eşleşmemiş olma olasılığı	SS-03 · probability of the base remaining unpaired
+Amplikon ikincil yapısı	Amplicon secondary structure
+Amplikon ikincil yapısı için ölçüm yok.	No amplicon secondary-structure measurement.
+Baz çifti	Base pairs
+Tm (yapı)	Tm (structure)
+Bağlanma oranı · θ(Ta)	Bound fraction · θ(Ta)
+Tuz modelleri arası Tm farkı	Tm difference across salt models
+Primer erime eğrileri · θ(T)	Primer melting curves · θ(T)
+İleri ve geri primerin sıcaklığa göre bağlanma oranı	Forward and reverse primer binding fraction by temperature
+Kesikli çizgi: Ta {0} °C	Dashed marker: Ta {0} °C
+θ(T), modelin o sıcaklıkta hedefe bağlı olduğunu öngördüğü primer oranıdır. Tm’de θ ≈ 0,5.	θ(T) is the predicted fraction of primer bound to the target at that temperature. At Tm, θ ≈ 0.5.
+Bu QC kaydında eğri noktaları yok. Yeni bir tasarımda eğriler otomatik oluşturulur.	This QC record has no curve points. A new design generates them automatically.
+Bu çift için termodinamik QC kaydı bulunamadı.	No thermodynamics QC record for this pair.
+Bu çift için yapı ve dimer QC kaydı bulunamadı.	No structure or dimer QC record for this pair.
+Ürün ve önerilen Ta	Product and suggested Ta
+Erime eğrisi θ(T)	Melting curve θ(T)
+Bu çift için QC kataloğu	QC catalog for this pair
+{0} kural kanıtla değerlendirildi · {1} FAIL · {2} WARN	{0} rules evaluated · {1} FAIL · {2} WARN
+{0} kural bu çift için koşulmadı ya da panel düzeyinde · {1} kural {2} profilinde uygulanmaz · {3} kural altyapı bekliyor. Ölçümü, eşiği ve modeli görmek için bir kurala tıklayın.	{0} rules were skipped or apply to the panel · {1} do not apply to the {2} profile · {3} are pending. Select a rule to view its measurement, threshold and model.
+Tümü	All
+Tümü {0}	All {0}
+Değerlendirilen {0}	Evaluated {0}
+Koşulmadı {0}	Not run {0}
+Profil dışı {0}	Out of profile {0}
+Bekliyor {0}	Pending {0}
+tümü	all
+Koşulmadı	Not run
+koşulmadı	not run
+profil dışı	out of profile
+Profil dışı	Out of profile
+değerlendirilmedi	not assessed
+Kural ara: TH-02, dimer, varyant…	Search rules: TH-02, dimer, variant…
+{0} kural	{0} rules
+Filtreye uyan kural yok.	No rules match the filter.
+Kalite kontrolü yap	Run quality checks
+Bir çift seçildiğinde bu kuralın kanıtı burada görünür.	Evidence for this rule appears here after selecting a pair.
+Bu çift için kayıt yok.	No record for this pair.
+model künyesi	model details
+Ham kanıt kaydı (JSON)	Raw evidence record (JSON)
+eşik	threshold
+değer	value
+Analiz kaydı	Analysis record
+hayır	no
+evet	yes
+# Saved panel
+Kayıtlı çalışma · arşivlenmiş motor çıktıları	Saved analysis · archived results
+chr22 ctDNA paneli — 20 aday primer çifti	chr22 ctDNA panel · 20 candidate primer pairs
+. Çiftler tasarlandı ve GRCh38 genelinde tarandı ({0} bağlanma kaydı, {1} shard, {2} s), gnomAD v4 varyantlarıyla ve multipleks çapraz-reaktiviteyle sıralandı.	. Pairs were designed and screened across GRCh38 ({0} binding records, {1} shards, {2} s), then ranked using gnomAD v4 variants and multiplex cross-reactivity.
+çapa	anchor
+uyumsuzluk · ürün {0}–{1} bp	mismatches · product {0}–{1} bp
+{0} tam uygulandı	{0} fully implemented
+{0} kısmi (SPC-08)	{0} partial (SPC-08)
+{0} altyapı/veri bekliyor	{0} awaiting data or infrastructure
+Kataloğu aç →	Open catalog →
+Aday çift · son karar	Candidate pairs · final verdict
+{0} PASS · {1} WARN · {2} FAIL (varyant katmanı dahil)	{0} PASS · {1} WARN · {2} FAIL (including variants)
+Genom-geneli bağlanma	Genome-wide binding
+{0} arama · 3′ {1} nt çapa	{0} searches · {1} nt 3′ anchor
+Hedef dışı ürün	Off-target product
+gnomAD varyantı	gnomAD variants
+{0} tanesi en az bir primerin altında	{0} overlap at least one primer
+Şablon üzerindeki çiftler	Pairs on the template
+Çift bölgesi	Pair region
+Tüm şablon	Whole template
+Panel sıralaması	Panel ranking
+final_ranked.tsv · özgüllük ve varyant katmanı sonrası	final_ranked.tsv · after specificity and variant screening
+{0} hedef dışı	{0} off-target
+Boru hattı	Analysis workflow
+bu panelin geçtiği adımlar	steps applied to this panel
+2000 aday çift · sert filtreler + Pareto	2,000 candidate pairs · strict filters and Pareto ranking
+Dizi / çift QC	Sequence and pair QC
+Genom taraması	Genome screening
+GRCh38 özgüllük taraması	GRCh38 specificity screening
+{0} bağlanma · {1} ürün · {2} s	{0} binding sites · {1} products · {2} s
+Termo + özgüllük QC	Thermodynamics and specificity QC
+Varyant katmanı	Variant screening
+{0} varyant · VAR-01…08	{0} variants · VAR-01…08
+çapraz ürün	cross-product
+MPX-01…03 · DIM-06 · çapraz ürün	MPX-01…03 · DIM-06 · cross-products
+Yeniden sıralama	Reranking
+Aile başına kapsam	Coverage by rule family
+tüm kurallar →	all rules →
+Açık maddeler	Open items
+acik_maddeler.tsv · kodla kapatılamayan, karar/altyapı bekleyen işler	Open decisions and infrastructure requirements
+Madde	Item
+Alan	Area
+Bu planda	In this plan
+kismen	partially
+hayir	no
+tamam	complete
+# Multiplex and probe archives
+Yerel multipleks taraması	Run local multiplex screening
+Aşağıda kayıtlı sonuçlar gösterilir.	Saved results are shown below.
+Havuz kurucu	Pool builder
+Aynı tüpte birlikte kullanılmak için tasarlanmadılar; bu yüzden panelin tamamı MPX-02'de FAIL verir. Bazı F ve R primerleri birbirinin tam ters tamamlayıcısıdır (ör. DESIGN_006_R ↔ DESIGN_004_F), matristeki −24 kcal/mol değerleri buradan gelir. Aşağıdaki havuz kurucu, birlikte kullanılabilecek alt kümeyi bulur.	These pairs were not designed for the same tube, so the full panel fails MPX-02. Some F and R primers are exact reverse complements (for example, DESIGN_006_R and DESIGN_004_F), producing the −24 kcal/mol values. The pool builder identifies a compatible subset.
+Bu 20 çift aynı ~300 bp lokus için alternatif adaylardır.	These 20 pairs are alternative candidates for the same ~300 bp locus.
+Bu iki primer birbirinin tam ters tamamlayıcısı: aynı bölgeyi zıt yönden okuyan alternatif adaylar.	These primers are exact reverse complements and are alternatives that read the same region in opposite directions.
+Bu lokustaki çiftlerin hepsi aynı 300 bp içinde: iki çift birlikte konduğunda birinin F primeri ile diğerinin R primeri arasında 100–300 bp’lik çapraz ürün oluşuyor. Multipleks için hedefleri farklı lokuslara yayın.	The pairs at this locus are all within the same 300 bp. When two pairs are pooled, the forward primer of one and the reverse primer of the other can form a 100–300 bp cross-product. Use distinct loci for multiplex targets.
+seçili {0} çift · {1} benzersiz primer	{0} selected pairs · {1} unique primers
+Uyumlu havuzu otomatik seç	Auto-select a compatible pool
+Tm homojenliği	Tm uniformity
+{0} ürün	{0} products
+{0} tam eşleşmeli · {1} örtüşen amplikon çifti	{0} exact matches · {1} overlapping amplicon pairs
+CE boy ayrımı	CE size separation
+komşu ürün farkı WARN < 10 bp	WARN if adjacent products differ by < 10 bp
+En kötü 3′ çapraz dimer	Strongest 3′ cross-dimer
+bp · renkli = tasarlanan · kesikli = çapraz ürün · kırmızı bant < 10 bp	bp · solid = designed · dashed = cross-product · red band < 10 bp
+Amplikonların şablondaki yeri	Amplicon positions on the template
+Çiftler arası dimer matrisi	Dimer matrix across pairs
+Dimer ısı haritası	Dimer heatmap
+3′ uçlu ΔG	3′ ΔG
+3′ uçlu	3′ end
+≥ −3 · boş	≥ −3 · blank
+Seçili havuz dışındaki hücreler soluk · "+" aynı diziyi paylaşan primer grubu	Cells outside the selected pool are dimmed · “+” marks a group sharing a sequence
+Çapraz ürünler	Cross-products
+{0} seçili havuzda · toplam {1} kayıt (multiplex/cross_products.tsv)	{0} in the selected pool · {1} total records (multiplex/cross_products.tsv)
+Sol primer	Left primer
+Sağ primer	Right primer
+uzun ürün	long product
+Seçili havuzda çapraz ürün yok	No cross-products in the selected pool
+Canlı prob analizi	Run probe analysis
+Canlı blocker QC	Run blocker QC
+Canlı erime profili	Run melting profile
+CT-05 · wild-type blocker ve alel-ayrım probları	CT-05 · wild-type blocker and allele-discriminating probes
+blocker_qc.py · kullanıcı reaktif seti	blocker_qc.py · user reagent set
+Prob Tm karşılaştırması (DNA iskeleti alt sınırı)	Probe Tm comparison (DNA backbone lower bound)
+LNA katkısı modellenmedi.	The LNA contribution is outside the model.
+Eş	Partner
+Eşikler: WARN genel < −6 / 3′ < −5, FAIL < −9 / < −7 kcal/mol	Thresholds: WARN overall < −6 / 3′ < −5, FAIL < −9 / < −7 kcal/mol
+Amplikon içinde	Within the amplicon
+tarayıcı portu · PRB-01/02/03 · SS-05 (sap) · DIM-05	browser model · PRB-01/02/03 · SS-05 (stem) · DIM-05
+LNA: +N · uç: /56-FAM/	LNA: +N · terminal: /56-FAM/
+Prob Tm farkı	Probe Tm difference
+prob primerlerden 6–10 °C yüksek	probe Tm is 6–10 °C above the primers
+florofor yanında G söndürür	G can quench an adjacent fluorophore
+prob ipliğinde C fazlası	C enrichment in the probe strand
+Prob sapı	Probe stem
+hairpin_stem; Zuker için motor	hairpin_stem · use the analysis for the Zuker model
+Prob en az 8, primerler en az 10 nt olmalı.	The probe must be at least 8 nt and the primers at least 10 nt.
+qPCR-SYBR profili tasarımının (design_qpcr_sybr) amplikonları. Erime profili motorun Poland tipi kısmi erime modelinden (amplicon.py) gelir; döngü entropisi bu modelin kapsamı dışındadır. İki pik, amplikon içinde farklı kararlılıkta bölgeler olduğunu gösterir.	Amplicons from the qPCR-SYBR design profile. The melting profile uses a Poland-type partial melting model without loop entropy. Two peaks indicate regions of differing stability in the amplicon.
+sıcaklık °C	temperature °C
+Tüm amplikonlar · küçük çoklu	All amplicons · small multiples
+her panel aynı ölçek, 70–92 °C	all charts share a 70–92 °C scale
+# Catalog and verification
+Toplam kural	Total rules
+{0} aile	{0} families
+Uygulanmış	Implemented
+Uygulanmış {0}	Implemented {0}
+Kısmi {0}	Partial {0}
+Bekleyen {0}	Pending {0}
+{0} tam + {1} kısmi (SPC-08)	{0} complete + {1} partial (SPC-08)
+Altyapı bekliyor	Infrastructure pending
+Tablo bekliyor	Parameter table pending
+BIS-02/03/04 indeks · RT-03 transkriptom	BIS-02/03/04 index · RT-03 transcriptome
+Ara: kural, yöntem, dosya…	Search rules, methods or files…
+Ad ve yöntem	Name and method
+Tarayıcı ve referans hesaplarının karşılaştırması	Browser and reference calculation comparison
+sayfa açılırken canlı hesaplandı · {0} primer · {1} çift	computed on page load · {0} primers · {1} pairs
+eşleşiyor	matches
+Büyüklük	Metric
+en büyük |fark|	maximum absolute difference
+Tolerans	Tolerance
+TH-01 Tm (Owczarzy 2008, primer fazlası)	TH-01 Tm (Owczarzy 2008, primer excess)
+{0}/{1} aynı	{0}/{1} match
+özdeş	identical
+fark	difference
+Tasarım denkliği	Design parity
+Tarayıcıda yeniden koş	Run again in browser
+Aynı şablon ve ctdna profiliyle tarayıcı motoru çalıştırılır; {0} çiftin ilk {1} tanesi (dizi, sıra, Pareto katmanı, skor) ve tüm elenme sayıları referansla karşılaştırılır.	The browser design uses the same template and ctDNA profile. The top {1} of {0} pairs are compared with the reference for sequence, rank, Pareto tier and score, along with all rejection counts.
+Hesaplama ve tarama sonuçlarının karşılaştırması	Calculation and screening comparison
+diff_cpp.py · 74 dizi × 17 sütun	diff_cpp.py · 74 sequences × 17 columns
+74 dizi × 17 sütun, hepsi eşleşiyor	74 sequences × 17 columns, all match
+satır: 17 sütun (dH, dS, n_bp … hetero helis) · sütun: 74 dizi	rows: 17 metrics (dH, dS, n_bp … heterodimer helix) · columns: 74 sequences
+Tüm 17 çekirdek ve dimer sütununda 74/74 MATCH. Koşul: Na 50 mM, Mg 1,5 mM, dNTP 0,6 mM, primer 200 nM, Ta 60 °C, owczarzy_2008. Bulge ve A·T kapanış cezası eklendikten sonra tam eşleşmeye ulaşıldı.	All 74 sequences match across 17 core and dimer metrics. Conditions: Na 50 mM, Mg 1.5 mM, dNTP 0.6 mM, primer 200 nM, Ta 60 °C, owczarzy_2008. Full agreement followed the addition of bulge and A·T closure penalties.
+Terminal tablo kaynak farkı	Terminal parameter discrepancy
+: tablo −6,9149, primer3 oracle −0,7000. ARMS bağlamında kararı WARN → INFO çeviriyor. Basılı tablodan hangi değerin doğru olduğu kodla çözülemez; birincil PDF'e bakılmalı.	: table −6.9149, Primer3 −0.7000. In the ARMS case the result changes from WARN to INFO. Consult the original publication for the printed value.
+Parametre tablolarının primer3'e karşı denetimi	Parameter table comparison with Primer3
+param_crosscheck.py · {0} karşılaştırma	param_crosscheck.py · {0} comparisons
+Çapraz denetim yalnız transkripsiyon hatasını yakalar; tabloyu	Cross-checks detect transcription errors and leave the table
+yapmaz. Tolerans dH/dS/dG37 0,051.	status as recorded. Tolerance for dH/dS/dG37 is 0.051.
+Motorun kullandığı tablolar (params.py künyeleri)	Parameter tables and sources
+Çapraz denetim	Cross-check
+TH-02 / TH-04 eşik karar desteği	TH-02 / TH-04 threshold comparison
+yayılım °C (2008 vs von Ahsen)	spread °C (2008 vs von Ahsen)
+öneri 3,0	suggested 3.0
+Karar deneysel veriyle kullanıcıya ait.	Use experimental data to decide.
+Uçtan uca regresyon	End-to-end regression
+regresyon.py · {0} günlük	regresyon.py · {0} logs
+atlandı	skipped
+hata	failed
+Tuz katmanı çapraz denetimi	Salt correction cross-check
+WSL gerekli	WSL required
+Tarayıcı motoru çalışıyor…	Browser analysis running…
+Çift sayısı	Pair count
+tarayıcı / referans	browser / reference
+İlk {0} çift	First {0} pairs
+aynı dizi ve sıra	same sequence and rank
+Skor farkı	Score difference
+Süre	Elapsed time
+Elenme kuralı	Rejection rule
+Tarayıcı	Browser
+tarayıcı	browser
+aynı	same
+# Profile labels as stored in the reference data
+qpcr_sybr — SYBR tabanli qPCR	qpcr_sybr — SYBR-based qPCR
+rt_qpcr — mRNA / RT-qPCR	rt_qpcr — mRNA / RT-qPCR
+ctdna — ctDNA / cfDNA, kisa amplikon	ctdna — ctDNA / cfDNA, short amplicon
+ddpcr — ddPCR	ddpcr — ddPCR
+sanger — Sanger dizileme	sanger — Sanger sequencing
+ngs_amplicon — NGS amplikon paneli	ngs_amplicon — NGS amplicon panel
+standard_pcr — Standart PCR	standard_pcr — Standard PCR
+bisulfite — Bisulfit donusturulmus DNA	bisulfite — Bisulfite-converted DNA
+# Quality control rule labels and methods
+Dizi bütünlüğü	Sequence integrity
+Kompozisyon	Composition
+İkincil yapı	Secondary structure
+Çift uyumu	Pair compatibility
+Reaksiyon koşulu	Reaction conditions
+amplikon	amplicon
+primer/amplikon	primer/amplicon
+çift	pair
+prob	probe
+girdi	input
+kalıp	template
+koşul	condition
+rapor	report
+simetri testi	symmetry test
+Amplikon GC	Amplicon GC
+Erime profili (tahmini)	Predicted melting profile
+Tekrar	Repeats
+CpG içeriği	CpG content
+Dönüşüm seçiciliği	Conversion selectivity
+Dönüşüm sonrası karmaşıklık	Post-conversion complexity
+İplik özgüllüğü	Strand specificity
+GC içeriği	GC content
+Di/tri-nükleotid tekrar	Di-/trinucleotide repeats
+Düşük karmaşıklık	Low complexity
+G-quadruplex motifi	G-quadruplex motif
+5′/3′ stabilite dengesi	5′/3′ stability balance
+3′ terminal baz	3′ terminal base
+Kısa amplikon	Short amplicon
+Bütün fragman olasılığı	Intact fragment probability
+Tespit edilebilirlik (Poisson)	Detectability (Poisson)
+Allel-spesifik (ARMS) ayrım	Allele-specific (ARMS) discrimination
+CHIP geni uyarısı	CHIP gene flag
+Self-dimer (genel)	Self-dimer (overall)
+Self-dimer (3′ uçlu)	Self-dimer (3′)
+Hetero-dimer F×R (genel)	F×R heterodimer (overall)
+Hetero-dimer F×R (3′ uçlu)	F×R heterodimer (3′)
+Multipleks matris	Multiplex matrix
+Kuyruk dahil analiz	Analysis with tails
+Hesaplama tutarlılığı	Calculation consistency
+Amplikon boy ayrımı (CE)	Amplicon size separation (CE)
+Adaptör dahil analiz	Analysis with adapters
+Ürün boyutu	Product size
+Primer çakışması	Primer overlap
+Ürün Tm ve primer Tm farkı	Product and primer Tm difference
+Primer–prob konumu	Primer–probe position
+LNA/MGB modifiyeli prob	LNA/MGB-modified probe
+Amplikon uzunluğu	Amplicon length
+Tek erime piki	Single melting peak
+Ekson-ekson kavşağı	Exon–exon junction
+gDNA ürünü	gDNA product
+İzoform kapsamı	Isoform coverage
+RNA kalıp erişilebilirliği	RNA template accessibility
+RT primeri DNA/RNA hibrit Tm	RT primer DNA/RNA hybrid Tm
+Hedefe mesafe	Distance to target
+Uzunluk	Length
+Alfabe	Alphabet
+Dejenerasyon katsayısı	Degeneracy factor
+Kalıpta belirsiz baz	Ambiguous bases in the template
+Koordinat–dizi tutarlılığı	Coordinate–sequence consistency
+Referans kimliği	Reference identity
+Hedef tekilliği	Target uniqueness
+Off-target bağlanma yerleri	Off-target binding sites
+Off-target ürünler	Off-target products
+Off-target termodinamik ağırlığı	Off-target thermodynamic weight
+3′ terminal uyumsuzluk tipi	3′ terminal mismatch type
+Segmental duplikasyon	Segmental duplication
+Mitokondriyal	Mitochondrial
+Sözleşme beyanı	Search configuration
+Hairpin (genel)	Hairpin (overall)
+3′ uçlu hairpin	3′ hairpin
+Bağlanma bölgesi erişilebilirliği	Binding region accessibility
+Amplikon yapısı	Amplicon structure
+Prob yapısı	Probe structure
+Tuz modeli duyarlılığı	Salt model sensitivity
+Hedefe bağlı fraksiyon θ(Ta)	Target-bound fraction θ(Ta)
+3′ uç stabilitesi	3′ end stability
+Erime eğrisi	Melting curve
+Katkı maddesi düzeltmesi	Additive correction
+Önerilen Ta	Suggested Ta
+3′ uçta varyant	Variant at the 3′ end
+Gövdede varyant	Variant in the primer body
+İndel	Indel
+ΔΔG etkisi	ΔΔG effect
+Varyantın yarattığı off-target	Variant-induced off-target
+Haplotip koruması	Haplotype conservation
+Klinik varyant çakışması	Clinical variant overlap
+Varyant özeti (çift düzeyi)	Variant summary (pair level)
+%GC ve 50-nt kayan pencere maksimumu	GC percentage and maximum in a 50 nt sliding window
+Kendi Poland tipi istatistiksel mekanik erime algoritması; dθ/dT pik sayı	Poland-type statistical mechanical melting algorithm and dθ/dT peak count
+düşük karmaşıklık / CMP-05 ve CMP-06 amplikona	Low-complexity and motif checks on the amplicon (CMP-05 and CMP-06)
+Primerde CpG sayısı ve 3′'e uzaklığı (MSP hariç)	Number of primer CpGs and distance to the 3′ end (excluding MSP)
+CpG dışı C (→T) sayısı	Number of non-CpG C bases (→T)
+CMP-05 dönüşmüş dizide	CMP-05 on the converted sequence
+4 dönüşmüş genom ipliğinde OligoScout taraması	OligoScout screening on four converted genome strands
+3′ son 5 nt içindeki G/C sayısı	G/C count within the final 5 nt at the 3′ end
+En uzun tek-baz koşusu	Longest homopolymer run
+Ardışık tekrar birimi sayısı	Number of consecutive repeat units
+Shannon entropisi (k=1,2) + DUST benzeri skor (kendi uygulamamız)	Shannon entropy (k=1,2) and a DUST-like score
+G≥3 N1–7 G≥3 N1–7 G≥3 N1–7 G≥3 regex taraması (her iki iplik)	G≥3 N1–7 G≥3 N1–7 G≥3 N1–7 G≥3 pattern search on both strands
+ΔG(3′ yarı) − ΔG(5′ yarı)	ΔG(3′ half) − ΔG(5′ half)
+Son baz kimliği	Identity of the terminal base
+Na⁺, K⁺, Mg²⁺, dNTP, primer/prob konsantrasyonu, Ta, katkılar	Na⁺, K⁺, Mg²⁺, dNTP, primer/probe concentration, Ta and additives
+[Mg]serbest ≈ [Mg] − [dNTP]	[Mg]free ≈ [Mg] − [dNTP]
+P = Σ f(L)·max(0, L−A+1)/L, fragman dağılımı üzerinden	P = Σ f(L)·max(0, L−A+1)/L over the fragment length distribution
+λ = GE × VAF × P_bütün; P(≥1 kopya)=1−e^−λ	λ = GE × VAF × P_intact; P(≥1 copy)=1−e^−λ
+3′ terminal varyant + −2/−3 kasıtlı uyumsuzluk; ΔΔG(mut vs wt) ve θ_wt(	3′ terminal variant, a deliberate −2/−3 mismatch, ΔΔG (mut vs WT) and WT bound fraction
+ddPCR prob ayrımı / ΔTm(mut vs wt prob)	ddPCR probe discrimination and ΔTm (mutant vs WT probe)
+Hedef DNMT3A, TET2, ASXL1, JAK2, TP53, PPM1D vb.	Flags targets such as DNMT3A, TET2, ASXL1, JAK2, TP53 and PPM1D
+Kendi termodinamik hizalama DP'si (iç döngü/bulge dahil); Tm_dimer ve θ_dimer(Ta	Thermodynamic alignment including internal loops and bulges, dimer Tm and θ(Ta)
+3′ uç eşleşmiş ve uzatılabilir dimer	Dimer with a matched, extendable 3′ end
+DIM-01 ile aynı	Same method as DIM-01
+DIM-02 ile aynı; öngörülen primer-dimer ürün dizisi ve uzunluğu raporlanır	Same method as DIM-02, with the predicted primer-dimer product sequence and length
+Tüm kombinasyonlar	All combinations
+n(n+1)/2 kombinasyon; ısı haritası; en kötü 3′-uçlu çift	n(n+1)/2 combinations, heatmap and strongest 3′ dimer
+M13/NGS adaptör kuyrukları dahil DIM/SS yeniden hesaplanır	Recompute DIM/SS with M13/NGS adapter tails
+dimer(A,B) = dimer(B,A); ters-tamamlayıcı değişmezlikleri	dimer(A,B) = dimer(B,A) and reverse-complement invariance
+Paneldeki Tm aralığı	Tm spread across the panel
+Tüm primer kombinasyonları ile tüm-tüme özgüllük	All-to-all specificity across primer combinations
+Komşu ürün boy farkı	Size gap between adjacent products
+DIM-07 zorunlu	Requires DIM-07
+Profil penceresi	Profile size range
+F ve R bölgeleri örtüşüyor mu / arası mesafe	Overlap and distance between F and R regions
+Tm(ürün) − Tm(primer)	Tm(product) − Tm(primer)
+Tm(prob) − ort. Tm(primer)	Tm(probe) − mean Tm(primer)
+Florofor yanındaki G	G next to the fluorophore
+Prob ipliğinde G sayısı > C sayısı	G count exceeds C count in the probe strand
+Primerle örtüşme / mesafe	Overlap with primer and distance to it
+LNA NN parametreleri ile Tm (McTigue 2004)	Tm with LNA nearest-neighbor parameters (McTigue 2004)
+AMP-02 sonucu	AMP-02 result
+Primer kavşağı kesiyorsa 5′ tarafta ≥7, 3′ tarafta ≥4 nt eşleşme	For junction-spanning primers, ≥7 nt match at 5′ and ≥4 nt at 3′
+Aynı çiftle genom taraması; gDNA ürün boyu	Genome screening of the same pair and gDNA product size
+Hedeflenen/hedeflenmeyen transkript listesi	List of targeted and non-targeted transcripts
+RNA parametreleri (Turner 2004) ile RT sıcaklığında SS-03	SS-03 at the RT temperature using RNA parameters (Turner 2004)
+İlgi bölgesinin primere uzaklığı	Distance from the region of interest to the primer
+Yalnız A/C/G/T; IUPAC yalnız dejenere modda; modifikasyon notasyonu ayrıştırılır	A/C/G/T only, IUPAC in degenerate mode, with modification notation parsed separately
+nt sayısı (kuyruk/adaptör hariç ve dahil ayrı raporlanır)	Nucleotide count with and without tails or adapters
+Π(her IUPAC konumundaki baz sayısı)	Product of base counts at all IUPAC positions
+Hedef bölgede N / soft-mask oranı	Proportion of N or soft-masked bases in the target region
+Kullanıcı koordinatı → referans dizisi ↔ verilen dizi karşılaştırması	Compare the supplied sequence with the reference at the given coordinates
+Build + yama + FASTA SHA-256 raporlanır	Reference build, patch and FASTA identity
+Tam eşleşmeli hedef sitesi sayısı	Count of exact-match target sites
+Uyumsuzluk sınıfı × 3′-çapa durumu histogramı	Histogram of mismatch class and 3′ anchor status
+F–R, F–F, R–R ürünleri; genişletilmiş boy aralığı (örn. 50–5000 bp) ayrıca	F–R, F–F and R–R products, including an extended size range
+Her site için uyumsuzluk NN parametreleriyle θ_off(Ta)	θ_off(Ta) per site using mismatch nearest-neighbor parameters
+Son 1–3 konumdaki uyumsuzluk tipi (G·T/T·G toleranslı; A·A, C·C, G·A yı	Mismatch type in the final 1–3 positions
+psödogen / Off-target'ın gen/psödogen anotasyonuyla örtüşmesi	Overlap of off-target sites with gene and pseudogene annotations
+tekrar / Bağlanma yerinin SD / tekrar anotasyonu	Segmental duplication and repeat annotations at binding sites
+alt contig / rRNA / chrM, ALT, rDNA ayrıca taranır	Separate screening of chrM, ALT and rDNA sequences
+Çapa uzunluğu, maks. uyumsuzluk, ürün aralığı, indeks sürümü ve checksum	Anchor length, mismatch limit, product range and index identity
+Kendi Zuker MFE + McCaskill fonksiyonu; hairpin Tm (=ΔH/ΔS) ve θ_hairpin(Ta)	Zuker MFE and McCaskill models, hairpin Tm and θ(Ta)
+3′ terminal baz eşleşmiş ve uzatılabilir yapı var mı	Whether the 3′ terminal base is paired in an extendable structure
+Kalıbın Ta'da eşleşmemiş olma olasılığı (bölge ortalaması, McCaski	Mean probability that the template remains unpaired at Ta
+Tek iplik amplikon MFE ve en kararlı yapının Tm'si	Single-strand amplicon MFE and Tm of its most stable structure
+Prob hairpin Tm ve θ	Probe hairpin Tm and θ
+İki-hal modeli; SantaLucia 1998 parametreleri; konsantrasyon modeli açıkça beyan edilir	Two-state model, SantaLucia 1998 parameters and the reported concentration model
+Tm'nin Owczarzy 2004 / 2008 (Mg²⁺) / von Ahsen 2001 Na-eşdeğeri altında yayı	Tm spread across Owczarzy 2004, Owczarzy 2008 (Mg²⁺) and von Ahsen 2001
+Primer fazlası varsayımı: θ = K[P]/(1+K[P])	Primer-excess assumption: θ = K[P]/(1+K[P])
+3′ son 5 bp ΔG°37	ΔG°37 for the last 5 bp at the 3′ end
+θ(T) eğrisi 40–80 °C, 0.1 °C adım; Tm'de θ=0.5 iç tutarlılık testi	θ(T) curve from 40 to 80 °C in 0.1 °C steps with θ=0.5 at Tm as an internal check
+DMSO/betain/formamid Tm düşürme (beyan edilen yaklaşık katsayı)	Estimated Tm reduction for DMSO, betaine or formamide
+Rychlik 1990: Ta = 0.3·Tm(primer) + 0.7·Tm(ürün) − 14.9 ve θ-tabanlı Ta karşılaştırılır	Compare Rychlik 1990 Ta = 0.3·Tm(primer) + 0.7·Tm(product) − 14.9 with θ-based Ta
+3′ son 5 nt içinde AF ≥ eşik (global VE her popülasyon)	AF at or above the threshold in the final 5 nt, globally and by population
+Konum ağırlıklı (3′'e yakın daha ağır) skor	Position-weighted score with more weight near 3′
+SV / Primer veya amplikonla örtüşen indel/SV; ürün boyu değişimi	Indels or structural variants overlapping the primer or amplicon and product size changes
+Alternatif allelde θ(Ta) yeniden hesaplanır	Recompute θ(Ta) for the alternate allele
+Alt allel yeni 3′-çapalı site oluşturuyor mu (varyant-farkında indek	Whether an alternate allele creates a new 3′-anchored site
+HPRC haplotiplerinde bağlanma yeri özdeşlik oranı	Binding-site identity across HPRC haplotypes
+Primer altında ClinVar patojenik/olası patojenik	Pathogenic or likely pathogenic ClinVar variants overlapping a primer
+Gösterilen Tm değerleri DNA iskeleti için hesaplanan alt sınırlardır.	The displayed Tm values are lower bounds calculated for the DNA backbone.
+# Live results and result annotations
+gnomAD v4 API önbelleği	gnomAD v4 API cache
+Yerel gnomAD önbelleği	Local gnomAD cache
+Varyant verisini yeniden sorgula	Query variant data again
+Yerel analizde aç	Open in Local Analysis
+3′ çapa: son {0} nt	3′ anchor: last {0} nt
+Toplam {0} yerden en yakın {1} tanesi pakette. {2}	The bundle contains the closest {1} of {0} sites. {2}
+SPC-03 · F–R ürünleri · {0}–{1} bp	SPC-03 · F–R products · {0}–{1} bp
+· WC yığınları + en fazla bir iç uyumsuzluk (Allawi-Peyret) ya da tek bazlık bulge (SantaLucia-Hicks 2004; A·T kapanış sabiti {0} kcal/mol, proje modelleme kararı).	· Watson–Crick stacks plus up to one internal mismatch (Allawi–Peyret) or a one-base bulge (SantaLucia–Hicks 2004), with an A·T closure constant of {0} kcal/mol.
+A·T bağı,	A·T bond,
+1 iç uyumsuzluk	1 internal mismatch
+uyumsuzluk,	mismatch,
+kcal/mol · 3′ uç uzatılabilir: {0}	kcal/mol · extendable 3′ end: {0}
+{0} · 3′ ortalaması {1}	{0} · mean at 3′ {1}
+Primer kendi içinde eşleştiğinde bu olasılık düşer (sarı < 0,5).	This probability decreases when the primer pairs with itself (yellow < 0.5).
+Eşik: WARN Tm_yapı > 50 °C, FAIL > 60 °C · Ta {0} °C. {1}	Threshold: WARN structure Tm > 50 °C, FAIL > 60 °C · Ta {0} °C. {1}
+Tm, MFE yapisindan tutarli turetildi (dongu cezalari dS'te)	Tm is derived consistently from the MFE structure, with loop penalties in ΔS.
+Ölçümü, eşiği ve modeli görmek için bir kurala tıklayın.	Select a rule to see its measurement, threshold and model.
+Bu çift için koşulmadı	Not run for this pair
+Ek referans dizileri değerlendirilmedi	Additional reference sequences were not evaluated
+Genom genelinde tarama gerekir	Requires genome-wide screening
+Bu çift için prob tanımlanmadı (Prob & Blocker sayfası)	No probe specified for this pair (Probe & Blocker page)
+Adaptör/M13 kuyruğu tanımlanmadı (sequence_qc.py --tails)	No adapter or M13 tail specified
+Katkı maddesi beyan edilmedi	No additive specified
+Panel düzeyi; Multipleks sayfasında havuz olarak değerlendirilir	Panel-level check evaluated for pools in Multiplex Design
+Erime profili qPCR koşusunda (qPCR Erime sayfası)	Melting profile from the qPCR analysis (qPCR Melting page)
+{0} ailesi {1} profilinde uygulanmaz	The {0} family does not apply to the {1} profile
+Varyant-farkında indeks gerekir	Requires a variant-aware index
+{0} · Aday {1} · {2}	{0} · Candidate {1} · {2}
+{0} · Aday {1}	{0} · Candidate {1}
+Primer QC	Primer QC
+Genomik çapraz ürün	Genomic cross-product
+Tek primerle tasarlanmamış genomik ürün	Unintended genomic product from a single primer
+Dimer ΔG	Dimer ΔG
+3′ dimer ΔG	3′ dimer ΔG
+Tm aralığı	Tm spread
+Ürün boyu ayrımı	Product size separation
+Çiftin kendi dimer ΔG değeri	Dimer ΔG within the pair
+Çiftin kendi 3′ dimer ΔG değeri	3′ dimer ΔG within the pair
+Çiftin kendi Tm aralığı	Tm spread within the pair
+Tasarımda elenme gerekçesi	Design rejection reason
+Dosya seçin	Choose a file
+Rapor	Report
+Değerlendirilen	Evaluated
+SNPCheck görünümü	SNPCheck view
+Kayıtlı FASTA başlığı ve uzunluğu	Saved FASTA header and length
+Primerler arası	Between primers
+RT-03 için yerel GENCODE ekson tablosu kullanılır. Kavşak ve gDNA kontrolleri ek hedef bilgisi gerektirir.	RT-03 uses the local GENCODE exon table. Junction and gDNA checks require additional target information.
+1. Yalnız Owczarzy 2008'i kanonik olarak raporlamak 68 TH-02 WARN kaydını kaldırır. Tek modelle modeller arası yayılım tanımsız olur. TH-04 etkisi 0. 2. İki modeli koruyup TH-02 WARN eşiğini 2,0 °C'den 3,0 °C'ye çıkarmak 68 primeri WARN'dan çıkarır. TH-04 INFO bandını ayrıca −9…−6'dan −10…−5 kcal/mol'e genişletmek 34 primeri TH-04 WARN'dan çıkarır. FAIL eşikleri sabit tutuldu.	1. Reporting Owczarzy 2008 alone removes 68 TH-02 WARN records. Inter-model spread is undefined for one model. TH-04 is unaffected. 2. Keeping both models and raising the TH-02 WARN threshold from 2.0 °C to 3.0 °C clears 68 primer warnings. Widening the TH-04 INFO band from −9…−6 to −10…−5 kcal/mol clears 34 TH-04 warnings. FAIL thresholds were held fixed.
+
+# QC catalog and rule details
+{0} kural · {1} aile	{0} rules · {1} families
+Tam kapsam	Full coverage
+Kısmi kapsam	Partial coverage
+Proje kaydına göre	Based on the project inventory
+Bir kuralı açarak neyi kontrol ettiğini ve neden önemli olduğunu görün. Kapsam, bir primerin test sonucunu göstermez.	Open a rule to see what it checks and why it matters. Coverage is separate from a primer’s test result.
+Kapsama göre filtrele	Filter by coverage
+Katalogda ara	Search the catalog
+Kural kodu veya konu ara…	Search by rule ID or topic…
+{0} / {1} kural gösteriliyor	Showing {0} of {1} rules
+Aramanıza uyan kural bulunamadı.	No rules match your search.
+Katalog kapsamı	Catalog coverage
+Neyi kontrol eder?	What does it check?
+Neden önemli?	Why does it matter?
+Bu kurulumun kapsamı	Coverage in this installation
+Yerel iş akışı mitokondri dizisini (chrM) kontrol eder. Alternatif dizilerin ve ribozomal DNA’nın tamamı için doğrulanmış bir tarama kaydı bulunmuyor.	The local workflow checks the mitochondrial sequence (chrM). There is no verified scan covering all alternate sequences and ribosomal DNA.
+Seçili çiftin sonucu	Selected pair result
+Bu kurulumda ekson birleşimi bir profil önerisi olarak kayıtlı. Birleşimin iki yanını ölçen ayrı bir sonuç doğrulanamadı.	This installation records exon junction targeting as a profile recommendation. No separate result measuring both sides was verified.
+Profil ayrı bir genomik DNA taraması önerir. RT profiline özgü bir sonuç kaydı doğrulanamadı.	The profile recommends a separate genomic DNA scan. No RT-specific result record was verified.
+RNA katlanması için gereken parametreler profil kaydında eksik olarak belirtiliyor.	The profile lists the required RNA folding parameters as missing.
+Sanger profilinde hedefe uzaklık önerisi bulunur. Otomatik bir uzaklık kontrolü doğrulanamadı.	The Sanger profile recommends a target distance. No automatic distance check was verified.
+Katkı maddelerine ait düzeltme katsayıları bu kurulumda kullanılmıyor.	Additive correction factors are not used in this installation.
+Bu tahmin ancak PCR ürününün erime sıcaklığı mevcutsa gösterilir.	This estimate is shown only when the PCR product melting temperature is available.
+Amplikon	Amplicon
+Prob	Probe
+Prob & Blocker	Probe & Blocker
+Yerel analiz	Local analysis
+1–22, X ve Y	1–22, X and Y
+Ölçüm, eşik ve yapı çizimi için bir karta tıklayın.	Click a card to see the measurement, threshold and structure drawing.
+Dimer yapı modeli	Dimer structure model

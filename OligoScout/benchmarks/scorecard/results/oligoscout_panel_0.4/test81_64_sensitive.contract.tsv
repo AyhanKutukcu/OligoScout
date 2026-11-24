@@ -1,0 +1,23 @@
+field	value
+manifest	/sessions/rcw-01yjfqqphcb3hecjguuxffqs/mnt/AYHAN-OligoScout/OligoScout/results/benchmarks/grch38_ppfm_batch/manifest.sa8.tsv
+index_dir	/sessions/rcw-01yjfqqphcb3hecjguuxffqs/mnt/AYHAN-OligoScout/OligoScout/data/indexes/ppfm
+shards	24
+panel	/sessions/rcw-01yjfqqphcb3hecjguuxffqs/scan/t81_64_panel.tsv
+panel_pairs	64
+anchor_length	12
+max_mismatches	3
+min_amplicon_length	50
+max_amplicon_length	3000
+search_mode	sensitive_terminal_rule
+terminal_window	5
+terminal_max_mismatches	1
+single_primer_products	on
+mask_convention	bit i = mismatch at primer position i from the 5' end
+site_strand	plus strand of the reference
+binding_records	498315
+product_records	95153
+unique_primer_searches	3072
+shard_loads	24
+shard_evictions	23
+search_seconds	40.2592
+thermodynamics	not computed in this tool (QC layer)

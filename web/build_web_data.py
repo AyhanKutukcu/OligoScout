@@ -48,7 +48,22 @@ OFFSET = 20000000  # 0-tabanli baslangic (baslikta beyan)
 # ---------- katalog ----------
 catalog = [{'id': r['kural'], 'fam': r['aile'], 'title': r['spec_basligi'], 'status': r['durum'], 'where': r['nerede']}
            for r in tsv(P('durum', 'qc_katalog_kapsami.tsv'))]
-open_items = tsv(P('durum', 'acik_maddeler.tsv'))
+# These earlier audit notes predate the currently installed engines.
+resolved_legacy = {'DIM-SCOPE', 'NGS-01', 'BIS-01..04', 'CPP-01'}
+open_items = [r for r in tsv(P('durum', 'acik_maddeler.tsv')) if r['madde'] not in resolved_legacy]
+for item in open_items:
+    if item['madde'] == 'RT-01/RT-03':
+        item.update(madde='RT-01/RT-02', alan='RT-qPCR hedef geometrisi',
+                    gerekce='RT-03 için yerel GENCODE ekson tablosu kullanılır. Kavşak ve gDNA kontrolleri ek hedef bilgisi gerektirir.')
+connected_rules = {
+    'RT-03': 'reference_py/cli/isoform_qc.py · GENCODE ekson anotasyonu',
+    'BIS-02': 'reference_py/oligoscout_thermo/bisulfite.py · dönüşmemiş bağlanma bölgesi',
+    'BIS-03': 'reference_py/oligoscout_thermo/bisulfite.py · dönüşmüş primer',
+    'BIS-04': 'reference_py/cli/bisulfite_qc.py · CT ve GA indeksleri',
+}
+for rule in catalog:
+    if rule['id'] in connected_rules:
+        rule.update(status='etiketli_uygulandi', where=connected_rules[rule['id']])
 
 # ---------- panel (ctDNA, tum genom taramasi) ----------
 PD = P('panel_design_ctdna')
@@ -78,13 +93,13 @@ with open(os.path.join(PD, 'panel.bindings.tsv'), encoding='utf-8') as f:
     for r in csv.DictReader(f, delimiter='\t'):
         bind[(r['pair_id'], r['role'])].append(r)
 
-def pack_bindings(rows, primer):
+def pack_bindings(rows, anchor):
     hist = collections.Counter()
     sites = []
     for r in rows:
         mm = int(r['mismatches']); mask = r['mask']
         L = len(mask)
-        anchored = 'X' not in mask[max(0, L-12):] if L else True  # 3' 12-nt capa (sozlesme anchor_length)
+        anchored = 'X' not in mask[max(0, L-anchor):] if L else True
         hist[(mm, anchored)] += 1
         site = r['site_plus_strand'].upper()
         oriented = site if r['strand'] == '+' else revcomp(site)
@@ -135,7 +150,13 @@ def cur_hetero(F, R):
 pairs = []
 for r in ranked:
     pid = r['pair_id']; F = r['left_primer']; R = r['right_primer']
-    fpos = template.find(F); rpos = template.find(revcomp(R))
+    declared = dpanel.get(pid, {})
+    if declared.get('primer1') != F or declared.get('primer2') != R:
+        raise ValueError(f'Panel ve sıralama girdileri farklı: {pid}')
+    fpos = int(declared['left_start']) - OFFSET
+    rpos = int(declared['right_start']) - OFFSET - len(R)
+    if template[fpos:fpos+len(F)] != F or template[rpos:rpos+len(R)] != revcomp(R):
+        raise ValueError(f'Kayıtlı koordinatlar hedef FASTA ile uyuşmuyor: {pid}')
     sp = seqpair.get((F, R))
     dpid = seq2dpid.get((F, R))
     pq = panelqc.get(pid, {})
@@ -146,7 +167,7 @@ for r in ranked:
         'seqpair': [compact_check(c) for c in sp['checks']] if sp else [],
         'seqpair_worst': sp['worst_severity'] if sp else None,
         'primers': {},
-        'bindings': {'F': pack_bindings(bind[(pid, 'F')], F), 'R': pack_bindings(bind[(pid, 'R')], R)},
+        'bindings': {'F': pack_bindings(bind[(pid, 'F')], int(contract['anchor_length'])), 'R': pack_bindings(bind[(pid, 'R')], int(contract['anchor_length']))},
         'offtarget': offt.get(pid, []),
         'products': products.get(pid, []),
         'design_id': dpid,
@@ -167,7 +188,7 @@ for r in ranked:
 
 # ---------- gnomAD varyant onbellegi (sablon bolgesi) ----------
 variants = []; _seen = set()
-for v in [x for x in jsonl(P('variant_cache.jsonl')) if 'pos' in x]:
+for v in [x for x in jsonl(P('variant_cache.jsonl')) if 'pos' in x and str(x.get('chrom', '')).removeprefix('chr') == '22']:
     _k = (v['pos'], v['ref'], v['alt'])
     if _k in _seen: continue
     _seen.add(_k)
@@ -240,6 +261,9 @@ try:
         'mismatch': _pm.MISMATCH_ALLAWI_PEYRET.require(), 'mismatch_prov': _prov(_pm.MISMATCH_ALLAWI_PEYRET),
         'loop': _pm.DNA_LOOP_SANTALUCIA_HICKS_2004.require(), 'loop_prov': _prov(_pm.DNA_LOOP_SANTALUCIA_HICKS_2004),
         'at_bulge_closure_dg37': _pm.AT_BULGE_CLOSURE.value,
+        'dangling': _pm.DANGLING_BOMMARITO_2000.require(), 'dangling_prov': _prov(_pm.DANGLING_BOMMARITO_2000),
+        'terminal': _pm.TERMINAL_MISMATCH_SANTALUCIA_PEYRET.require(),
+        'terminal_prov': _prov(_pm.TERMINAL_MISMATCH_SANTALUCIA_PEYRET),
         'R_cal': _pm.R_CAL, 'kelvin': _pm.KELVIN,
         'registry_digest': _pm.registry_digest() if hasattr(_pm, 'registry_digest') else None,
         'tables': [dict(name=n, **_prov(getattr(_pm, n))) for n in dir(_pm) if n.isupper() and hasattr(getattr(_pm, n), 'provenance')],

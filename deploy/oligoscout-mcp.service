@@ -1,0 +1,34 @@
+# OligoScout MCP server - systemd unit
+# Install:  sudo cp deploy/oligoscout-mcp.service /etc/systemd/system/
+#           sudo install -m 600 -o oligoscout /dev/null /etc/oligoscout/mcp.env
+#           echo 'OLIGOSCOUT_MCP_TOKEN=<long random string>' | sudo tee /etc/oligoscout/mcp.env
+#           sudo systemctl daemon-reload && sudo systemctl enable --now oligoscout-mcp
+
+[Unit]
+Description=OligoScout MCP server (Streamable HTTP on 127.0.0.1:8766)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=oligoscout
+Group=oligoscout
+WorkingDirectory=/opt/oligoscout
+EnvironmentFile=-/etc/oligoscout/mcp.env
+Environment=OLIGOSCOUT_PUBLIC_URL=https://oligoscout.org/mcp
+Environment=OLIGOSCOUT_ALLOWED_ORIGINS=https://oligoscout.org,https://chatgpt.com,https://claude.ai
+Environment=OLIGOSCOUT_GNOMAD_API=1
+# Public OAuth 2.1 (open registration; tools are read-only and rate-limited).
+Environment=OLIGOSCOUT_OAUTH=1
+Environment=OLIGOSCOUT_OAUTH_STATE=/var/lib/oligoscout/mcp_oauth.json
+StateDirectory=oligoscout
+ExecStart=/usr/bin/python3 /opt/oligoscout/mcp_server/server.py --http --host 127.0.0.1 --port 8766
+Restart=on-failure
+RestartSec=3
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+
+[Install]
+WantedBy=multi-user.target

@@ -364,8 +364,63 @@ double terminal_dG37(std::string_view seq, int window) {
     return dH - 310.15 * dS / 1000.0;
 }
 
+namespace {
+
+double dg37_of(const std::pair<double, double>& hs) {
+    return hs.first - 310.15 * hs.second / 1000.0;
+}
+
+// Bir heliks ucunun en kararli kenar terimi (align.py::_end_options ile ayni):
+// sarkan uc, iki sarkan uc toplami ya da terminal uyumsuzluk; hicbiri
+// stabilize etmiyorsa sifir.
+std::pair<double, double> best_end(const std::string& sa, const std::string& rb,
+                                   int offset, int col, int inner) {
+    const int na = static_cast<int>(sa.size());
+    const int nb = static_cast<int>(rb.size());
+    const char top = (col >= 0 && col < na) ? sa[static_cast<std::size_t>(col)] : 0;
+    const int bj = col - offset;
+    const char bot = (bj >= 0 && bj < nb) ? rb[static_cast<std::size_t>(bj)] : 0;
+    const char pt = sa[static_cast<std::size_t>(inner)];
+    const char pb = rb[static_cast<std::size_t>(inner - offset)];
+    const auto& dang = dangling_table();
+    const auto& term = terminal_mismatch_table();
+    auto key = [](std::initializer_list<char> cs) { return std::string(cs); };
+    std::pair<double, double> best{0.0, 0.0};
+    auto offer = [&](const std::pair<double, double>& hs) {
+        if (dg37_of(hs) < dg37_of(best)) best = hs;
+    };
+    const bool right = col > inner;
+    // right end: top 3' / bottom 5'; left end: top 5' / bottom 3'
+    const std::string d_top = top ? (right ? key({'D', '3', ':', top, ':', pt, '-', pb})
+                                           : key({'D', '5', ':', top, ':', pt, '-', pb})) : "";
+    const std::string d_bot = bot ? (right ? key({'D', '5', ':', bot, ':', pb, '-', pt})
+                                           : key({'D', '3', ':', bot, ':', pb, '-', pt})) : "";
+    if (top && bot) {
+        const std::string t = right ? key({pt, top, '/', pb, bot}) : key({pb, bot, '/', pt, top});
+        const auto it = term.find(t);
+        if (it != term.end()) offer(it->second);
+    }
+    if (top) offer(dang.at(d_top));
+    if (bot) offer(dang.at(d_bot));
+    if (top && bot) {
+        const auto& x = dang.at(d_top);
+        const auto& y = dang.at(d_bot);
+        offer({x.first + y.first, x.second + y.second});
+    }
+    return best;
+}
+
+std::pair<double, double> end_terms_energy(const std::string& sa, const std::string& rb,
+                                           int off_left, int left, int off_right, int right) {
+    const auto l = best_end(sa, rb, off_left, left - 1, left);
+    const auto r = best_end(sa, rb, off_right, right, right - 1);
+    return {l.first + r.first, l.second + r.second};
+}
+
+}  // namespace
+
 DimerResult best_dimer(std::string_view a, std::string_view b,
-                       std::string_view mode) {
+                       std::string_view mode, bool end_terms) {
     if (mode != "any" && mode != "3prime") {
         throw std::invalid_argument("bilinmeyen mod");
     }
@@ -454,6 +509,11 @@ DimerResult best_dimer(std::string_view a, std::string_view b,
                         mismatch_adjustment(top, bottom, mismatch - left);
                     hs.first += adj.first;
                     hs.second += adj.second;
+                }
+                if (end_terms) {
+                    const auto e = end_terms_energy(sa, rb, offset, left, offset, run_hi);
+                    hs.first += e.first;
+                    hs.second += e.second;
                 }
                 const int count = (mismatch >= 0) ? 1 : 0;
                 consider(hs.first, hs.second, offset, run_hi - left - count,
@@ -554,6 +614,11 @@ DimerResult best_dimer(std::string_view a, std::string_view b,
                 const auto across = stack(step);
                 dH += across.first;
                 dS += across.second;
+                if (end_terms) {
+                    const auto e = end_terms_energy(sa, rb, offset, left, o2, h2);
+                    dH += e.first;
+                    dS += e.second;
+                }
 
                 consider(dH, dS, offset, (h1 - left) + (h2 - l2), terminal,
                          0, 1);

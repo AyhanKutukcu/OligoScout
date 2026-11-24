@@ -3,7 +3,7 @@ const W_OF = el => Math.max(320, Math.floor((el && el.clientWidth) || 900));
 
 /* --- şablon genel izi: cetvel, GC, varyant, çift glifleri --- */
 function overviewTrack(width, opts) {
-  const {tpl=TPL, off=OFF, pairs=[], sel=null, showVars=true, showGC=true, region=null, compact=false, win=null} = opts;
+  const {tpl=TPL, off=OFF, pairs=[], sel=null, showVars=true, showGC=true, region=null, compact=false, win=null, variantPair=null, interactive=true} = opts;
   const L = tpl.length, lo = win ? Math.max(0, win[0]) : 0, hi = win ? Math.min(L, win[1]) : L;
   const m = {l:58, r:14}, iw = width - m.l - m.r; const x = i => m.l + ((Math.max(lo, Math.min(hi, i)) - lo) / (hi - lo)) * iw;
   let y = 8; const out = [];
@@ -11,7 +11,7 @@ function overviewTrack(width, opts) {
   out.push(`<line x1="${m.l}" x2="${width-m.r}" y1="${y+14}" y2="${y+14}" stroke="${css('--line2')}"/>`);
   for (let i = Math.ceil(lo / step) * step; i <= hi; i += step) { const X = x(i);
     out.push(`<line x1="${X}" x2="${X}" y1="${y+10}" y2="${y+18}" stroke="${css('--line2')}"/><text x="${X}" y="${y+6}" class="axm" text-anchor="middle">${off ? (off + i + 1).toLocaleString('tr-TR') : (i + 1).toLocaleString('tr-TR')}</text>`); }
-  out.push(`<text x="4" y="${y+17}" class="ax">${off ? CHR : 'konum'}</text>`); y += 26;
+  out.push(`<text x="4" y="${y+17}" class="ax">${variantPair?.chrom || pairs[0]?.chrom || (off ? CHR : 'konum')}</text>`); y += 26;
   if (region) out.push(`<rect x="${x(region[0])}" y="${y-4}" width="${Math.max(2, x(region[1]+1)-x(region[0]))}" height="2000" fill="${css('--accent')}" opacity=".06"/>`);
   if (showGC) {
     const w = span > 600 ? 25 : 15, pts = []; const stp = Math.max(1, Math.floor(span / 500));
@@ -20,9 +20,9 @@ function overviewTrack(width, opts) {
     if (pts.length > 1) out.push(`<path d="M${pts.map(p => p[0].toFixed(1)+' '+p[1].toFixed(1)).join('L')}L${pts.at(-1)[0]} ${y+30}L${pts[0][0]} ${y+30}Z" fill="${css('--accent')}" opacity=".14"/><path d="M${pts.map(p => p[0].toFixed(1)+' '+p[1].toFixed(1)).join('L')}" fill="none" stroke="${css('--accent')}" stroke-width="1.3"/>`);
     y += 40;
   }
-  if (showVars && off === OFF && tpl === TPL) {
+  if (showVars && (variantPair || (off === OFF && tpl === TPL))) {
     const H = 34; out.push(`<text x="4" y="${y+22}" class="ax">gnomAD</text><line x1="${m.l}" x2="${width-m.r}" y1="${y+H}" y2="${y+H}" stroke="${css('--line')}"/>`);
-    for (const v of VARS) { if (v.idx < lo || v.idx > hi) continue; const X = x(v.idx + .5), hh = Math.max(4, Math.min(H-2, (Math.log10(Math.max(v.af||1e-6, 1e-6)) + 6.2) / 6 * H));
+    for (const v of (variantPair ? varsIn(lo, hi - 1, variantPair) : VARS)) { if (!variantPair && (v.idx < lo || v.idx >= hi)) continue; const X = x(v.idx + .5), hh = Math.max(4, Math.min(H-2, (Math.log10(Math.max(v.af||1e-6, 1e-6)) + 6.2) / 6 * H));
       out.push(`<line x1="${X}" x2="${X}" y1="${y+H}" y2="${y+H-hh}" stroke="${varColor(v.af)}" stroke-width="${v.af>=0.001?1.8:1}" opacity="${v.af>=0.001?1:.55}"/>${v.af>=0.001?`<circle cx="${X}" cy="${y+H-hh}" r="2.8" fill="${varColor(v.af)}"/>`:''}<rect x="${X-2.5}" y="${y}" width="5" height="${H}" fill="transparent" data-tip="${esc(varTip(v))}"/>`); }
     y += H + 10;
   }
@@ -35,7 +35,7 @@ function overviewTrack(width, opts) {
     const fx = x(p.fStart), fw = Math.max(3, x(p.fEnd+1) - fx), rx = x(p.rStart), rw = Math.max(3, x(p.rEnd+1) - rx);
     out.push(`<path d="M${fx} ${yy+1}h${Math.max(0,fw-4)}l4 4l-4 4h-${Math.max(0,fw-4)}z" fill="${css('--fwd')}"/><path d="M${rx+rw} ${yy+1}h-${Math.max(0,rw-4)}l-4 4l4 4h${Math.max(0,rw-4)}z" fill="${css('--rev')}"/>`);
     if (!compact && iw / span > 1.2) out.push(`<text x="${x(p.rEnd+1)+6}" y="${yy+9}" class="axm" style="font-size:9.5px">${p.prod} bp</text>`);
-    out.push(`<rect x="0" y="${yy-2}" width="${width}" height="${rowH}" fill="transparent" data-pair="${esc(p.key)}" style="cursor:pointer" data-tip="${esc(`<b>${esc(p.label)}</b><br>${p.prod} bp · F ${gposAny(p,p.fStart)} → R ${gposAny(p,p.rEnd)}<br>Tm ${nf(p.tmF,2)} / ${nf(p.tmR,2)} °C`)}"/>`);
+    if (interactive) out.push(`<rect x="0" y="${yy-2}" width="${width}" height="${rowH}" fill="transparent" data-pair="${esc(p.key)}" style="cursor:pointer" data-tip="${esc(`<b>${esc(p.label)}</b><br>${p.prod} bp · F ${gposAny(p,p.fStart)} → R ${gposAny(p,p.rEnd)}<br>Tm ${nf(p.tmF,2)} / ${nf(p.tmR,2)} °C`)}"/>`);
   });
   y += pairs.length * rowH + 6;
   return `<svg width="${width}" height="${y}" viewBox="0 0 ${width} ${y}" role="img" aria-label="Şablon üzerindeki primer çiftleri">${out.join('')}</svg>`;
@@ -43,7 +43,7 @@ function overviewTrack(width, opts) {
 const gposAny = (p, i) => p.tplOff ? (p.tplOff + i + 1).toLocaleString('tr-TR') : (i + 1).toLocaleString('tr-TR');
 function varTip(v) {
   const pops = Object.entries(v.pop || {}).sort((a, b) => b[1] - a[1]).slice(0, 3).filter(x => x[1] > 0).map(([k, a]) => `${k} ${afFmt(a)}`).join(' · ');
-  return `<b>${esc(v.rsid || 'varyant')}</b> <span class="m">${esc(v.ref)}&gt;${esc(v.alt)}</span><br>chr22:${v.pos.toLocaleString('tr-TR')} · ${vtype(v)}<br>AF ${afFmt(v.af)} · AN ${ni(v.an)}${pops ? '<br>' + pops : ''}`;
+  return `<b>${esc(v.rsid || 'varyant')}</b> <span class="m">${esc(v.ref)}&gt;${esc(v.alt)}</span><br>${esc(v.chrom || CHR)}:${v.pos.toLocaleString('tr-TR')} · ${vtype(v)}<br>AF ${afFmt(v.af)} · AN ${ni(v.an)}${pops ? '<br>' + pops : ''}`;
 }
 
 /* --- baz düzeyinde dizi haritası (iki iplik, primer okları, varyantlar) --- */
@@ -52,7 +52,7 @@ function seqMap(width, pm, opts={}) {
   const lo = Math.max(0, (opts.lo ?? pm.fStart) - pad), hi = Math.min(tpl.length - 1, (opts.hi ?? pm.rEnd) + pad);
   const CW = 11.2, LM = 116, RM = 14;
   let N = Math.floor((width - LM - RM) / CW); N = Math.max(20, Math.min(100, N - N % 10));
-  const vlist = pm.hasVar ? varsIn(lo, hi) : [];
+  const vlist = pm.hasVar ? varsIn(lo, hi, pm) : [];
   const vmap = {}; for (const v of vlist) for (let k = 0; k < Math.max(1, v.ref.length === v.alt.length ? 1 : v.ref.length); k++) (vmap[v.idx + k] = vmap[v.idx + k] || []).push(v);
   const probe = opts.probe; // {start,end,strand}
   const rowsH = 106; const rows = Math.ceil((hi - lo + 1) / N); const H = rows * rowsH + 8;
@@ -103,17 +103,28 @@ function siteAlignHTML(primer, site, anchor=12) {
   return {top, bot};
 }
 
-/* --- IDT OligoAnalyzer tarzı dimer gösterimi --- */
+/* --- dimer yapı modeli: iki iplik, baz karoları ve bağlar (SVG) --- */
 function dimerHTML(al, opts={}) {
   if (!al) return '<div class="faint small">Kararlı yapı bulunamadı</div>';
   const [t, m, b] = al; const w = Math.max(t.length, m.length, b.length);
-  const col = ch => ch === ' ' ? ' ' : ch === '-' ? '<span class="lbl">-</span>' : `<span class="n${ch}">${ch}</span>`;
-  let T = '', M = '', B = '';
-  for (let i = 0; i < w; i++) { const tc = t[i] || ' ', mc = m[i] || ' ', bc = b[i] || ' ';
-    T += col(tc); B += col(bc);
-    if (mc === '|') { const gc = (tc === 'G' || tc === 'C'); M += `<span class="${gc?'bd':'bdw'}">${gc?'┃':'│'}</span>`; }
-    else if (mc === 'X') M += '<span class="bx">×</span>'; else if (mc === 'B') M += '<span class="bx">^</span>'; else M += ' '; }
-  return `<div class="aln"><span class="lbl">5′ </span>${T}<span class="lbl"> 3′</span>\n<span class="lbl">   </span>${M}\n<span class="lbl">3′ </span>${B}<span class="lbl"> 5′</span></div>`;
+  const CW = 14, LM = 24, RM = 24, yT = 18, yB = 64, TH = 18, W = LM + w * CW + RM, H = 84;
+  const nuc = {A:css('--nA'), C:css('--nC'), G:css('--nG'), T:css('--nT'), N:css('--ink3')};
+  const X = i => LM + i * CW;
+  const used = s => { let a = -1, z = -1; for (let i = 0; i < w; i++) if (s[i] && s[i] !== ' ') { if (a < 0) a = i; z = i; } return [a, z]; };
+  const o = [];
+  for (const [s, y] of [[t, yT], [b, yB]]) { const [a, z] = used(s); if (a < 0) continue;
+    o.push(`<line x1="${X(a) + CW / 2}" x2="${X(z) + CW / 2}" y1="${y}" y2="${y}" stroke="${css('--line2')}" stroke-width="2"/>`);
+    o.push(`<text x="${X(a) - 5}" y="${y + 4}" class="axm" text-anchor="end">${y === yT ? '5′' : '3′'}</text><text x="${X(z) + CW + 5}" y="${y + 4}" class="axm">${y === yT ? '3′' : '5′'}</text>`); }
+  for (let i = 0; i < w; i++) { const mc = m[i] || ' ', tc = t[i] || ' ', cx = X(i) + CW / 2, my = (yT + yB) / 2 + 5;
+    if (mc === '|') { const gc = tc === 'G' || tc === 'C';
+      o.push(`<line x1="${cx}" x2="${cx}" y1="${yT + TH / 2 + 1}" y2="${yB - TH / 2 - 1}" stroke="${gc ? css('--accent') : css('--ink3')}" stroke-width="${gc ? 3 : 1.6}" stroke-linecap="round"/>`); }
+    else if (mc === 'X') o.push(`<text x="${cx}" y="${my}" text-anchor="middle" style="font:700 14px var(--sans);fill:${css('--fail')}">×</text>`);
+    else if (mc === 'B') o.push(`<text x="${cx}" y="${my}" text-anchor="middle" style="font:700 13px var(--sans);fill:${css('--fail')}">^</text>`); }
+  for (const [s, y] of [[t, yT], [b, yB]]) for (let i = 0; i < w; i++) { const c = s[i]; if (!c || c === ' ') continue; const x = X(i);
+    if (c === '-') { o.push(`<text x="${x + CW / 2}" y="${y + 4}" text-anchor="middle" class="axm">-</text>`); continue; }
+    const col = nuc[c] || css('--ink2');
+    o.push(`<rect x="${x + 1}" y="${y - TH / 2}" width="${CW - 2}" height="${TH}" rx="3" fill="${css('--panel')}" stroke="${col}" stroke-width="1.2"/><text x="${x + CW / 2}" y="${y + 4}" text-anchor="middle" class="seqt" style="font-size:11px;font-weight:700;fill:${col}">${c}</text>`); }
+  return `<div class="scrollx"><svg class="dimer-svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="max-width:100%;height:auto" role="img" aria-label="Dimer yapı modeli">${o.join('')}</svg></div>`;
 }
 
 /* --- sap-ilmek (hairpin) çizimi nokta-parantezden --- */

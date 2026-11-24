@@ -1,0 +1,7 @@
+comparison,unit,primer3_reference,n,mean_diff,sd_diff,max_abs,pearson_r,spearman_rho,flag_agreement,cohen_kappa
+"Tm, 1 M Na⁺, aynı konsantrasyon sözleşmesi",°C,"oligotm -sc 2, -d 4C",2048,0.0,0.0,0.0001,1.0,1.0,,
+"Tm, PCR tuzu, aynı tuz modeli (Owczarzy 2004/2008)",°C,"oligotm -sc 2, -d 4C",2048,-0.0,0.0,0.0001,1.0,1.0,,
+"Tm, her aracın kendi varsayılanı",°C,"oligotm varsayılan (-sc 1, C/4)",2048,0.9948,0.2282,1.8328,0.9052,0.6604,,
+Hetero-dimer ΔG37 (1024 çift),kcal/mol,ntthal -a ANY,1024,1.7985,0.6654,4.7715,0.9168,0.8712,0.8965,0.4094
+Self-dimer ΔG37,kcal/mol,ntthal -a ANY,2048,1.9113,1.0162,6.7425,0.8844,0.8557,0.8652,0.4656
+Hairpin ΔG37,kcal/mol,ntthal -a HAIRPIN,2048,0.2649,0.3977,2.348,0.3453,0.3771,0.9966,-0.0008

@@ -45,3 +45,50 @@ constexpr double kBulge1_dG37 = 4.0;
 // registry_digest()e girer.
 constexpr double kAtBulgeClosure_dG37 = 0.5;
 
+// dangling_ends_bommarito_2000
+//   durum   : transcribed_unverified
+//   sha256  : ec8243ce524eba1ca5848182bcd55d683fefd8a0414575f4254eb719ea949474
+// Anahtar: "D3:K:P-Q" / "D5:K:P-Q": sarkan K, uc cifti P-Q (P sarkan iplikte)
+const std::map<std::string, std::pair<double, double>>& dangling_table() {
+    static const std::map<std::string, std::pair<double, double>> t = {
+        {"D3:A:A-T", {-0.5, -1.1}}, {"D3:A:C-G", {-5.9, -16.5}}, {"D3:A:G-C", {-2.1, -3.9}},
+        {"D3:A:T-A", {-0.7, -0.8}}, {"D3:C:A-T", {4.7, 14.2}}, {"D3:C:C-G", {-2.6, -7.4}},
+        {"D3:C:G-C", {-0.2, -0.1}}, {"D3:C:T-A", {4.4, 14.9}}, {"D3:G:A-T", {-4.1, -13.1}},
+        {"D3:G:C-G", {-3.2, -10.4}}, {"D3:G:G-C", {-3.9, -11.2}}, {"D3:G:T-A", {-1.6, -3.6}},
+        {"D3:T:A-T", {-3.8, -12.6}}, {"D3:T:C-G", {-5.2, -15.0}}, {"D3:T:G-C", {-4.4, -13.1}},
+        {"D3:T:T-A", {2.9, 10.4}}, {"D5:A:A-T", {0.2, 2.3}}, {"D5:A:C-G", {-6.3, -17.1}},
+        {"D5:A:G-C", {-3.7, -10.0}}, {"D5:A:T-A", {-2.9, -7.6}}, {"D5:C:A-T", {0.6, 3.3}},
+        {"D5:C:C-G", {-4.4, -12.6}}, {"D5:C:G-C", {-4.0, -11.9}}, {"D5:C:T-A", {-4.1, -13.0}},
+        {"D5:G:A-T", {-1.1, -1.6}}, {"D5:G:C-G", {-5.1, -14.0}}, {"D5:G:G-C", {-3.9, -10.9}},
+        {"D5:G:T-A", {-4.2, -15.0}}, {"D5:T:A-T", {-6.9, -20.0}}, {"D5:T:C-G", {-4.0, -10.9}},
+        {"D5:T:G-C", {-4.9, -13.8}}, {"D5:T:T-A", {-0.2, -0.5}},
+    };
+    return t;
+}
+
+// terminal_mismatch_santalucia_peyret_2001
+//   durum   : transcribed_unverified
+//   sha256  : acee72a6f38f16d526952250a37bf43b2e979c529e0ec899c8002ca58fb7c929
+// Anahtar: "XY/ZW": ust 5'-XY-3', alt 3'-ZW-5', Y-W uyumsuz (heliks ucu)
+const std::map<std::string, std::pair<double, double>>& terminal_mismatch_table() {
+    static const std::map<std::string, std::pair<double, double>> t = {
+        {"AA/TA", {-3.1, -7.8}}, {"AA/TC", {-1.6, -4.0}}, {"AA/TG", {-1.9, -4.4}},
+        {"AC/TA", {-1.8, -3.8}}, {"AC/TC", {-0.1, 0.5}}, {"AC/TT", {-0.9, -1.7}},
+        {"AG/TA", {-2.5, -5.9}}, {"AG/TG", {-1.1, -2.1}}, {"AG/TT", {-3.2, -8.7}},
+        {"AT/TC", {-2.3, -6.3}}, {"AT/TG", {-3.5, -9.4}}, {"AT/TT", {-2.4, -6.5}},
+        {"CA/GA", {-4.3, -10.7}}, {"CA/GC", {-2.6, -5.9}}, {"CA/GG", {-3.9, -9.6}},
+        {"CC/GA", {-2.7, -6.0}}, {"CC/GC", {-2.1, -5.1}}, {"CC/GT", {-3.2, -8.0}},
+        {"CG/GA", {-6.0, -15.5}}, {"CG/GG", {-3.8, -9.5}}, {"CG/GT", {-3.8, -9.0}},
+        {"CT/GC", {-3.9, -10.6}}, {"CT/GG", {-6.6, -18.7}}, {"CT/GT", {-6.1, -16.9}},
+        {"GA/CA", {-8.0, -22.5}}, {"GA/CC", {-5.0, -13.8}}, {"GA/CG", {-4.3, -11.1}},
+        {"GC/CA", {-3.2, -7.1}}, {"GC/CC", {-3.9, -10.6}}, {"GC/CT", {-4.9, -13.5}},
+        {"GG/CA", {-4.6, -11.4}}, {"GG/CG", {-6.914879999999999, -19.2}}, {"GG/CT", {-5.7, -15.9}},
+        {"GT/CC", {-3.0, -7.8}}, {"GT/CG", {-5.9, -16.1}}, {"GT/CT", {-7.4, -21.2}},
+        {"TA/AA", {-2.5, -6.3}}, {"TA/AC", {-2.3, -5.9}}, {"TA/AG", {-2.0, -4.7}},
+        {"TC/AA", {-2.7, -7.0}}, {"TC/AC", {-0.7, -1.3}}, {"TC/AT", {-2.5, -6.3}},
+        {"TG/AA", {-2.4, -5.8}}, {"TG/AG", {-1.1, -2.7}}, {"TG/AT", {-3.9, -10.5}},
+        {"TT/AC", {-0.7, -1.2}}, {"TT/AG", {-3.6, -9.8}}, {"TT/AT", {-3.2, -8.9}},
+    };
+    return t;
+}
+

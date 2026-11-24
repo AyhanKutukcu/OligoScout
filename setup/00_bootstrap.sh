@@ -162,7 +162,7 @@ faz1() {
         log "Eksik: ${missing[*]}"
         need_sudo
         $SUDO apt-get update
-        $SUDO DEBIAN_FRONTEND=noninteractive apt-get install -y "${missing[@]}"
+        $SUDO env DEBIAN_FRONTEND=noninteractive apt-get install -y "${missing[@]}"
         ok "Paketler kuruldu."
     fi
     g++ --version | head -n1

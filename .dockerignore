@@ -1,0 +1,22 @@
+# Keep the build context small: code only, no data or outputs.
+**/__pycache__
+**/*.pyc
+.git
+downloads/
+logs/
+OligoScout/data/
+OligoScout/build/
+OligoScout/results/
+OligoScout/third_party/
+OligoScout/benchmarks/test81/results/comparisons/
+OligoScout/benchmarks/scorecard/results/oligoscout_panel_0.4/
+reference_py/out/
+_backup_pairview/
+oligoscout_panel_*/
+params_in/
+params_out/
+Claude outputs/
+_to_delete/
+*.fa
+*.fa.gz
+*.ppfm

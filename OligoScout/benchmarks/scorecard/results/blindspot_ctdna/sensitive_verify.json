@@ -1,0 +1,13 @@
+{
+  "label": "ctdna",
+  "search_mode": "sensitive_terminal_rule",
+  "search_seconds": 29.3424,
+  "sites_bruteforce": 32546,
+  "sites_oligoscout": 32546,
+  "only_bruteforce": 0,
+  "only_oligoscout": 0,
+  "products_bruteforce": 728,
+  "products_oligoscout": 728,
+  "pairs_mismatching": [],
+  "exact_match": true
+}

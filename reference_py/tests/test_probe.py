@@ -72,7 +72,13 @@ class TestProbeChecks(unittest.TestCase):
     def test_all_pass_for_designed_probe(self):
         cand = prb.pick_probe(AMPLICON, FWD, REV)
         res = self.evaluate(cand.sequence)
-        self.assertEqual(res["worst_severity"], "INFO")
+        # Uc terimleriyle prob self-dimeri -6.04 kcal/mol; primer3 ntthal da
+        # -6.01 verir (esik -6.0). Bu sinirdaki WARN disinda her kural INFO.
+        flagged = {c["id"]: c for c in res["checks"] if c["severity"] != "INFO"}
+        self.assertLessEqual(set(flagged), {"PRB-05"})
+        if "PRB-05" in flagged:
+            self.assertEqual(flagged["PRB-05"]["severity"], "WARN")
+            self.assertGreater(flagged["PRB-05"]["value"]["dG37_kcal_mol"], -6.1)
 
     def test_prb01_probe_too_cold(self):
         """Primerlerle ayni Tm'deki bir prob PRB-01'de FAIL."""

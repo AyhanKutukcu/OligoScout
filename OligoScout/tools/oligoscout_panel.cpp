@@ -20,7 +20,18 @@
  *   oligoscout_panel <manifest.tsv> <ppfm_dir> <panel.tsv> <out_prefix>
  *       [--anchor 12] [--max-mismatch 3]
  *       [--min-amplicon 50] [--max-amplicon 3000]
- *       [--cache 1]
+ *       [--cache 1] [--single-primer on|off]
+ *
+ *   --mode anchored (default) | sensitive
+ *       anchored : exact 3' anchor of --anchor nt, <= --max-mismatch elsewhere
+ *       sensitive: Primer-BLAST-style terminal rule, no exact anchor: every
+ *                  site with <= --max-mismatch mismatches and at most
+ *                  --terminal-max (1) of them in the 3'-terminal
+ *                  --terminal-window (5) nt
+ *
+ *   --single-primer on (default) also assembles single-primer products
+ *   (F-> <-F and R-> <-R), which Primer-BLAST reports as well. Each product
+ *   row carries left_role, right_role and orientation (F-R, R-F, F-F, R-R).
  *
  * Outputs:
  *   <out_prefix>.bindings.tsv
@@ -33,7 +44,9 @@
 #include "primerpair/ppfm_shard_cache.hpp"
 #include "primerpair/primer_pair_assembler.hpp"
 #include "primerpair/strand_aware_primer_search.hpp"
+#include "primerpair/terminal_rule_search.hpp"
 
+#include <algorithm>
 #include <cctype>
 #include <chrono>
 #include <cstddef>
@@ -305,7 +318,8 @@ int main(
                 << " <manifest.tsv> <ppfm_dir> <panel.tsv> <out_prefix>\n"
                 << "    [--anchor 12] [--max-mismatch 3]\n"
                 << "    [--min-amplicon 50] [--max-amplicon 3000]\n"
-                << "    [--cache 1]\n";
+                << "    [--cache 1] [--single-primer on|off]\n"
+                << "    [--mode anchored|sensitive] [--terminal-window 5] [--terminal-max 1]\n";
             return 2;
         }
 
@@ -319,6 +333,9 @@ int main(
         std::uint64_t min_amplicon = 50;
         std::uint64_t max_amplicon = 3000;
         std::size_t cache_capacity = 1;
+        bool single_primer_products = true;
+        bool sensitive_mode = false;
+        TerminalRuleOptions terminal_options{};
 
         for (int i = 5; i + 1 < argc; i += 2) {
             const std::string flag = argv[i];
@@ -340,6 +357,30 @@ int main(
             } else if (flag == "--max-amplicon") {
                 max_amplicon =
                     parse_option(value, "--max-amplicon");
+            } else if (flag == "--mode") {
+                if (value == "anchored") {
+                    sensitive_mode = false;
+                } else if (value == "sensitive") {
+                    sensitive_mode = true;
+                } else {
+                    throw std::runtime_error("--mode expects anchored or sensitive");
+                }
+            } else if (flag == "--terminal-window") {
+                terminal_options.terminal_window =
+                    static_cast<std::size_t>(parse_option(value, "--terminal-window"));
+            } else if (flag == "--terminal-max") {
+                terminal_options.max_terminal_mismatches =
+                    static_cast<std::size_t>(parse_option(value, "--terminal-max"));
+            } else if (flag == "--single-primer") {
+                if (value == "on") {
+                    single_primer_products = true;
+                } else if (value == "off") {
+                    single_primer_products = false;
+                } else {
+                    throw std::runtime_error(
+                        "--single-primer expects on or off"
+                    );
+                }
             } else if (flag == "--cache") {
                 cache_capacity =
                     static_cast<std::size_t>(
@@ -386,7 +427,8 @@ int main(
             << "pair_id\tchrom\tamplicon_start\tamplicon_end_exclusive"
                "\tamplicon_length\tleft_position\tright_position"
                "\tleft_mismatches\tright_mismatches\ttotal_mismatches"
-               "\tleft_mask\tright_mask\n";
+               "\tleft_mask\tright_mask"
+               "\tleft_role\tright_role\torientation\n";
 
         PpfmShardCache cache(
             manifest,
@@ -426,17 +468,30 @@ int main(
                         continue;
                     }
 
-                    auto result =
-                        searcher.search(
+                    if (sensitive_mode) {
+                        terminal_options.max_mismatches = max_mismatches;
+                        primer_hits.emplace(
                             *primer,
-                            anchor_length,
-                            max_mismatches
+                            search_terminal_rule(
+                                shard.index(),
+                                shard.reference(),
+                                *primer,
+                                terminal_options
+                            )
                         );
+                    } else {
+                        auto result =
+                            searcher.search(
+                                *primer,
+                                anchor_length,
+                                max_mismatches
+                            );
 
-                    primer_hits.emplace(
-                        *primer,
-                        std::move(result.hits)
-                    );
+                        primer_hits.emplace(
+                            *primer,
+                            std::move(result.hits)
+                        );
+                    }
 
                     ++unique_primer_searches;
                 }
@@ -519,7 +574,64 @@ int main(
                         max_amplicon
                     );
 
-                for (const auto& hit : assembled.amplicons) {
+                std::vector<PrimerPairHit> pair_products =
+                    assembled.amplicons;
+
+                /*
+                 * Single-primer products. When both primers have the same
+                 * sequence the hetero assembly above already covers them.
+                 */
+                if (
+                    single_primer_products &&
+                    pair.primer1 != pair.primer2
+                ) {
+                    for (const auto& single :
+                         assemble_single_primer_hits(
+                             pair.primer1,
+                             left->second,
+                             PrimerIdentity::Primer1,
+                             min_amplicon,
+                             max_amplicon
+                         )) {
+                        pair_products.push_back(single);
+                    }
+
+                    for (const auto& single :
+                         assemble_single_primer_hits(
+                             pair.primer2,
+                             right->second,
+                             PrimerIdentity::Primer2,
+                             min_amplicon,
+                             max_amplicon
+                         )) {
+                        pair_products.push_back(single);
+                    }
+                }
+
+                std::stable_sort(
+                    pair_products.begin(),
+                    pair_products.end(),
+                    [](const PrimerPairHit& a, const PrimerPairHit& b) {
+                        if (a.amplicon_start != b.amplicon_start) {
+                            return a.amplicon_start < b.amplicon_start;
+                        }
+                        return a.amplicon_end_exclusive <
+                               b.amplicon_end_exclusive;
+                    }
+                );
+
+                const auto role = [](const PrimerIdentity id) {
+                    return id == PrimerIdentity::Primer1 ? "F" : "R";
+                };
+
+                const auto role_length =
+                    [&pair](const PrimerIdentity id) {
+                        return id == PrimerIdentity::Primer1
+                            ? pair.primer1.size()
+                            : pair.primer2.size();
+                    };
+
+                for (const auto& hit : pair_products) {
 
                     products
                         << pair.pair_id << '\t'
@@ -534,13 +646,17 @@ int main(
                         << hit.total_mismatches() << '\t'
                         << render_mask(
                                hit.left_mismatch_mask,
-                               pair.primer1.size()
+                               role_length(hit.left_primer)
                            )
                         << '\t'
                         << render_mask(
                                hit.right_mismatch_mask,
-                               pair.primer2.size()
+                               role_length(hit.right_primer)
                            )
+                        << '\t' << role(hit.left_primer)
+                        << '\t' << role(hit.right_primer)
+                        << '\t' << role(hit.left_primer) << '-'
+                        << role(hit.right_primer)
                         << '\n';
 
                     ++product_total;
@@ -576,6 +692,14 @@ int main(
             << "max_mismatches\t" << max_mismatches << '\n'
             << "min_amplicon_length\t" << min_amplicon << '\n'
             << "max_amplicon_length\t" << max_amplicon << '\n'
+            << "search_mode\t"
+            << (sensitive_mode ? "sensitive_terminal_rule" : "anchored") << '\n'
+            << "terminal_window\t"
+            << (sensitive_mode ? std::to_string(terminal_options.terminal_window) : "") << '\n'
+            << "terminal_max_mismatches\t"
+            << (sensitive_mode ? std::to_string(terminal_options.max_terminal_mismatches) : "") << '\n'
+            << "single_primer_products\t"
+            << (single_primer_products ? "on" : "off") << '\n'
             << "mask_convention\tbit i = mismatch at primer position i "
                "from the 5' end\n"
             << "site_strand\tplus strand of the reference\n"

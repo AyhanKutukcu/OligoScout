@@ -101,6 +101,28 @@ def render() -> str:
         f"constexpr double kAtBulgeClosure_dG37 = {at_closure!r};",
         "",
     ]
+    # Dimer uc terimleri (align.end_terms_energy ile ayni anahtarlar).
+    for fn, table, note in (
+        ("dangling_table", params.DANGLING_BOMMARITO_2000,
+         "\"D3:K:P-Q\" / \"D5:K:P-Q\": sarkan K, uc cifti P-Q (P sarkan iplikte)"),
+        ("terminal_mismatch_table", params.TERMINAL_MISMATCH_SANTALUCIA_PEYRET,
+         "\"XY/ZW\": ust 5'-XY-3', alt 3'-ZW-5', Y-W uyumsuz (heliks ucu)"),
+    ):
+        lines += [
+            f"// {table.provenance.table_id}",
+            f"//   durum   : {table.provenance.verification_status}",
+            f"//   sha256  : {table.sha256}",
+            f"// Anahtar: {note}",
+            "const std::map<std::string, std::pair<double, double>>& "
+            f"{fn}() {{",
+            "    static const std::map<std::string, std::pair<double, double>> t = {",
+        ]
+        items = sorted(table.require().items())
+        for index in range(0, len(items), 3):
+            chunk = items[index:index + 3]
+            lines.append("        " + " ".join(
+                '{"%s", {%r, %r}},' % (k, float(v[0]), float(v[1])) for k, v in chunk))
+        lines += ["    };", "    return t;", "}", ""]
     return "\n".join(lines) + "\n"
 
 

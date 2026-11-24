@@ -33,13 +33,16 @@ def read_tsv(path: str) -> list[dict]:
         return list(csv.DictReader(fh, delimiter="\t"))
 
 
-def count_by_pair(products: list[dict]) -> tuple[dict, dict]:
+def count_by_pair(products: list[dict], targets: dict[str, tuple[str, int, int]] | None = None) -> tuple[dict, dict]:
     total = collections.Counter()
     intended = collections.Counter()
     for p in products:
         pid = p["pair_id"]
         total[pid] += 1
-        if int(p.get("total_mismatches", 0)) == 0:
+        target = (targets or {}).get(pid)
+        locus_matches = target is None or target == (
+            p["chrom"], int(p["amplicon_start"]), int(p["amplicon_end_exclusive"]))
+        if locus_matches and int(p.get("total_mismatches", 0)) == 0:
             intended[pid] += 1
     return total, intended
 
@@ -59,19 +62,23 @@ def main() -> int:
     os.makedirs(args.out, exist_ok=True)
     ct = read_tsv(args.ct_prefix + ".products.tsv")
     ga = read_tsv(args.ga_prefix + ".products.tsv")
-    ct_total, ct_int = count_by_pair(ct)
-    ga_total, ga_int = count_by_pair(ga)
-
     intended_of: dict[str, str] = {}
+    targets = {}
+    panel_ids = set()
     if args.panel:
         for row in read_tsv(args.panel):
             low = {k.lower(): v for k, v in row.items()}
             pid = low.get("pair_id")
             conv = (low.get("conversion") or "").upper()
-            if pid and conv in ("CT", "GA"):
-                intended_of[pid] = conv
-
-    pair_ids = sorted(set(ct_total) | set(ga_total) | set(ct_int) | set(ga_int),
+            if pid:
+                panel_ids.add(pid)
+                if conv in ("CT", "GA"):
+                    intended_of[pid] = conv
+                if all(low.get(k) for k in ("expected_chrom", "left_start", "right_start")):
+                    targets[pid] = (low["expected_chrom"], int(low["left_start"]), int(low["right_start"]))
+    ct_total, ct_int = count_by_pair(ct, targets)
+    ga_total, ga_int = count_by_pair(ga, targets)
+    pair_ids = sorted(set(ct_total) | set(ga_total) | panel_ids,
                       key=lambda x: (len(x), x))
     digest = params.registry_digest()
 

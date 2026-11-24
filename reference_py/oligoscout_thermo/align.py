@@ -10,6 +10,14 @@ Model ve sinirlari (acikca beyan edilir):
     Coklu uyumsuzluk, birden buyuk bulge, ayni yapida uyumsuzluk + bulge ve
     diziye bagli uc terimleri kapsam disindadir.
   * Enerji : iki uc baslatmasi ve NN yiginlari, 37 C ve 1 M NaCl'de.
+  * Kenar  : (varsayilan, `end_terms=True`) her heliks ucunda, varsa,
+             sarkan uc (Bommarito 2000), iki sarkan uc toplami ya da
+             terminal uyumsuzluk (SantaLucia & Peyret 2001) teriminden en
+             kararlisi eklenir;
+             primer3 ntthal'in uc secimiyle ayni mantik. 1.024 Test #81
+             ciftinde ntthal'a ortalama fark 1.80 -> 0.47 kcal/mol,
+             -6 kcal/mol bayrak uyumu kappa 0.41 -> 0.71
+             (OligoScout/benchmarks/scorecard/thermo_vs_primer3.py).
   * Mod    : "any"      -> en dusuk dG'li helis
              "3prime"   -> en az bir oligonun 3' terminal bazi eslesmis olmali
                            (polimerazla uzatilabilir dimer)
@@ -33,6 +41,8 @@ from dataclasses import dataclass
 from .nn import _mismatch_stack_adjustment, reverse_complement, validate
 from .params import (
     AT_BULGE_CLOSURE,
+    DANGLING_BOMMARITO_2000,
+    TERMINAL_MISMATCH_SANTALUCIA_PEYRET,
     DNA_LOOP_SANTALUCIA_HICKS_2004,
     KELVIN,
     MISMATCH_ALLAWI_PEYRET,
@@ -44,27 +54,33 @@ _PAIR = {("A", "T"), ("T", "A"), ("G", "C"), ("C", "G")}
 MODES = ("any", "3prime")
 MODEL_NAME = "nn_single_internal_mismatch_or_bulge"
 MODEL_NAME_NO_BULGE = "nn_single_internal_mismatch"
+END_TERMS_SUFFIX = "+end_terms"
 _T37 = 310.15
 # Beyan edilmis model sabiti; deger ve gerekce params.MODEL_CONSTANTS'ta
 # tutulur ve registry_digest'e girer (REP-02).
 _AT_BULGE_CLOSURE_DG37 = AT_BULGE_CLOSURE.value
 
 
-def model_metadata(allow_bulge: bool = True) -> dict:
+def model_metadata(allow_bulge: bool = True, end_terms: bool = True) -> dict:
     provenance = MISMATCH_ALLAWI_PEYRET.provenance
     loop = DNA_LOOP_SANTALUCIA_HICKS_2004.provenance
     meta = {
-        "model": MODEL_NAME if allow_bulge else MODEL_NAME_NO_BULGE,
+        "model": (MODEL_NAME if allow_bulge else MODEL_NAME_NO_BULGE)
+                 + (END_TERMS_SUFFIX if end_terms else ""),
         "mismatch_table": provenance.table_id,
         "mismatch_table_status": provenance.verification_status,
         "reference_conditions": "37 C, 1 M NaCl",
         "limitation": (
             "en fazla bir kusur: tekli ic uyumsuzluk VEYA tek bazlik ic "
-            "bulge (her iki yanda >=2 WC); coklu kusur ve uc terimleri kapsam disi"
+            "bulge (her iki yanda >=2 WC); coklu kusur kapsam disi"
             if allow_bulge else
-            "tekli ic uyumsuzluk; bulge ve uc terimleri kapsam disi"
-        ),
+            "tekli ic uyumsuzluk; bulge kapsam disi"
+        ) + ("; uclarda sarkan uc / terminal uyumsuzluk terimi" if end_terms
+             else "; uc terimleri kapsam disi"),
     }
+    if end_terms:
+        meta["end_tables"] = [DANGLING_BOMMARITO_2000.provenance.table_id,
+                              TERMINAL_MISMATCH_SANTALUCIA_PEYRET.provenance.table_id]
     if allow_bulge:
         meta["loop_table"] = loop.table_id
         meta["loop_table_status"] = loop.verification_status
@@ -152,6 +168,66 @@ def _helix_energy(top_segment: str) -> tuple[float, float]:
     return dH, dS
 
 
+def _dg37(h: float, s: float) -> float:
+    return h - _T37 * s / 1000.0
+
+
+def _end_options(sa: str, rb: str, offset: int, col: int, inner: int) -> list[tuple[float, float]]:
+    """Bir heliks ucundaki kenar terimi secenekleri (dH, dS).
+
+    `col` heliksin hemen disindaki sutun, `inner` uctaki eslesmis sutun.
+    Ust iplik `sa` 5'->3' soldan saga, alt iplik `rb` 3'->5' soldan saga.
+    Anahtar sozlesmeleri params.py ile aynidir: "D3:K:P-Q" = 3' ucta sarkan
+    K, uc cifti P-Q (P sarkan iplikte); terminal uyumsuzluk "XY/ZW" = ust
+    5'-XY-3', alt 3'-ZW-5', Y-W uyumsuz.
+    """
+    na, nb = len(sa), len(rb)
+    top = sa[col] if 0 <= col < na else ""
+    bj = col - offset
+    bot = rb[bj] if 0 <= bj < nb else ""
+    pt, pb = sa[inner], rb[inner - offset]
+    dang = DANGLING_BOMMARITO_2000.require()
+    term = TERMINAL_MISMATCH_SANTALUCIA_PEYRET.require()
+    out: list[tuple[float, float]] = []
+    if col > inner:          # sag uc: ust ipligin 3', alt ipligin 5' tarafi
+        if top and bot and f"{pt}{top}/{pb}{bot}" in term:
+            out.append(tuple(term[f"{pt}{top}/{pb}{bot}"]))
+        if top:
+            out.append(tuple(dang[f"D3:{top}:{pt}-{pb}"]))
+        if bot:
+            out.append(tuple(dang[f"D5:{bot}:{pb}-{pt}"]))
+        if top and bot:      # iki sarkan uc birlikte (ntthal END5_3 secenegi)
+            d3, d5 = dang[f"D3:{top}:{pt}-{pb}"], dang[f"D5:{bot}:{pb}-{pt}"]
+            out.append((d3[0] + d5[0], d3[1] + d5[1]))
+    else:                    # sol uc: alt iplik 5'->3' okunur
+        if top and bot and f"{pb}{bot}/{pt}{top}" in term:
+            out.append(tuple(term[f"{pb}{bot}/{pt}{top}"]))
+        if top:
+            out.append(tuple(dang[f"D5:{top}:{pt}-{pb}"]))
+        if bot:
+            out.append(tuple(dang[f"D3:{bot}:{pb}-{pt}"]))
+        if top and bot:
+            d5, d3 = dang[f"D5:{top}:{pt}-{pb}"], dang[f"D3:{bot}:{pb}-{pt}"]
+            out.append((d5[0] + d3[0], d5[1] + d3[1]))
+    return out
+
+
+def _best_end(options: list[tuple[float, float]]) -> tuple[float, float]:
+    best = (0.0, 0.0)
+    for h, s in options:
+        if _dg37(h, s) < _dg37(*best):
+            best = (h, s)
+    return best
+
+
+def end_terms_energy(sa: str, rb: str, off_left: int, left: int,
+                     off_right: int, right: int) -> tuple[float, float]:
+    """Heliksin iki ucu icin en kararli kenar terimi; terim stabilize etmiyorsa 0."""
+    lh, ls = _best_end(_end_options(sa, rb, off_left, left - 1, left))
+    rh, rs = _best_end(_end_options(sa, rb, off_right, right, right - 1))
+    return lh + rh, ls + rs
+
+
 def _bulge1_energy() -> tuple[float, float]:
     """Tek bazlik bulge uzunluk teriminin (dH, dS)'i.
 
@@ -163,7 +239,7 @@ def _bulge1_energy() -> tuple[float, float]:
 
 
 def best_dimer(a: str, b: str, mode: str = "any",
-               allow_bulge: bool = True) -> DimerResult:
+               allow_bulge: bool = True, end_terms: bool = True) -> DimerResult:
     """a ve b arasinda en dusuk dG37'li, en fazla bir kusurlu dupleks.
 
     `a` ve `b` 5'->3' verilir. Hizalamada b ters cevrilir (3'->5'),
@@ -175,15 +251,15 @@ def best_dimer(a: str, b: str, mode: str = "any",
         raise ValueError(f"bilinmeyen mod: {mode}")
     sa, sb = validate(a), validate(b)
     rb = sb[::-1]                      # b, 3'->5'
-    best = _scan_contiguous(sa, rb, mode)
+    best = _scan_contiguous(sa, rb, mode, end_terms)
     if allow_bulge:
-        bulged = _scan_bulge(sa, rb, mode)
+        bulged = _scan_bulge(sa, rb, mode, end_terms)
         if bulged.found and (not best.found or bulged.dG37_kcal < best.dG37_kcal):
             best = bulged
     return best
 
 
-def _scan_contiguous(sa: str, rb: str, mode: str) -> DimerResult:
+def _scan_contiguous(sa: str, rb: str, mode: str, end_terms: bool = True) -> DimerResult:
     """Kesintisiz helis ya da tek ic uyumsuzluk; tum kaymalar taranir."""
     na, nb = len(sa), len(rb)
     best = _EMPTY
@@ -228,6 +304,10 @@ def _scan_contiguous(sa: str, rb: str, mode: str) -> DimerResult:
                                                                 mismatch - left)
                     dH += delta_h
                     dS += delta_s
+                if end_terms:
+                    eh, es = end_terms_energy(sa, rb, offset, left, offset, run_hi)
+                    dH += eh
+                    dS += es
                 dG = dH - 310.15 * dS / 1000.0
                 if best.found and dG >= best.dG37_kcal:
                     continue
@@ -249,7 +329,7 @@ def _scan_contiguous(sa: str, rb: str, mode: str) -> DimerResult:
     return best
 
 
-def _scan_bulge(sa: str, rb: str, mode: str) -> DimerResult:
+def _scan_bulge(sa: str, rb: str, mode: str, end_terms: bool = True) -> DimerResult:
     """Tek bazlik ic bulge tasiyan en kararli dupleks.
 
     Geometri: sol segment `offset` kaymasinda, sag segment `offset -+ 1`
@@ -315,6 +395,10 @@ def _scan_bulge(sa: str, rb: str, mode: str) -> DimerResult:
                     sh, ss = _nn_step(rb[j + 1] + rb[j])
                 dH += sh
                 dS += ss
+                if end_terms:
+                    eh, es = end_terms_energy(sa, rb, offset, left, o2, h2)
+                    dH += eh
+                    dS += es
                 dG = dH - _T37 * dS / 1000.0
 
                 terminal = h2 == na or left == offset
@@ -351,8 +435,9 @@ def _scan_bulge(sa: str, rb: str, mode: str) -> DimerResult:
     return best
 
 
-def self_dimer(a: str, mode: str = "any", allow_bulge: bool = True) -> DimerResult:
-    return best_dimer(a, a, mode, allow_bulge=allow_bulge)
+def self_dimer(a: str, mode: str = "any", allow_bulge: bool = True,
+               end_terms: bool = True) -> DimerResult:
+    return best_dimer(a, a, mode, allow_bulge=allow_bulge, end_terms=end_terms)
 
 
 def hairpin_stem(a: str, min_loop: int = 3, mode: str = "any") -> DimerResult:

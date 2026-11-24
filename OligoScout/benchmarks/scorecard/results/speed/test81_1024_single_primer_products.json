@@ -1,0 +1,27 @@
+{
+  "pairs_with_single_primer_products": 181,
+  "single_primer_products": 569666,
+  "hetero_products": 425055,
+  "by_stratum": {
+    "Q1_LOW": {
+      "pairs": 256,
+      "pairs_with_single": 0,
+      "single_products": 0
+    },
+    "Q2_MEDIUM_LOW": {
+      "pairs": 256,
+      "pairs_with_single": 3,
+      "single_products": 3
+    },
+    "Q3_MEDIUM_HIGH": {
+      "pairs": 256,
+      "pairs_with_single": 15,
+      "single_products": 20
+    },
+    "Q4_HIGH": {
+      "pairs": 256,
+      "pairs_with_single": 163,
+      "single_products": 569643
+    }
+  }
+}

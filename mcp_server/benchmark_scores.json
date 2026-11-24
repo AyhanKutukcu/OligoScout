@@ -1,0 +1,750 @@
+{
+  "title": "OligoScout validation & benchmark scorecard",
+  "generated_utc": "2026-11-24T12:55:28Z",
+  "engine": "oligoscout-thermo-ref/0.4.0 + oligoscout_panel 0.4 (C++20 FM-index, PPFM 24 shards; anchored and sensitive search modes, single-primer products)",
+  "how_to_read": [
+    "Every number links to an evidence file under the project root.",
+    "Specificity results are exact against the stated CONTRACT; the anchor_blind_spot section measures what lies outside it.",
+    "No wet-lab calibration exists yet (REP-03): computational agreement is not assay performance."
+  ],
+  "specificity_test81": {
+    "evidence": "OligoScout/benchmarks/test81/results/test81_results.tsv",
+    "panel": "1,024 Primer3 pairs (2,048 x 24-nt primers), 4 difficulty strata x 256",
+    "reference": "GRCh38.p14 primary, 24 sequences",
+    "contract": "exact 12-nt 3' anchor, <=3 mismatches/primer, products 50-3000 bp",
+    "truth": "independent full-reference oracle (8,262,803 bindings, 425,055 products)",
+    "machine": "i5-12500H, WSL2, single thread, single run; index build excluded",
+    "methods": [
+      {
+        "method": "oracle",
+        "label": "Independent full-scan oracle",
+        "panel_pairs": 1024.0,
+        "binding_truth": 8262803.0,
+        "binding_predictions": 8262803.0,
+        "binding_precision": 1.0,
+        "binding_recall": 1.0,
+        "binding_f1": 1.0,
+        "binding_jaccard": 1.0,
+        "product_truth": 425055.0,
+        "product_predictions": 425055.0,
+        "product_precision": 1.0,
+        "product_recall": 1.0,
+        "product_f1": 1.0,
+        "product_jaccard": 1.0,
+        "intended_recall": 1.0,
+        "macro_pair_f1": 1.0,
+        "macro_pair_f1_ci_low": 1.0,
+        "macro_pair_f1_ci_high": 1.0,
+        "search_wall_seconds": 194.11,
+        "search_max_rss_kib": 251600.0,
+        "timing_scope": "single measured search process",
+        "end_to_end_wall_seconds": 379.48,
+        "end_to_end_max_stage_rss_kib": 2963900.0
+      },
+      {
+        "method": "oligoscout",
+        "label": "OligoScout",
+        "panel_pairs": 1024.0,
+        "binding_truth": 8262803.0,
+        "binding_predictions": 8262803.0,
+        "binding_precision": 1.0,
+        "binding_recall": 1.0,
+        "binding_f1": 1.0,
+        "binding_jaccard": 1.0,
+        "product_truth": 425055.0,
+        "product_predictions": 425055.0,
+        "product_precision": 1.0,
+        "product_recall": 1.0,
+        "product_f1": 1.0,
+        "product_jaccard": 1.0,
+        "intended_recall": 1.0,
+        "macro_pair_f1": 1.0,
+        "macro_pair_f1_ci_low": 1.0,
+        "macro_pair_f1_ci_high": 1.0,
+        "search_wall_seconds": 111.8,
+        "search_max_rss_kib": 680804.0,
+        "timing_scope": "single measured search process",
+        "end_to_end_wall_seconds": 255.91,
+        "end_to_end_max_stage_rss_kib": 2963684.0
+      },
+      {
+        "method": "bowtie1",
+        "label": "Bowtie 1 + contract filter",
+        "panel_pairs": 1024.0,
+        "binding_truth": 8262803.0,
+        "binding_predictions": 8262803.0,
+        "binding_precision": 1.0,
+        "binding_recall": 1.0,
+        "binding_f1": 1.0,
+        "binding_jaccard": 1.0,
+        "product_truth": 425055.0,
+        "product_predictions": 425055.0,
+        "product_precision": 1.0,
+        "product_recall": 1.0,
+        "product_f1": 1.0,
+        "product_jaccard": 1.0,
+        "intended_recall": 1.0,
+        "macro_pair_f1": 1.0,
+        "macro_pair_f1_ci_low": 1.0,
+        "macro_pair_f1_ci_high": 1.0,
+        "search_wall_seconds": 148.64,
+        "search_max_rss_kib": 3832160.0,
+        "timing_scope": "single measured search process",
+        "end_to_end_wall_seconds": 479.53,
+        "end_to_end_max_stage_rss_kib": 3832160.0
+      },
+      {
+        "method": "bwa_aln",
+        "label": "BWA-aln + contract filter",
+        "panel_pairs": 1024.0,
+        "binding_truth": 8262803.0,
+        "binding_predictions": 8262803.0,
+        "binding_precision": 1.0,
+        "binding_recall": 1.0,
+        "binding_f1": 1.0,
+        "binding_jaccard": 1.0,
+        "product_truth": 425055.0,
+        "product_predictions": 425055.0,
+        "product_precision": 1.0,
+        "product_recall": 1.0,
+        "product_f1": 1.0,
+        "product_jaccard": 1.0,
+        "intended_recall": 1.0,
+        "macro_pair_f1": 1.0,
+        "macro_pair_f1_ci_low": 1.0,
+        "macro_pair_f1_ci_high": 1.0,
+        "search_wall_seconds": 141.14,
+        "search_max_rss_kib": 5271468.0,
+        "timing_scope": "single measured search process",
+        "end_to_end_wall_seconds": 419.16999999999996,
+        "end_to_end_max_stage_rss_kib": 5271468.0
+      },
+      {
+        "method": "blastn_e1100",
+        "label": "BLASTN-short e=1100 + contract filter",
+        "panel_pairs": 1024.0,
+        "binding_truth": 8262803.0,
+        "binding_predictions": 8255989.0,
+        "binding_precision": 1.0,
+        "binding_recall": 0.9991753403778355,
+        "binding_f1": 0.9995875001029132,
+        "binding_jaccard": 0.9991753403778355,
+        "product_truth": 425055.0,
+        "product_predictions": 425053.0,
+        "product_precision": 1.0,
+        "product_recall": 0.9999952947265648,
+        "product_f1": 0.9999976473577475,
+        "product_jaccard": 0.9999952947265648,
+        "intended_recall": 1.0,
+        "macro_pair_f1": 0.9998635912698413,
+        "macro_pair_f1_ci_low": 0.9996186755952381,
+        "macro_pair_f1_ci_high": 1.0,
+        "search_wall_seconds": 3065.39,
+        "search_max_rss_kib": 11518096.0,
+        "timing_scope": "sum of 39 sequential query chunks; RSS is chunk maximum",
+        "end_to_end_wall_seconds": 3558.7,
+        "end_to_end_max_stage_rss_kib": 11518096.0
+      }
+    ]
+  },
+  "anchor_blind_spot": {
+    "ctdna_panel": {
+      "evidence": "OligoScout/benchmarks/scorecard/results/blindspot_ctdna/summary.json",
+      "label": "ctdna_20pairs",
+      "primers": 22,
+      "pairs": 20,
+      "contract": {
+        "max_mismatches": 3,
+        "anchor_nt": 12,
+        "pb_rule": "<=1 mismatch in 3' 5 nt",
+        "product_bp": [
+          50,
+          3000
+        ]
+      },
+      "sites": {
+        "all": 39049,
+        "anchored": 4931,
+        "pb_relevant": 32546,
+        "blind_spot": 27615,
+        "anchored_not_pb": 0,
+        "blind_spot_terminal_3p_mismatch": 2354
+      },
+      "blind_spot_fraction_of_pb_relevant": 0.8485,
+      "blind_spot_mismatch_distance_from_3p": {
+        "1": 2354,
+        "2": 1735,
+        "3": 2581,
+        "4": 3456,
+        "5": 3228,
+        "6": 5609,
+        "7": 4086,
+        "8": 2614,
+        "9": 2484,
+        "10": 5081,
+        "11": 6899,
+        "12": 7826
+      },
+      "products": {
+        "all_le3mm": 829,
+        "single_primer_le3mm": 104,
+        "oligoscout": 26,
+        "anchored_single_primer": 1,
+        "primer_blast_rule": 728,
+        "pb_not_oligoscout": 701,
+        "pb_not_oligoscout_max1mm_per_site": 0,
+        "pb_not_oligoscout_max2mm_per_site": 38,
+        "oligoscout_not_pb": 0,
+        "pairs_with_pb_extra": 13,
+        "pairs_with_pb_extra_max2mm": 3
+      },
+      "verify_sites_vs_oligoscout": {
+        "oligoscout_unique_sites": 4931,
+        "exhaustive_anchored_sites": 4931,
+        "intersection": 4931,
+        "only_oligoscout": 0,
+        "only_exhaustive": 0,
+        "exact_match": true
+      },
+      "verify_products_vs_oligoscout": {
+        "oligoscout_products": 27,
+        "exhaustive_anchored_products": 27,
+        "includes_single_primer": true,
+        "single_primer_in_oligoscout": 1,
+        "pairs_mismatching": [],
+        "exact_match": true
+      }
+    },
+    "test81_first64_balanced": {
+      "evidence": "OligoScout/benchmarks/scorecard/results/blindspot_test81_64/summary.json",
+      "label": "test81_first64_balanced",
+      "primers": 128,
+      "pairs": 64,
+      "contract": {
+        "max_mismatches": 3,
+        "anchor_nt": 12,
+        "pb_rule": "<=1 mismatch in 3' 5 nt",
+        "product_bp": [
+          50,
+          3000
+        ]
+      },
+      "sites": {
+        "all": 512082,
+        "anchored": 12141,
+        "pb_relevant": 498315,
+        "blind_spot": 486174,
+        "anchored_not_pb": 0,
+        "blind_spot_terminal_3p_mismatch": 60893
+      },
+      "blind_spot_fraction_of_pb_relevant": 0.9756,
+      "blind_spot_mismatch_distance_from_3p": {
+        "1": 60893,
+        "2": 25610,
+        "3": 9887,
+        "4": 19367,
+        "5": 97092,
+        "6": 94019,
+        "7": 43144,
+        "8": 205501,
+        "9": 133610,
+        "10": 57122,
+        "11": 8844,
+        "12": 35584
+      },
+      "products": {
+        "all_le3mm": 110795,
+        "single_primer_le3mm": 12994,
+        "oligoscout": 1683,
+        "anchored_single_primer": 1,
+        "primer_blast_rule": 95153,
+        "pb_not_oligoscout": 93469,
+        "pb_not_oligoscout_max1mm_per_site": 4776,
+        "pb_not_oligoscout_max2mm_per_site": 20177,
+        "oligoscout_not_pb": 0,
+        "pairs_with_pb_extra": 15,
+        "pairs_with_pb_extra_max2mm": 11
+      },
+      "verify_sites_vs_oligoscout": {
+        "oligoscout_unique_sites": 12141,
+        "exhaustive_anchored_sites": 12141,
+        "intersection": 12141,
+        "only_oligoscout": 0,
+        "only_exhaustive": 0,
+        "exact_match": true
+      },
+      "verify_products_vs_oligoscout": {
+        "oligoscout_products": 1684,
+        "exhaustive_anchored_products": 1684,
+        "includes_single_primer": true,
+        "single_primer_in_oligoscout": 1,
+        "pairs_mismatching": [],
+        "exact_match": true
+      },
+      "verify_vs_test81_oracle": {
+        "pairs": 64,
+        "binding_count_pairs_mismatching": 0,
+        "product_count_pairs_mismatching": 0,
+        "oracle_bindings": 12141,
+        "oracle_products": 1683,
+        "note": "oracle contract is hetero (F-R/R-F) products only"
+      },
+      "by_stratum": {
+        "Q1_LOW": {
+          "pairs": 16,
+          "os_offtarget_pairs": 0,
+          "pb_extra_pairs": 4,
+          "pb_extra_max2_pairs": 3,
+          "pb_extra_max1_pairs": 0,
+          "os_products": 16,
+          "pb_products": 664
+        },
+        "Q2_MEDIUM_LOW": {
+          "pairs": 16,
+          "os_offtarget_pairs": 1,
+          "pb_extra_pairs": 2,
+          "pb_extra_max2_pairs": 0,
+          "pb_extra_max1_pairs": 0,
+          "os_products": 18,
+          "pb_products": 20
+        },
+        "Q3_MEDIUM_HIGH": {
+          "pairs": 16,
+          "os_offtarget_pairs": 1,
+          "pb_extra_pairs": 2,
+          "pb_extra_max2_pairs": 1,
+          "pb_extra_max1_pairs": 1,
+          "os_products": 26,
+          "pb_products": 18456
+        },
+        "Q4_HIGH": {
+          "pairs": 16,
+          "os_offtarget_pairs": 2,
+          "pb_extra_pairs": 7,
+          "pb_extra_max2_pairs": 7,
+          "pb_extra_max1_pairs": 4,
+          "os_products": 1624,
+          "pb_products": 76013
+        }
+      }
+    }
+  },
+  "sensitive_mode_vs_brute_force": {
+    "ctdna": {
+      "evidence": "OligoScout/benchmarks/scorecard/results/blindspot_ctdna/sensitive_verify.json",
+      "label": "ctdna",
+      "search_mode": "sensitive_terminal_rule",
+      "search_seconds": 29.3424,
+      "sites_bruteforce": 32546,
+      "sites_oligoscout": 32546,
+      "only_bruteforce": 0,
+      "only_oligoscout": 0,
+      "products_bruteforce": 728,
+      "products_oligoscout": 728,
+      "pairs_mismatching": [],
+      "exact_match": true
+    },
+    "test81_64": {
+      "evidence": "OligoScout/benchmarks/scorecard/results/blindspot_test81_64/sensitive_verify.json",
+      "label": "test81_64",
+      "search_mode": "sensitive_terminal_rule",
+      "search_seconds": 40.2592,
+      "sites_bruteforce": 498315,
+      "sites_oligoscout": 498315,
+      "only_bruteforce": 0,
+      "only_oligoscout": 0,
+      "products_bruteforce": 95153,
+      "products_oligoscout": 95153,
+      "pairs_mismatching": [],
+      "exact_match": true
+    }
+  },
+  "primer_blast_web_head_to_head": {
+    "evidence": "OligoScout/benchmarks/scorecard/results/primer_blast_web/summary.json",
+    "benchmark": "OligoScout sensitive mode vs NCBI Primer-BLAST web (2026-11-22)",
+    "primer_blast_settings": {
+      "database": "Genomes for selected organisms (primary reference assembly)",
+      "organism": "Homo sapiens (taxid:9606)",
+      "TOTAL_PRIMER_SPECIFICITY_MISMATCH": 2,
+      "PRIMER_3END_SPECIFICITY_MISMATCH": 2,
+      "MISMATCH_REGION_LENGTH": 5,
+      "TOTAL_MISMATCH_IGNORE": 6,
+      "MAX_TARGET_SIZE": 3000,
+      "note": "Default specificity stringency; Primer-BLAST lists targets up to TOTAL_MISMATCH_IGNORE, so its list is filtered here to products whose both sites have <=3 mismatches and <=1 in the 3'-terminal 5 nt (the rule OligoScout --mode sensitive implements)."
+    },
+    "oligoscout_settings": {
+      "mode": "sensitive",
+      "max_mismatches": 3,
+      "terminal_window": 5,
+      "terminal_max_mismatches": 1,
+      "amplicon": [
+        50,
+        3000
+      ],
+      "single_primer_products": true
+    },
+    "pairs": 31,
+    "pairs_detail": "20 ctDNA test designs (DESIGN_000-019) + 11 ready-made catalog pairs",
+    "primer_blast_products_listed": 2229,
+    "primer_blast_products_both_sites_le3mm": 742,
+    "primer_blast_products_rule_satisfying": 654,
+    "primer_blast_listed_but_violating_terminal_rule": 88,
+    "rule_products_also_found_by_oligoscout": 653,
+    "rule_products_missed_by_oligoscout": [
+      {
+        "pair": "DESIGN_015",
+        "product": "NT_187392.1:84605:69",
+        "explanation": "On chr22 unlocalized scaffold NT_187392.1 (HSCHR22_UNLOCALIZED_CTG7), 3/3 mismatches with 0 in the terminal 5 nt; part of the primary assembly but outside the 24-chromosome PPFM index. Found by SPC-08 in sensitive mode (oligoscout_contig_scan, <=3 mm + terminal rule) as NT_187392.1:84605 69 bp after this comparison; the earlier SPC-08 used <=2 mm."
+      }
+    ],
+    "primary_chromosome_recall": "653/653 (100%)",
+    "oligoscout_products": 740,
+    "oligoscout_only_products": 87,
+    "oligoscout_only_explanation": "Products satisfying the rule that Primer-BLAST did not report (BLAST word-seeding misses, e.g. DESIGN_000/001/011 chr5:40812528 2891 bp, DESIGN_007 chr1:87298596 89 bp). None was listed by Primer-BLAST with a different mismatch count.",
+    "kras_catalog_note": "CAT_KRAS_G12_G13: Primer-BLAST also reports the KRASP1 pseudogene product chr6:54770597 62 bp (1/1 mismatches), as OligoScout sensitive mode does.",
+    "rule_products_found_including_spc08": "654/654 (100%)",
+    "spc08_change": "SPC-08 now follows the search mode: sensitive -> <=3 mismatches, <=1 in the 3'-terminal 5 nt (was always <=2 mm + 3-nt anchor)."
+  },
+  "speed_repeated": {
+    "evidence": "OligoScout/benchmarks/scorecard/results/speed/summary.json",
+    "machine": "AMD Ryzen 9 9950X (VM, 2 vCPU, 3 GiB RAM), Ubuntu 22.04, native Linux kernel; PPFM index read from the connected Windows folder mount; single search thread",
+    "note": "Repeated runs, warm page cache after the first. Test #81 full-panel numbers from the original i5-12500H/WSL2 run are kept separately in specificity_test81.",
+    "runs": {
+      "ctdna_anchored": {
+        "n": 5,
+        "search_s_mean": 26.16,
+        "search_s_sd": 0.12,
+        "search_s_min": 25.9707,
+        "search_s_max": 26.2795,
+        "max_rss_mib": 660.5,
+        "products": 27
+      },
+      "ctdna_sensitive": {
+        "n": 5,
+        "search_s_mean": 28.98,
+        "search_s_sd": 0.12,
+        "search_s_min": 28.884,
+        "search_s_max": 29.2239,
+        "max_rss_mib": 660.6,
+        "products": 728
+      },
+      "t81_64_anchored": {
+        "n": 5,
+        "search_s_mean": 26.69,
+        "search_s_sd": 0.15,
+        "search_s_min": 26.4892,
+        "search_s_max": 26.8947,
+        "max_rss_mib": 660.6,
+        "products": 1684
+      },
+      "t81_64_sensitive": {
+        "n": 5,
+        "search_s_mean": 42.96,
+        "search_s_sd": 0.08,
+        "search_s_min": 42.8986,
+        "search_s_max": 43.1021,
+        "max_rss_mib": 662.5,
+        "products": 95153
+      },
+      "test81_1024_anchored": {
+        "n": 4,
+        "search_s_mean": 33.73,
+        "search_s_sd": 0.41,
+        "search_s_min": 33.3638,
+        "search_s_max": 34.4127,
+        "max_rss_mib": 684.5,
+        "bindings": 8262803,
+        "hetero_products": 425055,
+        "single_primer_products": 569666,
+        "oracle_match": "bindings 8,262,803 and hetero products 425,055 equal the Test #81 oracle"
+      }
+    }
+  },
+  "primerbank_validated_pairs": {
+    "evidence": "OligoScout/benchmarks/scorecard/results/primerbank/summary.json",
+    "lines": [
+      "121 PrimerBank mouse pairs with validation pages (89 genes): 101 sequence-confirmed, 9 expected transcript not the top BLAST hit, 11 without a BLAST result",
+      "OligoScout worst verdict on sequence-confirmed pairs (rt_qpcr, Ta 60 C): {'WARN': 56, 'FAIL': 45}; FAIL mostly TH-03 (43 pairs)",
+      "TH-03 failures on working pairs by annealing temperature: 60 C: 43/101, 58 C: 0/101, 56 C: 0/101",
+      "Tm OligoScout - PrimerBank: mean +1.59 C (SD 0.33)",
+      "PrimerBank recommends 60 C annealing. At 60 C OligoScout's TH-03 (bound fraction < 0.80) fails pairs that were sequence-confirmed, because OligoScout's Tm under 50 mM Na+/1.5 mM Mg2+ sits near 60-64 C for these primers; TH-02 (salt-model spread > 2 C) warns on every primer. Both thresholds are uncalibrated (REP-03) and this sample argues for relaxing them."
+    ],
+    "source": "PrimerBank (pga.mgh.harvard.edu), mouse, searched by gene symbol; validation pages read 2026-11-22",
+    "pairs_collected": 121,
+    "genes": 89,
+    "with_validation_page": 121,
+    "works_sequence_confirmed": 101,
+    "profile": "rt_qpcr (default conditions)",
+    "by_outcome": {
+      "sequence_confirmed": {
+        "pairs": 101,
+        "worst": {
+          "WARN": 56,
+          "FAIL": 45
+        },
+        "fail_rate": 0.446,
+        "median_amplicon": 131
+      },
+      "expected_not_top_hit": {
+        "pairs": 9,
+        "worst": {
+          "FAIL": 4,
+          "WARN": 5
+        },
+        "fail_rate": 0.444,
+        "median_amplicon": 111
+      },
+      "blast_missing": {
+        "pairs": 11,
+        "worst": {
+          "FAIL": 7,
+          "WARN": 4
+        },
+        "fail_rate": 0.636,
+        "median_amplicon": 111
+      }
+    },
+    "worst_verdict_on_working_pairs": {
+      "WARN": 56,
+      "FAIL": 45
+    },
+    "fail_rate_on_working_pairs": 0.446,
+    "pairs_with_fail_by_check": {
+      "TH-03": 43,
+      "DIM-01": 3,
+      "TH-01": 1
+    },
+    "pairs_with_warn_by_check": {
+      "TH-02": 101,
+      "TH-01": 93,
+      "TH-04": 93,
+      "TH-03": 86,
+      "CMP-08": 45,
+      "PAIR-01": 28,
+      "DIM-01": 19,
+      "CMP-07": 12,
+      "DIM-03": 3,
+      "CMP-05": 2,
+      "SS-02": 1,
+      "DIM-02": 1
+    },
+    "tm_oligoscout_minus_primerbank": {
+      "n": 242,
+      "mean": 1.59,
+      "sd": 0.33
+    },
+    "limits": [
+      "'blast_missing' (no sequencing/BLAST result) is a weak failure proxy: PrimerBank notes short products (<75 bp) often fail sequencing; too few for sensitivity/AUC",
+      "specificity not evaluated: OligoScout indexes GRCh38 only",
+      "gene list is a convenience sample of well-studied genes"
+    ],
+    "th03_by_annealing_c": {
+      "60": {
+        "working_pairs_failing_TH03": 43,
+        "of": 101
+      },
+      "58": {
+        "working_pairs_failing_TH03": 0,
+        "of": 101
+      },
+      "56": {
+        "working_pairs_failing_TH03": 0,
+        "of": 101
+      }
+    },
+    "reading": "PrimerBank recommends 60 C annealing. At 60 C OligoScout's TH-03 (bound fraction < 0.80) fails pairs that were sequence-confirmed, because OligoScout's Tm under 50 mM Na+/1.5 mM Mg2+ sits near 60-64 C for these primers; TH-02 (salt-model spread > 2 C) warns on every primer. Both thresholds are uncalibrated (REP-03) and this sample argues for relaxing them."
+  },
+  "thermodynamics_vs_primer3": {
+    "evidence": "OligoScout/benchmarks/scorecard/results/thermo_vs_primer3/summary.json",
+    "primers": 2048,
+    "pairs": 1024,
+    "seconds": 15.0,
+    "conditions": {
+      "na_mM": 50.0,
+      "mg_mM": 1.5,
+      "dntp_mM": 0.6,
+      "primer_nM": 200.0
+    },
+    "primer3_version_hint": "third_party/primer3/src (built in WSL, gcc -O2)",
+    "A_tm_1M_aligned_conc": {
+      "n": 2048,
+      "mean_diff": 0.0,
+      "sd_diff": 0.0,
+      "mae": 0.0,
+      "max_abs": 0.0001,
+      "pearson_r": 1.0,
+      "spearman_rho": 1.0
+    },
+    "B_tm_default_each_tool": {
+      "n": 2048,
+      "mean_diff": 0.9948,
+      "sd_diff": 0.2282,
+      "mae": 0.9948,
+      "max_abs": 1.8328,
+      "pearson_r": 0.9052,
+      "spearman_rho": 0.6604
+    },
+    "C_tm_same_salt_model_aligned_conc": {
+      "n": 2048,
+      "mean_diff": -0.0,
+      "sd_diff": 0.0,
+      "mae": 0.0,
+      "max_abs": 0.0001,
+      "pearson_r": 1.0,
+      "spearman_rho": 1.0
+    },
+    "D_heterodimer_dG37": {
+      "n": 1024,
+      "mean_diff": -0.007,
+      "sd_diff": 0.4624,
+      "mae": 0.2529,
+      "max_abs": 3.5954,
+      "pearson_r": 0.9617,
+      "spearman_rho": 0.961,
+      "flag_agreement": {
+        "threshold_kcal_mol": -6.0,
+        "both_flag": 126,
+        "oligoscout_only": 14,
+        "primer3_only": 23,
+        "neither": 861,
+        "agreement": 0.9639,
+        "cohen_kappa": 0.851
+      }
+    },
+    "E_selfdimer_dG37": {
+      "n": 2048,
+      "mean_diff": 0.0895,
+      "sd_diff": 0.709,
+      "mae": 0.36,
+      "max_abs": 4.49,
+      "pearson_r": 0.9446,
+      "spearman_rho": 0.9376,
+      "flag_agreement": {
+        "threshold_kcal_mol": -6.0,
+        "both_flag": 344,
+        "oligoscout_only": 32,
+        "primer3_only": 84,
+        "neither": 1588,
+        "agreement": 0.9434,
+        "cohen_kappa": 0.8207
+      }
+    },
+    "F_hairpin_dG37": {
+      "n": 2048,
+      "mean_diff": 0.2649,
+      "sd_diff": 0.3977,
+      "mae": 0.2779,
+      "max_abs": 2.348,
+      "pearson_r": 0.3453,
+      "spearman_rho": 0.3771,
+      "flag_agreement": {
+        "threshold_kcal_mol": -2.0,
+        "both_flag": 0,
+        "oligoscout_only": 1,
+        "primer3_only": 6,
+        "neither": 2041,
+        "agreement": 0.9966,
+        "cohen_kappa": -0.0008
+      }
+    },
+    "notes": [
+      "A isolates the NN layer: OligoScout uses C (primer excess), primer3 C/4; oligotm is given -d 4*C.",
+      "B is what users see: different salt model (Owczarzy 2008 vs SantaLucia 1998) AND concentration convention.",
+      "D-F: ntthal includes multiple loops/defects; OligoScout dimers are WC stacks + <=1 internal mismatch or 1-nt bulge, plus (since v0.4) the best end term per helix end (dangle, double dangle or terminal mismatch) exactly as ntthal selects them."
+    ],
+    "dimer_model": "nn_single_internal_mismatch_or_bulge+end_terms (dangling ends, double dangle, terminal mismatch)",
+    "previous_dimer_model": {
+      "model": "nn_single_internal_mismatch_or_bulge (no end terms)",
+      "D_heterodimer_dG37": {
+        "mean_diff": 1.7985,
+        "sd_diff": 0.6654,
+        "pearson_r": 0.9168,
+        "cohen_kappa": 0.4094
+      },
+      "E_selfdimer_dG37": {
+        "mean_diff": 1.9113,
+        "sd_diff": 1.0162,
+        "pearson_r": 0.8844,
+        "cohen_kappa": 0.4656
+      }
+    }
+  },
+  "software_integrity": {
+    "unit_tests": {
+      "tests": 279,
+      "status": "OK (1 platform skip)",
+      "evidence": "reference_py/tests",
+      "note": "v0.4.0; the end-to-end regression log below predates it"
+    },
+    "cpp_tests": {
+      "single_primer_products": "PASS",
+      "primer_pair_assembler_equivalence": "PASS (500 checks)",
+      "terminal_rule_search_vs_brute_force": "PASS (terminal max 0/1/2)"
+    },
+    "salt_layer_vs_oligotm": {
+      "values": 60,
+      "identical": 60,
+      "tolerance_c": 0.05,
+      "evidence": "reference_py/out/salt_crosscheck/salt_crosscheck_summary.md"
+    },
+    "mcp_oauth_tests": {
+      "tests": 3,
+      "status": "OK",
+      "evidence": "mcp_server/tests/test_oauth.py"
+    },
+    "end_to_end_regression": {
+      "pass": 20,
+      "skip": 1,
+      "fail": 0,
+      "evidence": "reference_py/out/regresyon/REGRESYON_RAPORU.md"
+    },
+    "python_vs_cpp": {
+      "sequences": 74,
+      "columns": 17,
+      "differences": 0,
+      "evidence": "reference_py/out/diff_cpp/diff_cpp_summary.md"
+    },
+    "parameter_tables_vs_primer3": {
+      "tables": 6,
+      "values_compared": 373,
+      "identical": 371,
+      "flagged_deviations": 0,
+      "note": "2 of 96 terminal-mismatch (tstack2) entries are not counted as matches; see the evidence file",
+      "evidence": "reference_py/out/param_crosscheck/crosscheck_summary.md"
+    }
+  },
+  "qc_catalog": {
+    "rules": 91,
+    "status_counts": {
+      "etiketli_uygulandi": 91
+    },
+    "evidence": "reference_py/out/qc_catalog_audit/qc_kural_dogrulama.tsv",
+    "wet_lab_calibrated_rules": 0,
+    "calibration_record": "REP-03 (thresholds are literature starting values)"
+  },
+  "integrations": {
+    "mcp_conformance": {
+      "sdk": "official MCP Python SDK 2.3.0",
+      "transports": [
+        "stdio",
+        "streamable-http"
+      ],
+      "checks_passed": 26,
+      "checks_total": 26,
+      "protocol": "2025-06-18",
+      "tools": 15,
+      "evidence": "mcp_server/README.md#dogrulama"
+    },
+    "browser_port_equivalence": {
+      "cases": 2000,
+      "identical": 2000,
+      "evidence": "web/ (engine.js port check)"
+    }
+  },
+  "not_yet_benchmarked": [
+    "Wet-lab validation (qPCR efficiency, specificity by melt/gel/NGS) - required before any calibrated claim",
+    "Head-to-head design quality vs Primer3/Primer-BLAST/PrimerQuest outputs on the same targets with a wet-lab outcome (PrimerBank gives outcomes only for its own mouse designs; QC false-alarm rate on them is in section 3b)",
+    "Multiplex panel performance vs PrimerPlex/Ultiplex/olivar on wet-lab data",
+    "LNA-modified oligos (needs the McTigue 2004 LNA NN table) and non-human genomes (index + annotations)"
+  ]
+}

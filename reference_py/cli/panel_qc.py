@@ -96,6 +96,9 @@ def main() -> int:
     ap.add_argument("--primer-nm", type=float, default=200.0)
     ap.add_argument("--tm-window", default="58:62")
     ap.add_argument("--anchor", type=int, default=12)
+    ap.add_argument("--profile", default="qpcr_sybr")
+    ap.add_argument("--salt-model", default="owczarzy_2008",
+                    choices=("owczarzy_2008", "owczarzy_2004", "von_ahsen_2001"))
     ap.add_argument("--panel", help="beklenen koordinatlari iceren panel TSV'si; "
                                     "verilirse hedef/hedef disi ayrimi yapilir")
     args = ap.parse_args()
@@ -108,7 +111,8 @@ def main() -> int:
         dntp_M=args.dntp / 1e3, primer_M=args.primer_nm / 1e9,
         anneal_c=args.ta,
     )
-    eng = engine.ThermoEngine(cond=cond, profile=engine.Profile(tm_window_c=(lo, hi)))
+    eng = engine.ThermoEngine(cond=cond, profile=engine.Profile(name=args.profile, tm_window_c=(lo, hi)),
+                              salt_model=args.salt_model)
 
     bindings = read_tsv(args.prefix + ".bindings.tsv")
     products = read_tsv(args.prefix + ".products.tsv")
@@ -119,6 +123,12 @@ def main() -> int:
     primers: dict[tuple[str, str], str] = {}
     for b in bindings:
         primers[(b["pair_id"], b["role"])] = b["primer"]
+    panel_rows = read_tsv(args.panel) if args.panel else []
+    for row in panel_rows:
+        row = {k.lower(): v for k, v in row.items()}
+        for role, column in (("F", "primer1"), ("R", "primer2")):
+            if row.get("pair_id") and row.get(column):
+                primers.setdefault((row["pair_id"], role), row[column])
 
     thermo: dict[str, dict] = {}
     for (pid, role), seq in primers.items():
@@ -291,22 +301,30 @@ def main() -> int:
     # panelde beyan edilenle ayni ise HEDEF sayilir. Aksi halde, uyumsuzlugu
     # sifir olsa bile hedef disidir — tam eslesmeli hedef disi urun en kotu
     # siniftir ve "exact" etiketiyle temiz gorunmemelidir.
-    expected: dict[str, tuple[int, int]] = {}
-    if args.panel:
-        for row in read_tsv(args.panel):
-            low = {k.lower(): v for k, v in row.items()}
-            pid = low.get("pair_id")
-            start = low.get("left_start")
-            length = low.get("expected_amplicon_length")
-            if pid and start and length:
-                expected[pid] = (int(start), int(length))
+    expected: dict[str, tuple[int, int, str]] = {}
+    for row in panel_rows:
+        low = {k.lower(): v for k, v in row.items()}
+        pid = low.get("pair_id")
+        start = low.get("left_start")
+        length = low.get("expected_amplicon_length")
+        if pid and start and length:
+            chrom = low.get("expected_chrom", "").strip()
+            expected[pid] = (int(start), int(length), chrom)
+
+    def is_single(p: dict) -> bool:
+        # oligoscout_panel >= 0.4: F-F / R-R tek primer urunleri (P-> <-P)
+        return p.get("orientation") in ("F-F", "R-R")
 
     def is_intended(p: dict) -> bool:
+        if is_single(p):
+            return False
         exp = expected.get(p["pair_id"])
         if exp is None:
             return int(p["total_mismatches"]) == 0
-        return (int(p["amplicon_start"]) == exp[0]
-                and int(p["amplicon_length"]) == exp[1])
+        start, length, chrom = exp
+        return (int(p["amplicon_start"]) == start
+                and int(p["amplicon_length"]) == length
+                and (not chrom or p["chrom"] == chrom))
 
     prod_by_pair = collections.defaultdict(list)
     for p in products:
@@ -317,7 +335,7 @@ def main() -> int:
     off_path = os.path.join(args.out, "offtarget_products.tsv")
     rec_path = os.path.join(args.out, "panel_qc_records.jsonl")
 
-    pair_ids = sorted({b["pair_id"] for b in bindings},
+    pair_ids = sorted({pair_id for pair_id, _ in primers},
                       key=lambda x: (len(x), x))
     n_pairs_with_off = 0
 
@@ -333,11 +351,13 @@ def main() -> int:
             "products_total", "products_intended", "offtarget_total",
             "offtarget_exact", "offtarget_anchored", "min_offtarget_mismatches",
             "spc01", "spc03", "worst_primer_severity", "spc04_status",
+            "offtarget_single_primer",
         ])
         ow = csv.writer(fo, delimiter="\t", lineterminator="\n")
         ow.writerow(["pair_id", "chrom", "amplicon_start", "amplicon_length",
                      "total_mismatches", "class", "left_mask", "right_mask",
-                     "left_anchor_intact", "right_anchor_intact"])
+                     "left_anchor_intact", "right_anchor_intact",
+                     "left_role", "right_role", "orientation"])
 
         for pid in pair_ids:
             f_key, r_key = (pid, "F"), (pid, "R")
@@ -346,6 +366,7 @@ def main() -> int:
             intended = [p for p in prods if is_intended(p)]
             off = [p for p in prods if not is_intended(p)]
             off_exact = [p for p in off if int(p["total_mismatches"]) == 0]
+            off_single = [p for p in off if is_single(p)]
             off_anchored = [
                 p for p in off
                 if three_prime_anchor_intact(p["left_mask"], args.anchor)
@@ -388,6 +409,7 @@ def main() -> int:
                 len(off_anchored),
                 min((int(p["total_mismatches"]) for p in off), default=""),
                 spc01, spc03, sev, spc04,
+                len(off_single),
             ])
 
             for p in sorted(off, key=lambda x: int(x["total_mismatches"]))[:50]:
@@ -405,6 +427,8 @@ def main() -> int:
                     p["left_mask"], p["right_mask"],
                     three_prime_anchor_intact(p["left_mask"], args.anchor),
                     three_prime_anchor_intact(p["right_mask"], args.anchor),
+                    p.get("left_role", "F"), p.get("right_role", "R"),
+                    p.get("orientation", "F-R"),
                 ])
 
             for rec in (tf, tr):
@@ -420,6 +444,9 @@ def main() -> int:
                        "offtarget_total": len(off),
                        "offtarget_exact": len(off_exact),
                        "offtarget_anchored": len(off_anchored),
+                       "offtarget_single_primer": len(off_single),
+                       "single_primer_assembled":
+                           bool(products) and "orientation" in products[0],
                        "min_offtarget_mismatches":
                            min((int(p["total_mismatches"]) for p in off),
                                default=None)},
@@ -427,8 +454,8 @@ def main() -> int:
                            "fail": "tam eslesmeli hedef disi urun"},
                 severity=spc03,
                 model={"source": "genome_scan_products",
-                       "note": "F-R urunler sozlesme araligindan; F-F/R-R ve "
-                               "genisletilmis aralik ayri C++ taramasi ister"},
+                       "note": "F-R, R-F ve (oligoscout_panel >= 0.4) F-F/R-R "
+                               "tek primer urunleri sozlesme araligindan"},
                 conditions=cond.as_dict(), param_set_sha256=eng.param_digest,
                 profile=eng.profile.name,
                 note="cift duzeyi ozgulluk; kalibre esik yok")
@@ -445,7 +472,7 @@ def main() -> int:
         # SPC-09: arama sozlesmesi beyani + indeks checksum'u.
         index_digest = None
         manifest_src = contract.get("manifest", "")
-        manifest_path = _win(manifest_src)
+        manifest_path = _win(manifest_src) if os.name == "nt" else manifest_src
         if manifest_path and os.path.exists(manifest_path):
             shard_sha = []
             for mrow in read_tsv(manifest_path):
