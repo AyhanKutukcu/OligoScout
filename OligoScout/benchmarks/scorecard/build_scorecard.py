@@ -55,8 +55,8 @@ def regression():
     dm = re.search(r"dizi sayisi: (\d+)", dtxt)
     pc = OUT / "param_crosscheck" / "crosscheck_summary.md"
     return {
-        "unit_tests": {"tests": 279, "status": "OK (1 platform skip)", "evidence": "reference_py/tests",
-                       "note": "v0.4.0; the end-to-end regression log below predates it"},
+        "unit_tests": {"tests": 292, "status": "OK (1 platform skip)", "evidence": "reference_py/tests",
+                       "note": "v0.4.1; the end-to-end regression log below predates it"},
         "cpp_tests": {"single_primer_products": "PASS", "primer_pair_assembler_equivalence": "PASS (500 checks)",
                       "terminal_rule_search_vs_brute_force": "PASS (terminal max 0/1/2)"},
         "salt_layer_vs_oligotm": {"values": 60, "identical": 60, "tolerance_c": 0.05,
@@ -115,6 +115,12 @@ def primer_blast_web():
     return {"evidence": rel(p), **keep}
 
 
+def lna_model():
+    p = HERE / "results" / "lna_mctigue2004" / "summary.json"
+    d = jload(p)
+    return {"evidence": rel(p), **d} if d else None
+
+
 def primerbank():
     p = HERE / "results" / "primerbank" / "summary.json"
     d = jload(p)
@@ -151,7 +157,7 @@ def main():
     card = {
         "title": "OligoScout validation & benchmark scorecard",
         "generated_utc": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "engine": "oligoscout-thermo-ref/0.4.0 + oligoscout_panel 0.4 (C++20 FM-index, PPFM 24 shards; "
+        "engine": "oligoscout-thermo-ref/0.4.1 + oligoscout_panel 0.4 (C++20 FM-index, PPFM 24 shards; "
                   "anchored and sensitive search modes, single-primer products)",
         "how_to_read": [
             "Every number links to an evidence file under the project root.",
@@ -165,6 +171,7 @@ def main():
         "primer_blast_web_head_to_head": primer_blast_web(),
         "speed_repeated": speed(),
         "primerbank_validated_pairs": primerbank(),
+        "lna_model_vs_mctigue2004": lna_model(),
         "thermodynamics_vs_primer3": thermo(),
         "software_integrity": regression(),
         "qc_catalog": catalog(),
@@ -180,7 +187,6 @@ def main():
             "wet-lab outcome (PrimerBank gives outcomes only for its own mouse designs; QC false-alarm rate on "
             "them is in section 3b)",
             "Multiplex panel performance vs PrimerPlex/Ultiplex/olivar on wet-lab data",
-            "LNA-modified oligos (needs the McTigue 2004 LNA NN table) and non-human genomes (index + annotations)",
         ],
     }
     dst = ROOT / "mcp_server" / "benchmark_scores.json"
@@ -252,6 +258,15 @@ def render_md(c):
                   f"{pm['D_heterodimer_dG37']['mean_diff']:+.2f}, kappa {pm['D_heterodimer_dG37']['cohen_kappa']}; "
                   f"now kappa {t['D_heterodimer_dG37']['flag_agreement']['cohen_kappa']} "
                   f"(self-dimer {t['E_selfdimer_dG37'].get('flag_agreement', {}).get('cohen_kappa', '-')})."]
+    ln = c.get("lna_model_vs_mctigue2004")
+    if ln:
+        m3, m4 = ln["M3_measured_reference_plus_table"], ln["M4_oligoscout_unified_dna_plus_table"]
+        L += ["", "## 3c. LNA model vs. McTigue 2004 Table 1", "",
+              f"- {ln['n']} singly LNA-substituted oligos (excluded: {', '.join(ln['excluded'])})",
+              f"- measured DNA reference + LNA table: RMSD ΔTm {m3['rmsd_dtm_c']} °C "
+              f"(paper {m3['paper_reported_rmsd_dtm_c']} °C)",
+              f"- OligoScout DNA model + LNA table: RMSD Tm {m4['rmsd_tm_c']} °C, {m4['within_2c']}/{ln['n']} within "
+              f"2 °C; DNA references alone {m4['dna_reference_rmsd_tm_c']} °C"]
     pk = c.get("primerbank_validated_pairs")
     if pk:
         L += ["", "## 3b. PrimerBank experimentally tested mouse pairs", ""] + [f"- {x}" for x in pk.get("lines", [])]

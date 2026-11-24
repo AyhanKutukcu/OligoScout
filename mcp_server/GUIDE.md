@@ -60,8 +60,12 @@ Long jobs return `job_id`; poll `oligoscout_job_status`.
 * θ(Ta) is the bound fraction at the annealing temperature (TH-03).
 * Dimers: WC stacks plus at most one internal mismatch (Allawi–Peyret) or one 1-nt
   bulge. Hairpins: Zuker MFE (SS-01).
-* LNA and other modifications are **not** modelled: reported Tm is a DNA-backbone
-  **lower bound**.
+* LNA (`+N`): duplex ΔH/ΔS get the McTigue 2004 nearest-neighbour increments
+  (32NN set). Measured domain: one internal LNA ≥ 2 nt from each end, perfect-match
+  DNA target; other layouts (adjacent, terminal, several LNAs, LNA next to a
+  mismatch) are computed additively and flagged `in_domain: false`. LNA effects on
+  hairpins, dimers and 3′-end ΔG are not modelled. End labels (dyes, quenchers,
+  MGB) are not modelled.
 
 ## Variants (VAR family)
 * gnomAD v4 genomes/exomes (API or local cache). Variants in the last 5 nt of the
@@ -70,7 +74,7 @@ Long jobs return `job_id`; poll `oligoscout_job_status`.
 ## What OligoScout does not claim
 * No wet-lab calibration yet (REP-03); thresholds are literature starting values.
 * Human GRCh38.p14 only.
-* LNA and other modifications are not modelled thermodynamically (Tm is a DNA-backbone lower bound).
+* LNA beyond the McTigue 2004 domain is extrapolated; dyes/quenchers/MGB are not modelled.
 * RT-05 DNA/RNA hybrid Tm uses Sugimoto 1995 transcribed from Biopython (status
   transcribed_unverified); report it as informational.
 * SPC-08 scans every GRCh38.p14 sequence outside the 24 primary chromosomes; ALT-locus and

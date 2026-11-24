@@ -1,0 +1,40 @@
+{
+ "source": "McTigue, Peterson & Kahn, Biochemistry 2004, Table 1 (100 LNA oligos, 24 DNA references)",
+ "excluded": [
+  "LT6a",
+  "LT6b"
+ ],
+ "n": 98,
+ "M3_measured_reference_plus_table": {
+  "rmsd_dtm_c": 0.886,
+  "mean_c": 0.111,
+  "max_abs_c": 3.318,
+  "paper_reported_rmsd_dtm_c": 0.88
+ },
+ "M4_oligoscout_unified_dna_plus_table": {
+  "rmsd_tm_c": 1.605,
+  "mean_c": 0.342,
+  "max_abs_c": 4.667,
+  "within_2c": 75,
+  "rmsd_dtm_c": 0.864,
+  "dna_reference_rmsd_tm_c": 1.538,
+  "paper_reported_rmsd_tm_c_16RY_test_set": 1.47
+ },
+ "by_set": {
+  "training": {
+   "n": 67,
+   "rmsd_dtm_m3": 0.867,
+   "rmsd_tm_m4": 1.659
+  },
+  "test": {
+   "n": 31,
+   "rmsd_dtm_m3": 0.927,
+   "rmsd_tm_m4": 1.482
+  }
+ },
+ "conditions": {
+  "na_M": 1.011,
+  "salt_model": "owczarzy_2004",
+  "concentration": "CT/4 (5 uM; 1 uM for LT4/LT5)"
+ }
+}

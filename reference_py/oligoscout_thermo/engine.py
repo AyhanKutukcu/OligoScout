@@ -17,7 +17,7 @@ from typing import Any
 
 from . import align, concentration, fold, nn, params, salt
 
-ENGINE_VERSION = "oligoscout-thermo-ref/0.4.0"
+ENGINE_VERSION = "oligoscout-thermo-ref/0.4.1"
 
 SEVERITY_ORDER = {"INFO": 0, "WARN": 1, "FAIL": 2}
 
@@ -103,6 +103,15 @@ def _terminal_dG37(seq: str, window: int) -> float:
     return dH - 310.15 * dS / 1000.0
 
 
+def _split_mods(seq: str) -> tuple[str, frozenset[int] | None]:
+    """Modifiye notasyonu (+X LNA, /uc/) DNA iskeleti + LNA konumlarina ayirir."""
+    if any(ch in seq for ch in "+/"):
+        from . import oligomod
+        p = oligomod.parse(seq)
+        return nn.validate(p.dna), (p.lna_positions or None)
+    return nn.validate(seq), None
+
+
 class ThermoEngine:
     def __init__(
         self,
@@ -159,9 +168,20 @@ class ThermoEngine:
 
     # -- tek primer ---------------------------------------------------------
     def evaluate(self, primer_id: str, seq: str) -> dict[str, Any]:
-        s = nn.validate(seq)
+        # Modifiye notasyon (+X = LNA, /.../ uc etiketi) kabul edilir; duplex
+        # Tm'ine McTigue 2004 LNA artislari eklenir. Hairpin/dimer/3' uc
+        # enerjileri DNA iskeletinden hesaplanir (LNA katkisi modellenmez).
+        mods = None
+        if any(ch in seq for ch in "+/"):
+            from . import oligomod
+            parsed = oligomod.parse(seq)
+            s = nn.validate(parsed.dna)
+            mods = parsed
+        else:
+            s = nn.validate(seq)
         model = concentration.build(
-            s, cond=self.cond, salt_model=self.salt_model
+            s, cond=self.cond, salt_model=self.salt_model,
+            lna_positions=mods.lna_positions if mods else None,
         )
         ta = self.cond.anneal_c
         checks: list[CheckRecord] = []
@@ -207,7 +227,9 @@ class ThermoEngine:
             {"warn": f"{lo}-{hi} C disi", "fail": f"{lo - m}-{hi + m} C disi"},
             sev,
             {"conc_model": model.conc_model, "salt_model": model.salt_model,
-             "salt_regime": model.salt_detail.get("regime")},
+             "salt_regime": model.salt_detail.get("regime"),
+             **({"lna_table": model.lna["model"], "lna_in_domain": model.lna["in_domain"],
+                 "lna_out_of_domain": model.lna["out_of_domain"]} if model.lna else {})},
         )
 
         # --- TH-02  tuz modeli duyarliligi ---------------------------------
@@ -321,6 +343,9 @@ class ThermoEngine:
             "TH-06": "katki maddesi katsayilari aktarilmadi",
             "TH-07": "urun Tm'i gerekir (amplikon modulu)",
         }
+        if mods is not None and mods.lna_count:
+            not_eval["LNA-SS"] = ("LNA'nin hairpin, dimer ve 3' uc enerjisine katkisi "
+                                  "modellenmez (McTigue 2004 yalniz tam eslesen hedef dupleksi)")
 
         worst = max((c.severity for c in checks), key=lambda x: SEVERITY_ORDER[x])
         return {
@@ -332,6 +357,7 @@ class ThermoEngine:
             "worst_severity": worst,
             "checks": [c.as_dict() for c in checks],
             "not_evaluated": not_eval,
+            **({"modifications": mods.as_dict()} if mods is not None else {}),
             "engine_version": ENGINE_VERSION,
             "param_set_sha256": self.param_digest,
             "calibration_status": {
@@ -346,9 +372,9 @@ class ThermoEngine:
     # -- primer cifti -------------------------------------------------------
     def evaluate_pair(self, pair_id: str, fwd: str, rev: str) -> dict[str, Any]:
         """DIM-03, DIM-04 (hetero-dimer) ve PAIR-01 (dTm)."""
-        f, r = nn.validate(fwd), nn.validate(rev)
-        mf = concentration.build(f, cond=self.cond, salt_model=self.salt_model)
-        mr = concentration.build(r, cond=self.cond, salt_model=self.salt_model)
+        (f, lf), (r, lr) = _split_mods(fwd), _split_mods(rev)
+        mf = concentration.build(f, cond=self.cond, salt_model=self.salt_model, lna_positions=lf)
+        mr = concentration.build(r, cond=self.cond, salt_model=self.salt_model, lna_positions=lr)
         checks: list[CheckRecord] = []
 
         def rec(cid, value, threshold, severity, model, note=""):
@@ -395,6 +421,7 @@ class ThermoEngine:
 
     def melting_curve(self, seq: str, t_min: float = 20.0, t_max: float = 95.0,
                       step: float = 0.25) -> list[tuple[float, float]]:
-        model = concentration.build(nn.validate(seq), cond=self.cond,
-                                    salt_model=self.salt_model)
+        dna, lp = _split_mods(seq)
+        model = concentration.build(dna, cond=self.cond, salt_model=self.salt_model,
+                                    lna_positions=lp)
         return model.melting_curve(t_min, t_max, step)

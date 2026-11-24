@@ -256,7 +256,8 @@ python reference_py/cli/blocker_qc.py \
     --forward AGTCCTTTCTGTGTCTTCCCA --reverse TCCAGCATCTCCAGCAGC
 ```
 
-**Output:** `ct05_qc.tsv` (probe ΔTm; LNA labeled as a "lower bound"),
+**Output:** `ct05_qc.tsv` (probe ΔTm with LNA increments from McTigue 2004;
+probes outside the measured domain are flagged `lna_in_domain: false`),
 `ct05_qc_records.jsonl`.
 
 ### 7) Amplicon melting — `amplicon_melt.py`
@@ -317,11 +318,12 @@ identical** result; the reference FASTA SHA-256 (SEQ-06) is stored with the resu
 
 | Tool | What it does | Result |
 |---|---|---|
-| Unit tests | `reference_py/tests/` | 279, all passing (1 platform skip) |
+| Unit tests | `reference_py/tests/` | 292, all passing (1 platform skip) |
 | `param_crosscheck.py` | Tables vs primer3 (independent oracle) | 373 comparisons, 0 transcription errors |
 | `salt_crosscheck.py` | Salt layer vs primer3 `oligotm` | 60/60 Tm values identical |
 | `diff_cpp.py` | Python ↔ C++ differential | 74 sequences × 17 columns, 0 differences |
 | `regresyon.py` | 21-step end-to-end | 20 PASS / 1 SKIP / 0 FAIL |
+| `lna_validate.py` | LNA model vs McTigue 2004 Table 1 (98 oligos) | RMSD ΔTm 0.886 °C (paper 0.88); Tm 1.61 °C |
 | `benchmarks/scorecard/` | Search vs brute force, Primer-BLAST web, primer3, timings | see [`SCORECARD.md`](OligoScout/benchmarks/scorecard/SCORECARD.md) |
 
 Highlights of the v0.4.0 scorecard: the sensitive search mode (Primer-BLAST's
@@ -338,8 +340,12 @@ still required.
 ## Calibration caveats (REP-03)
 
 1. Most thresholds are literature starting values and are **NOT calibrated**.
-2. LNA/modified-base contributions are not modeled; the related Tm values are a
-   **LOWER BOUND**.
+2. LNA duplex Tm uses the McTigue 2004 nearest-neighbour increments (32NN set),
+   validated on the paper's 100 oligos (RMSD ΔTm 0.89 °C, absolute Tm 1.6 °C with
+   OligoScout's DNA model). The measured domain is a single internal LNA; adjacent,
+   terminal or multiple LNAs are extrapolated and flagged. LNA effects on hairpins
+   and dimers, and dye/quencher/MGB labels, are not modelled (hairpin Tm with LNA
+   is a **lower bound**).
 3. Parameter tables are in a "transcribed, unverified" state.
 4. The A·T bulge-closure constant is a project modeling decision.
 5. All 91 catalog rules are implemented (SPC-08 scans chrM, ALT loci, patches and

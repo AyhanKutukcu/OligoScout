@@ -1,6 +1,6 @@
 # OligoScout validation & benchmark scorecard
 
-_generated 2026-11-24T12:55:28Z_
+_generated 2026-11-24T23:21:42Z_
 
 ## 1. Specificity search vs. independent oracle (Test #81)
 
@@ -64,6 +64,12 @@ _AMD Ryzen 9 9950X (VM, 2 vCPU, 3 GiB RAM), Ubuntu 22.04, native Linux kernel; P
 
 Dimer model: nn_single_internal_mismatch_or_bulge+end_terms (dangling ends, double dangle, terminal mismatch). Before end terms (nn_single_internal_mismatch_or_bulge (no end terms)): hetero-dimer mean diff +1.80, kappa 0.4094; now kappa 0.851 (self-dimer 0.8207).
 
+## 3c. LNA model vs. McTigue 2004 Table 1
+
+- 98 singly LNA-substituted oligos (excluded: LT6a, LT6b)
+- measured DNA reference + LNA table: RMSD ΔTm 0.886 °C (paper 0.88 °C)
+- OligoScout DNA model + LNA table: RMSD Tm 1.605 °C, 75/98 within 2 °C; DNA references alone 1.538 °C
+
 ## 3b. PrimerBank experimentally tested mouse pairs
 
 - 121 PrimerBank mouse pairs with validation pages (89 genes): 101 sequence-confirmed, 9 expected transcript not the top BLAST hit, 11 without a BLAST result
@@ -74,7 +80,7 @@ Dimer model: nn_single_internal_mismatch_or_bulge+end_terms (dangling ends, doub
 
 ## 4. Software integrity
 
-- unit tests: 279 OK; C++ single-primer + assembler equivalence tests PASS
+- unit tests: 292 OK; C++ single-primer + assembler equivalence tests PASS
 - end-to-end regression: {'pass': 20, 'skip': 1, 'fail': 0, 'evidence': 'reference_py/out/regresyon/REGRESYON_RAPORU.md'}
 - Python vs C++: 74 sequences, 0 differences
 - parameter tables vs primer3: 371/373 identical, 0 flagged deviations
@@ -86,4 +92,3 @@ Dimer model: nn_single_internal_mismatch_or_bulge+end_terms (dangling ends, doub
 - Wet-lab validation (qPCR efficiency, specificity by melt/gel/NGS) - required before any calibrated claim
 - Head-to-head design quality vs Primer3/Primer-BLAST/PrimerQuest outputs on the same targets with a wet-lab outcome (PrimerBank gives outcomes only for its own mouse designs; QC false-alarm rate on them is in section 3b)
 - Multiplex panel performance vs PrimerPlex/Ultiplex/olivar on wet-lab data
-- LNA-modified oligos (needs the McTigue 2004 LNA NN table) and non-human genomes (index + annotations)

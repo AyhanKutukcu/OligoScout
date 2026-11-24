@@ -62,6 +62,7 @@ class MeltingModel:
     tm_K: float
     dS_eff_cal: float
     salt_detail: dict
+    lna: dict | None = None      # LNA artisi (McTigue 2004); yoksa None
 
     # -- tureyen degerler ---------------------------------------------------
     @property
@@ -124,6 +125,7 @@ class MeltingModel:
             "ds_rescaled_to_salt_corrected_tm": True,
             "dG37_kcal_mol": round(self.dG_kcal(37.0), 4),
             "salt_regime": self.salt_detail.get("regime"),
+            **({"lna": self.lna} if self.lna else {}),
         }
 
 
@@ -136,8 +138,13 @@ def build(
     *,
     template_site: str | None = None,
     arms_mismatch: bool = False,
+    lna_positions=None,
 ) -> MeltingModel:
-    """Bir oligo icin erime modelini kurar."""
+    """Bir oligo icin erime modelini kurar.
+
+    `lna_positions` (0-tabanli) verilirse DNA dupleksine McTigue 2004 LNA
+    artislari eklenir (oligoscout_thermo.lna).
+    """
     cond = cond or Conditions()
     if arms_mismatch:
         if template_site is None:
@@ -146,6 +153,12 @@ def build(
     else:
         duplex = (watson_crick(seq) if template_site is None
                   else duplex_with_mismatches(seq, template_site))
+    lna_info = None
+    if lna_positions:
+        from . import lna as _lna
+        inc = _lna.increments(seq, lna_positions, template_site)
+        duplex = _lna.apply(duplex, inc)
+        lna_info = inc.as_dict()
     f_gc = gc_fraction(seq)
     conc_model = conc_model or default_model(duplex)
     if total_strand_M is None:
@@ -174,4 +187,5 @@ def build(
         tm_K=tm_K,
         dS_eff_cal=dS_eff,
         salt_detail=detail,
+        lna=lna_info,
     )

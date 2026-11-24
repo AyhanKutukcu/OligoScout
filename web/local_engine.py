@@ -751,7 +751,7 @@ class LocalEngine:
     def oligo(self, action, data, work):
         conditions = reaction(data.get("conditions", {}))
         if action == "thermo":
-            s = dna(data.get("sequence"), "Primer", 8, 80)
+            s = dna(data.get("sequence"), "Primer", 8, 80, modified=True)
             return {"result": engine.ThermoEngine(cond=condition_model(conditions)).evaluate("WEB", s)}
         mutant = dna(data.get("mutant"), "Mutant prob", 8, 80, modified=True)
         wild = dna(data.get("wt"), "WT prob", 8, 80, modified=True)

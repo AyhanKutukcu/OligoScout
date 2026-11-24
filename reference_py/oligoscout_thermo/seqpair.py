@@ -543,11 +543,10 @@ def check_ct05(mutant_probe: str, wt_probe: str,
                delta_tm_warn: float = 5.0, delta_tm_fail: float = 3.0) -> dict:
     """CT-05: mutant ve WT prob arasindaki Tm farki (kanal ayrimi).
 
-    Problar genellikle LNA tasir; LNA mutlak Tm'i belirgin yukseltir ve bu
-    motorda MODELLENMEZ (ayri bir McTigue 2004 parametre tablosu gerekir).
-    Bu yuzden raporlanan Tm'ler DNA ISKELETININ degeridir (gercek Tm'in alt
-    siniri); iki probun LNA sayilari da verilir ki fark yorumlanabilsin.
-    Kucuk ayrim (ΔTm) iki kanalin birbirine girmesi demektir.
+    Problar genellikle LNA tasir. LNA katkisi McTigue 2004 en yakin komsu
+    artislariyla eklenir (oligoscout_thermo.lna); model tek, ic, tam eslesen
+    LNA icin olculmustur, bu alanin disindaki problar `lna_in_domain=False`
+    ile isaretlenir. Kucuk ayrim (ΔTm) iki kanalin birbirine girmesi demektir.
 
     Girdi modifiye notasyonda olabilir (+LNA, /uc/); iceride ayristirilir.
     """
@@ -555,25 +554,37 @@ def check_ct05(mutant_probe: str, wt_probe: str,
     cond = cond or salt.Conditions()
     mp = oligomod.parse(mutant_probe)
     wp = oligomod.parse(wt_probe)
-    tm_mut = concentration.build(mp.dna, cond=cond, salt_model=salt_model).tm_c
-    tm_wt = concentration.build(wp.dna, cond=cond, salt_model=salt_model).tm_c
+    m_mut = concentration.build(mp.dna, cond=cond, salt_model=salt_model,
+                                lna_positions=mp.lna_positions or None)
+    m_wt = concentration.build(wp.dna, cond=cond, salt_model=salt_model,
+                               lna_positions=wp.lna_positions or None)
+    tm_mut, tm_wt = m_mut.tm_c, m_wt.tm_c
+    tm_mut_dna = concentration.build(mp.dna, cond=cond, salt_model=salt_model).tm_c
+    tm_wt_dna = concentration.build(wp.dna, cond=cond, salt_model=salt_model).tm_c
     delta = abs(tm_mut - tm_wt)
     sev = "INFO"
     if delta < delta_tm_fail:
         sev = "FAIL"
     elif delta < delta_tm_warn:
         sev = "WARN"
+    lna_used = bool(mp.lna_positions or wp.lna_positions)
+    in_domain = all(m.lna is None or m.lna["in_domain"] for m in (m_mut, m_wt))
+    note = ("LNA katkisi McTigue 2004 tablosuyla (tek ic LNA icin olculmus)."
+            if lna_used else "LNA yok; DNA NN modeli.")
+    if lna_used and not in_domain:
+        note += " En az bir prob modelin olcum alaninin disinda (extrapolated)."
     return _rec("CT-05",
                 {"mutant_probe_dna": mp.dna, "wt_probe_dna": wp.dna,
-                 "mutant_tm_c_dna_backbone": round(tm_mut, 3),
-                 "wt_tm_c_dna_backbone": round(tm_wt, 3),
+                 "mutant_tm_c": round(tm_mut, 3), "wt_tm_c": round(tm_wt, 3),
+                 "mutant_tm_c_dna_backbone": round(tm_mut_dna, 3),
+                 "wt_tm_c_dna_backbone": round(tm_wt_dna, 3),
                  "delta_tm_c": round(delta, 3),
                  "mutant_lna_count": mp.lna_count, "wt_lna_count": wp.lna_count,
-                 "lna_modelled": False},
+                 "lna_modelled": lna_used, "lna_in_domain": in_domain,
+                 "lna_out_of_domain": sorted({r for m in (m_mut, m_wt) if m.lna
+                                              for r in m.lna["out_of_domain"]})},
                 {"warn": f"ΔTm < {delta_tm_warn} C", "fail": f"ΔTm < {delta_tm_fail} C"},
-                sev,
-                "Tm DNA iskeletinden; LNA stabilizasyonu modellenMEDI (alt "
-                "sinir). Mutlak esik LNA-dogru Tm ile kalibre edilmeli (REP-03)")
+                sev, note)
 
 
 # ---------------------------------------------------------------------------
@@ -747,9 +758,9 @@ def check_seq01(raw_seq: str) -> dict:
 
     Yalniz A/C/G/T beklenir; IUPAC dejenere kodlar yalniz dejenere modda
     kabul edilir; LNA (+N) ve uc modifikasyonlari (/.../) oligomod ile
-    ayristirilir ve termodinamik hesap DNA iskeleti uzerinden yapilir.
-    LNA / uc modifikasyonu kararlilik katkisi bu motorda MODELLENMEZ ve bu
-    durum acikca raporlanir. Taninmayan karakter FAIL dondurur.
+    ayristirilir. Dupleks Tm'ine LNA katkisi McTigue 2004 tablosuyla eklenir;
+    uc etiketlerinin (florofor, sondurucu, MGB) kararlilik katkisi ve LNA'nin
+    hairpin/dimer katkisi modellenmez. Taninmayan karakter FAIL dondurur.
     """
     parsed = oligomod.parse(raw_seq)
     core = re.sub(r"/[^/]+/", "", raw_seq.strip()).replace("+", "")
@@ -769,8 +780,8 @@ def check_seq01(raw_seq: str) -> dict:
          "invalid_chars": invalid},
         {"fail": "A/C/G/T, IUPAC ya da taninan modifikasyon disi karakter"},
         sev,
-        "LNA/mod ayristirildi; termodinamik DNA iskeleti uzerinden "
-        "(LNA/mod kararlilik katkisi modellenmez)")
+        "LNA/mod ayristirildi; dupleks Tm'ine LNA katkisi McTigue 2004 ile eklenir; "
+        "uc etiketlerinin ve LNA'nin hairpin/dimer katkisi modellenmez")
 
 
 def check_ss05(probe: str, anneal_c: float = 60.0,

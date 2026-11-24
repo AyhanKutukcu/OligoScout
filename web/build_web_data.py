@@ -264,6 +264,7 @@ try:
         'dangling': _pm.DANGLING_BOMMARITO_2000.require(), 'dangling_prov': _prov(_pm.DANGLING_BOMMARITO_2000),
         'terminal': _pm.TERMINAL_MISMATCH_SANTALUCIA_PEYRET.require(),
         'terminal_prov': _prov(_pm.TERMINAL_MISMATCH_SANTALUCIA_PEYRET),
+        'lna': _pm.LNA_MCTIGUE_2004.require(), 'lna_prov': _prov(_pm.LNA_MCTIGUE_2004),
         'R_cal': _pm.R_CAL, 'kelvin': _pm.KELVIN,
         'registry_digest': _pm.registry_digest() if hasattr(_pm, 'registry_digest') else None,
         'tables': [dict(name=n, **_prov(getattr(_pm, n))) for n in dir(_pm) if n.isupper() and hasattr(getattr(_pm, n), 'provenance')],

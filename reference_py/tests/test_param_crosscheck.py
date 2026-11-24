@@ -82,7 +82,10 @@ class TestCrossCheck(unittest.TestCase):
         # girmezler. Ayrica DNA/RNA hibrit NN tablosunun (Sugimoto 1995)
         # primer3'te bagimsiz oracle'i YOKTUR (primer3 yalniz DNA); aktarilmis
         # olsa bile capraz denetime giremez.
-        no_oracle = {params.HYBRID_SUGIMOTO_1995.provenance.table_id}
+        # LNA (McTigue 2004) tablosunun da primer3'te karsiligi yoktur; oracle'i
+        # makalenin Tablo 1 olcumleridir (tests/test_lna.py).
+        no_oracle = {params.HYBRID_SUGIMOTO_1995.provenance.table_id,
+                     params.LNA_MCTIGUE_2004.provenance.table_id}
         expected = {tid for tid, t in params.REGISTRY.items()
                     if t.provenance.verification_status != "pending"
                     and tid not in no_oracle}

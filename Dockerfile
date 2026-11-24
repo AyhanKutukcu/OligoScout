@@ -1,4 +1,4 @@
-# OligoScout v0.4.0 — web engine + MCP server in one image.
+# OligoScout v0.4.1 — web engine + MCP server in one image.
 #
 # The image carries the code and the compiled C++ tools. Large data stay OUTSIDE
 # the image and are mounted at /data (same layout as OligoScout/data):
@@ -7,10 +7,10 @@
 #   /data/annotations/{chrM.fa, grch38_extra_contigs.fa/.tsv, *.tsv, gencode...gtf.gz}
 #   and OligoScout/results/benchmarks/grch38_ppfm_batch/manifest.sa8.tsv -> /data/manifest
 #
-# Build:   docker build -t oligoscout:0.4.0 .
+# Build:   docker build -t oligoscout:0.4.1 .
 # Run MCP: docker run --rm -p 8766:8766 -v /srv/oligoscout-data:/data \
-#            -e OLIGOSCOUT_MCP_TOKEN=... oligoscout:0.4.0
-# Run web: docker run --rm -p 8765:8765 -v /srv/oligoscout-data:/data oligoscout:0.4.0 web
+#            -e OLIGOSCOUT_MCP_TOKEN=... oligoscout:0.4.1
+# Run web: docker run --rm -p 8765:8765 -v /srv/oligoscout-data:/data oligoscout:0.4.1 web
 
 FROM ubuntu:24.04 AS build
 ARG DEBIAN_FRONTEND=noninteractive

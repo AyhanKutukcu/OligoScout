@@ -695,7 +695,7 @@ rules:
   family: ctDNA
   status: etiketli_uygulandi
   spec_title: prob / Wild-type blocker / ddPCR prob ayrımı / ΔTm(mut vs wt prob)
-  where: reference_py/oligoscout_thermo/seqpair.py; cli/blocker_qc.py (LNA modellenmiyor)
+  where: reference_py/oligoscout_thermo/seqpair.py; cli/blocker_qc.py; oligoscout_thermo/lna.py (LNA, McTigue 2004)
   evidence_level: unit_test
   evidence:
     regression: []

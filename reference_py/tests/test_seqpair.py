@@ -405,7 +405,10 @@ class TestOligoModParser(unittest.TestCase):
 class TestCt05(unittest.TestCase):
     def test_delta_tm_reported_lna_flagged(self):
         rec = seqpair.check_ct05("CCC+CT+C+T+C+TGAC", "C+CT+C+T+ATG+A+CC")
-        self.assertFalse(rec["value"]["lna_modelled"])
+        self.assertTrue(rec["value"]["lna_modelled"])
+        # bitisik LNA'lar McTigue 2004 olcum alaninin disinda
+        self.assertFalse(rec["value"]["lna_in_domain"])
+        self.assertGreater(rec["value"]["mutant_tm_c"], rec["value"]["mutant_tm_c_dna_backbone"])
         self.assertGreater(rec["value"]["delta_tm_c"], 0)
         self.assertEqual(rec["value"]["mutant_lna_count"], 5)
 

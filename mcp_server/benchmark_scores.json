@@ -1,7 +1,7 @@
 {
   "title": "OligoScout validation & benchmark scorecard",
-  "generated_utc": "2026-11-24T12:55:28Z",
-  "engine": "oligoscout-thermo-ref/0.4.0 + oligoscout_panel 0.4 (C++20 FM-index, PPFM 24 shards; anchored and sensitive search modes, single-primer products)",
+  "generated_utc": "2026-11-24T23:21:42Z",
+  "engine": "oligoscout-thermo-ref/0.4.1 + oligoscout_panel 0.4 (C++20 FM-index, PPFM 24 shards; anchored and sensitive search modes, single-primer products)",
   "how_to_read": [
     "Every number links to an evidence file under the project root.",
     "Specificity results are exact against the stated CONTRACT; the anchor_blind_spot section measures what lies outside it.",
@@ -554,6 +554,47 @@
     },
     "reading": "PrimerBank recommends 60 C annealing. At 60 C OligoScout's TH-03 (bound fraction < 0.80) fails pairs that were sequence-confirmed, because OligoScout's Tm under 50 mM Na+/1.5 mM Mg2+ sits near 60-64 C for these primers; TH-02 (salt-model spread > 2 C) warns on every primer. Both thresholds are uncalibrated (REP-03) and this sample argues for relaxing them."
   },
+  "lna_model_vs_mctigue2004": {
+    "evidence": "OligoScout/benchmarks/scorecard/results/lna_mctigue2004/summary.json",
+    "source": "McTigue, Peterson & Kahn, Biochemistry 2004, Table 1 (100 LNA oligos, 24 DNA references)",
+    "excluded": [
+      "LT6a",
+      "LT6b"
+    ],
+    "n": 98,
+    "M3_measured_reference_plus_table": {
+      "rmsd_dtm_c": 0.886,
+      "mean_c": 0.111,
+      "max_abs_c": 3.318,
+      "paper_reported_rmsd_dtm_c": 0.88
+    },
+    "M4_oligoscout_unified_dna_plus_table": {
+      "rmsd_tm_c": 1.605,
+      "mean_c": 0.342,
+      "max_abs_c": 4.667,
+      "within_2c": 75,
+      "rmsd_dtm_c": 0.864,
+      "dna_reference_rmsd_tm_c": 1.538,
+      "paper_reported_rmsd_tm_c_16RY_test_set": 1.47
+    },
+    "by_set": {
+      "training": {
+        "n": 67,
+        "rmsd_dtm_m3": 0.867,
+        "rmsd_tm_m4": 1.659
+      },
+      "test": {
+        "n": 31,
+        "rmsd_dtm_m3": 0.927,
+        "rmsd_tm_m4": 1.482
+      }
+    },
+    "conditions": {
+      "na_M": 1.011,
+      "salt_model": "owczarzy_2004",
+      "concentration": "CT/4 (5 uM; 1 uM for LT4/LT5)"
+    }
+  },
   "thermodynamics_vs_primer3": {
     "evidence": "OligoScout/benchmarks/scorecard/results/thermo_vs_primer3/summary.json",
     "primers": 2048,
@@ -671,10 +712,10 @@
   },
   "software_integrity": {
     "unit_tests": {
-      "tests": 279,
+      "tests": 292,
       "status": "OK (1 platform skip)",
       "evidence": "reference_py/tests",
-      "note": "v0.4.0; the end-to-end regression log below predates it"
+      "note": "v0.4.1; the end-to-end regression log below predates it"
     },
     "cpp_tests": {
       "single_primer_products": "PASS",
@@ -744,7 +785,6 @@
   "not_yet_benchmarked": [
     "Wet-lab validation (qPCR efficiency, specificity by melt/gel/NGS) - required before any calibrated claim",
     "Head-to-head design quality vs Primer3/Primer-BLAST/PrimerQuest outputs on the same targets with a wet-lab outcome (PrimerBank gives outcomes only for its own mouse designs; QC false-alarm rate on them is in section 3b)",
-    "Multiplex panel performance vs PrimerPlex/Ultiplex/olivar on wet-lab data",
-    "LNA-modified oligos (needs the McTigue 2004 LNA NN table) and non-human genomes (index + annotations)"
+    "Multiplex panel performance vs PrimerPlex/Ultiplex/olivar on wet-lab data"
   ]
 }

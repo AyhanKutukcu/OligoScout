@@ -9,7 +9,8 @@ ileri/geri primer ve blocker) ve rapor uretir:
   blocker x prob/primer dimerleri (verilirse)
 
 Diziler MODIFIYE notasyonda olabilir: +baz = LNA, /uc/ = 5'/3' isareti.
-LNA stabilizasyonu MODELLENMEZ; Tm'ler DNA iskeletinin alt sinirlaridir.
+LNA katkisi McTigue 2004 NN artislariyla Tm'e eklenir. Model tek ic LNA icin
+olculmustur; bitisik ya da uca yakin LNA'lar "extrapolated" olarak isaretlenir.
 
 Kullanim:
     python3 cli/blocker_qc.py --mutant CCC+CT+C+T+C+TGAC \\
@@ -102,7 +103,7 @@ def main() -> int:
     for c in checks:
         print(f"{c['id']:7s} {c.get('role',''):16s} {c['severity']:5s} "
               + json.dumps(c["value"], ensure_ascii=False))
-    print("LNA stabilizasyonu modellenMEDI; Tm'ler DNA iskeleti alt siniri")
+    print("LNA: McTigue 2004 NN artislari; alan disi problar lna_in_domain=False")
     print("esikler kalibre degildir (REP-03)")
     print("ciktilar:")
     for p in (tsv_path, rec_path):

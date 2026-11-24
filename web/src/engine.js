@@ -1,13 +1,13 @@
 // OligoScout tarayıcı motoru — reference_py/oligoscout_thermo'nun birebir portu.
 // Parametre tabloları kopyalanmaz: veri paketindeki engine_params (params.py dışa aktarımı) kullanılır.
 const OS = (() => {
-  let WC=null, INIT=null, SYM=[0,-1.4], MM=null, LOOP=null, DANG=null, TERM=null, ATB=0.5, R=1.9872, K0=273.15;
+  let WC=null, INIT=null, SYM=[0,-1.4], MM=null, LOOP=null, DANG=null, TERM=null, LNA=null, ATB=0.5, R=1.9872, K0=273.15;
   const T37=310.15;
   const COMP={A:'T',T:'A',G:'C',C:'G',N:'N'};
   const PAIR=(x,y)=>(x==='A'&&y==='T')||(x==='T'&&y==='A')||(x==='G'&&y==='C')||(x==='C'&&y==='G');
   const rc=s=>{let o='';for(let i=s.length-1;i>=0;i--)o+=COMP[s[i]]||'N';return o;};
   const gcf=s=>{let n=0;for(const c of s)if(c==='G'||c==='C')n++;return s.length?n/s.length:0;};
-  function setParams(p){WC=p.wc.nn;INIT=p.wc.init;SYM=p.wc.symmetry||SYM;MM=p.mismatch;LOOP=p.loop;DANG=p.dangling||null;TERM=p.terminal||null;ATB=p.at_bulge_closure_dg37;R=p.R_cal||R;K0=p.kelvin||K0;}
+  function setParams(p){WC=p.wc.nn;INIT=p.wc.init;SYM=p.wc.symmetry||SYM;MM=p.mismatch;LOOP=p.loop;DANG=p.dangling||null;TERM=p.terminal||null;LNA=p.lna||null;ATB=p.at_bulge_closure_dg37;R=p.R_cal||R;K0=p.kelvin||K0;}
   const step=s=>WC[s]||WC[rc(s)];
   function stackE(seg){let h=0,s=0;for(let i=0;i<seg.length-1;i++){const v=step(seg.substr(i,2));h+=v[0];s+=v[1];}return [h,s];}
   const initE=b=>INIT[(b==='A'||b==='T')?'AT':'GC'];
@@ -33,15 +33,28 @@ const OS = (() => {
     if(model==='owczarzy_2004')return [ow04K(tm1K,k.mon,f),'monovalent'];
     if(model==='von_ahsen_2001')return [ow04K(tm1K,naEqVA(k.mon,k.mg,k.dntp),f),'na_equivalent'];
     return ow08K(tm1K,k.free,k.mon,f,n);}
+  // ---- oligomod.py + lna.py (McTigue 2004) ----
+  function parseMod(raw){const ends=[];let s=String(raw||'').trim().replace(/\/([^/]+)\//g,(m,t)=>{ends.push(t);return '';});
+    let dna='',lna=[],nxt=false;for(const ch of s){if(ch==='+'){nxt=true;continue;}const u=ch.toUpperCase();
+      if('ACGT'.includes(u)){if(nxt)lna.push(dna.length);dna+=u;nxt=false;}else nxt=false;}
+    return {dna,lna,ends};}
+  function lnaInc(dna,pos){const n=dna.length,P=[...new Set(pos)].sort((a,b)=>a-b),L=new Set(P),why=[];let h=0,s=0,g=0;
+    if(!LNA||!P.length)return {h,s,g,inDomain:true,why,n:0};
+    if(P.length>1)why.push('birden cok LNA (katkilar toplanarak; makale tek LNA olctu)');
+    for(const p of P){if(p<2||p>n-3)why.push(`LNA ${p}: uca 2 nt'den yakin`);if(L.has(p-1)||L.has(p+1))why.push(`LNA ${p}: bitisik LNA (LNA:LNA adimi olculmedi)`);
+      if(p>0){const v=LNA.lna_3prime[dna[p-1]+dna[p]];h+=v[0];s+=v[1];g+=v[2];}
+      if(p<n-1){const v=LNA.lna_5prime[dna[p]+dna[p+1]];h+=v[0];s+=v[1];g+=v[2];}}
+    const u=[...new Set(why)];return {h,s,g,inDomain:!u.length,why:u,n:P.length};}
   // concentration.build(primer_excess)
-  function thermo(seq,c,model='owczarzy_2008'){
-    const k=M(c),d=watsonCrick(seq);const ceff=k.C;
+  function thermo(seq,c,model='owczarzy_2008',lnaPos=null){
+    const k=M(c),d=watsonCrick(seq);const ceff=k.C;let lna=null;
+    if(lnaPos&&lnaPos.length){lna=lnaInc(seq,lnaPos);d.h+=lna.h;d.s+=lna.s;}
     const tm1K=d.h*1000/(d.s+R*Math.log(ceff));
     const [tmK,regime]=saltTmK(tm1K,seq,c,model);
     const sEff=d.h*1000/tmK-R*Math.log(ceff);
     const dGcal=T=>d.h*1000-(T+K0)*sEff;
     const theta=T=>{const x=Math.exp(-dGcal(T)/(R*(T+K0)))*ceff;return x/(1+x);};
-    return {dH:d.h,dS:d.s,dS_eff:sEff,tm1M:tm1K-K0,tm:tmK-K0,regime,theta,thetaTa:theta(k.ta),dGta:dGcal(k.ta)/1000,dG37:d.h-T37*d.s/1000,ceff};
+    return {dH:d.h,dS:d.s,dS_eff:sEff,tm1M:tm1K-K0,tm:tmK-K0,regime,theta,thetaTa:theta(k.ta),dGta:dGcal(k.ta)/1000,dG37:d.h-T37*d.s/1000,ceff,lna};
   }
   function saltSpread(seq,c){const o={};for(const m of ['owczarzy_2004','owczarzy_2008','von_ahsen_2001'])o[m]=thermo(seq,c,m).tm;
     const used=c.mg>0?['owczarzy_2008','von_ahsen_2001']:['owczarzy_2004','owczarzy_2008'];const v=used.map(m=>o[m]);o.spread=Math.max(...v)-Math.min(...v);o.used=used;return o;}
@@ -231,6 +244,6 @@ const OS = (() => {
     let pairs=buildPairs(L,Rr,cons,onRej,opts.mustCover);pairs=rankPairs(pairs,cons);
     return {target_length:target.length,left:L,right:Rr,pairs,rejections:rej};
   }
-  return {setParams,rc,gcf,watsonCrick,thermo,saltSpread,dG3,halves,bestDimer,dimerList,hairpinStem,longestHomo,repUnits,clamp,shannon,g4,gcWindowMax,design,stackE,COMP,PAIR};
+  return {setParams,rc,gcf,watsonCrick,thermo,parseMod,lnaInc,saltSpread,dG3,halves,bestDimer,dimerList,hairpinStem,longestHomo,repUnits,clamp,shannon,g4,gcWindowMax,design,stackE,COMP,PAIR};
 })();
 if(typeof module!=='undefined')module.exports=OS;

@@ -40,9 +40,9 @@ from oligoscout_thermo import (align, engine, nn, oligomod, params, profiles,  #
 if os.getenv("OLIGOSCOUT_PANEL_BINARY"):
     LE.BINARY = Path(os.environ["OLIGOSCOUT_PANEL_BINARY"])
 
-VERSION = "0.4.0"
+VERSION = "0.4.1"
 CALIBRATION = ("REP-03: most thresholds are literature starting values, NOT calibrated against "
-               "wet-lab data; LNA contributions are not modelled (Tm is a lower bound). "
+               "wet-lab data; LNA duplex Tm uses McTigue 2004 (single internal LNA; other layouts are extrapolated). "
                "Research use only - confirm experimentally.")
 PROFILE_IDS = sorted(profiles.PROFILES)
 SALT_MODELS = list(salt.MODELS)
@@ -497,7 +497,7 @@ def t_thermo(args):
     results, lines = [], []
     for i, raw in enumerate(args["sequences"], 1):
         dna, parsed = clean_dna(raw, f"sequence {i}", modified=True)
-        r = eobj.evaluate(f"S{i}", dna)
+        r = eobj.evaluate(f"S{i}", raw if parsed and (parsed.lna_positions or parsed.end_mods) else dna)
         lna = len(parsed.lna_positions) if parsed else 0
         th = r["thermo"]
         recs = [{**c, "role": f"S{i}"} for c in r["checks"]]
@@ -510,12 +510,16 @@ def t_thermo(args):
                 "records": recs if args.get("detail") == "full" else None,
                 "not_evaluated": r.get("not_evaluated", {})}
         if lna:
+            li = th.get("lna", {})
             item["lna_count"] = lna
-            item["not_evaluated"] = {**item["not_evaluated"], "LNA": "LNA stabilisation not modelled; Tm is a DNA-backbone LOWER BOUND"}
+            item["lna"] = li
+            item["lna_positions"] = sorted(parsed.lna_positions)
         results.append(item)
         lines.append(f"S{i} {dna} ({len(dna)} nt, GC {item['gc_pct']}%): Tm {th['tm_c']:.2f} C "
                      f"[{model}], ΔG37 {th['dG37_kcal_mol']:.2f} kcal/mol, worst {r['worst_severity']}"
-                     + (f", {lna} LNA -> lower bound" if lna else ""))
+                     + (f", {lna} LNA (McTigue 2004, ddG37 {th['lna']['ddG37_kcal_mol']:+.2f} kcal/mol"
+                        + ("" if th["lna"]["in_domain"] else "; EXTRAPOLATED: " + "; ".join(th["lna"]["out_of_domain"]))
+                        + ")" if lna else ""))
     return {"text": "\n".join(lines) + f"\nConditions {cond}. {CALIBRATION}",
             "structured": {"results": results, "conditions": cond, "provenance": provenance()}}
 
@@ -827,9 +831,10 @@ def t_blocker(args):
     recs = out["records"]
     ct = next((x for x in recs if x["id"] == "CT-05"), {})
     v = ct.get("value", {})
-    txt = (f"CT-05 allele discrimination: mutant probe Tm {v.get('mutant_tm_c_dna_backbone')} C, WT probe "
-           f"{v.get('wt_tm_c_dna_backbone')} C, ΔTm {v.get('delta_tm_c')} C -> {ct.get('severity')}. LNA modelled: "
-           f"{v.get('lna_modelled')} (Tm values are DNA-backbone LOWER BOUNDS).\n" +
+    txt = (f"CT-05 allele discrimination: mutant probe Tm {v.get('mutant_tm_c')} C, WT probe "
+           f"{v.get('wt_tm_c')} C, ΔTm {v.get('delta_tm_c')} C -> {ct.get('severity')}. LNA modelled "
+           f"(McTigue 2004): {v.get('lna_modelled')}; within the measured domain (single internal LNA): "
+           f"{v.get('lna_in_domain')}.\n" +
            "\n".join(f"- {x['id']} {x.get('role', '')} {x['severity']}: {brief(x['value'])}" for x in recs if x["id"] != "CT-05")
            + f"\n{CALIBRATION}")
     return {"text": txt, "structured": {"records": recs, "provenance": provenance()}}
@@ -935,7 +940,7 @@ def build_registry():
     reg.tool(Tool("oligoscout_thermo", "Oligo thermodynamics",
                   "Nearest-neighbour thermodynamics for 1-50 oligos: Tm under the chosen salt model (+ spread across "
                   "Owczarzy 2004/2008 and von Ahsen 2001), ΔH/ΔS/ΔG37, θ at Ta, 3'-end stability, self-dimer and "
-                  "hairpin (TH-01..05, DIM-01/02, SS-01/03). LNA '+N' and end modifications accepted (LNA -> lower bound).",
+                  "hairpin (TH-01..05, DIM-01/02, SS-01/03). LNA '+N' (McTigue 2004 duplex Tm) and end modifications accepted.",
                   obj({"sequences": {"type": "array", "minItems": 1, "maxItems": 50, "items": {"type": "string", "maxLength": 200}},
                        "conditions": COND_SCHEMA, "salt_model": SALT, "detail": detail}, ["sequences"]), t_thermo))
     reg.tool(Tool("oligoscout_dimer", "Dimer alignment",
@@ -994,7 +999,7 @@ def build_registry():
                                  ["forward", "reverse"]), t_probe))
     reg.tool(Tool("oligoscout_check_blocker", "Allele discrimination (CT-05)",
                   "Mutant vs wild-type probe/blocker discrimination (ΔTm) and probe/blocker x primer dimers. LNA as +N, "
-                  "end mods as /56-FAM/ etc. LNA is not modelled: Tm values are lower bounds.",
+                  "end mods as /56-FAM/ etc. LNA duplex Tm from McTigue 2004 (single internal LNA measured; others flagged).",
                   obj({"mutant": {"type": "string", "maxLength": 200}, "wt": {"type": "string", "maxLength": 200},
                        "forward": {"type": "string", "maxLength": 200}, "reverse": {"type": "string", "maxLength": 200},
                        "blocker": {"type": "string", "maxLength": 200}, "conditions": COND_SCHEMA}, ["mutant", "wt"]),

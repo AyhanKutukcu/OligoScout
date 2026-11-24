@@ -450,7 +450,7 @@ RENDER.yerel = el => {
         <label class="f"><span>Arama modu</span><select name="search_mode"><option value="anchored" selected>Hızlı · tam 3′ çapa</option><option value="sensitive">Hassas · Primer-BLAST kuralı</option></select></label></div>` : ''}
       ${tool === 'isoform' ? control('gene','GENCODE gen simgesi') : ''}
       ${tool === 'probe' ? control('probe','Var olan prob (boş bırakılırsa aday aranır)',false) : ''}
-      ${tool === 'thermo' ? control('sequence','Primer dizisi (5′ → 3′)') + localConditionsHTML() : ''}
+      ${tool === 'thermo' ? control('sequence','Primer dizisi (5′ → 3′; LNA: +N)') + localConditionsHTML() : ''}
       ${tool === 'blocker' ? `<div class="fgrid c3">${control('mutant','Mutant prob')}${control('wt','WT prob')}${control('blocker','Blocker (isteğe bağlı)',false)}${control('forward','İleri primer (isteğe bağlı)',false)}${control('reverse','Geri primer (isteğe bağlı)',false)}</div>${localConditionsHTML()}` : ''}
       ${!liveReady() ? liveNote(localAvailability()) : ''}
       ${jobNotice(key)}

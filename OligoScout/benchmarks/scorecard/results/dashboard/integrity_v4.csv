@@ -1,0 +1,18 @@
+check,passed,total,detail,evidence
+Birim testleri (reference_py),292,292,"unittest, Python 3.10 (1 platform atlaması); v0.4.1",reference_py/tests
+Uçtan uca regresyon adımları,20,21,"20 PASS, 1 SKIP (girdi yok), 0 FAIL",reference_py/out/regresyon/REGRESYON_RAPORU.md
+Python ↔ C++ diferansiyel (dizi),74,74,"17 sütun, 0 fark (dimer uç terimleri dahil)",reference_py/out/diff_cpp/diff_cpp_summary.md
+C++ testleri,3,3,"tek primer montajı, montaj eşdeğerliği (500 kontrol), hassas mod ↔ kaba kuvvet",OligoScout/tests
+NN parametre tabloları ↔ primer3,371,373,0 işaretli sapma; tstack2 tablosunda 2 girdi eşleşme sayılmadı,reference_py/out/param_crosscheck/crosscheck_summary.md
+Tuz katmanı ↔ primer3 oligotm (Tm),60,60,konsantrasyon sözleşmesi eşitlendi,reference_py/out/salt_crosscheck/salt_crosscheck_summary.md
+"Kaba kuvvet tarama ↔ oligoscout_panel (ürün, tek primer dahil)",1711,1711,ctDNA 27/27 + Test #81-64 1684/1684 ürün; siteler de birebir,benchmarks/scorecard/results/oligoscout_panel_0.4
+Hassas mod ↔ kaba kuvvet (site),530861,530861,ctDNA 32.546 + Test #81-64 498.315 site; ürünler 728 + 95.153 birebir,benchmarks/scorecard/results/blindspot_*/sensitive_verify.json
+NCBI Primer-BLAST web kuralına uyan ürün ↔ OligoScout hassas mod,654,654,"31 çift; 653 birincil kromozom + 1 SPC-08 ek kontig; OligoScout 87 ek ürün buldu",benchmarks/scorecard/results/primer_blast_web/summary.json
+Kaba kuvvet tarama ↔ Test #81 oracle (çift),64,64,bağlanma ve ürün sayıları her çiftte aynı,benchmarks/scorecard/results/blindspot_test81_64
+MCP uyumluluk (resmî Python SDK 2.3.0),26,26,"stdio + Streamable HTTP, protokol 2025-06-18",mcp_server/README.md
+MCP OAuth 2.1 testleri,3,3,"dinamik kayıt, PKCE S256, yenileme rotasyonu",mcp_server/tests/test_oauth.py
+Tarayıcı motoru ↔ Python motoru,2000,2000,web/src/engine.js portu (dimer uç terimleri dahil),web/
+Tarayıcı LNA Tm ↔ Python,2000,2000,McTigue 2004 artışları; ölçüm alanı bayrağı da aynı,reference_py/tests/test_lna.py
+LNA modeli ↔ McTigue 2004 Tablo 1 (ΔTm ≤ 2 °C),95,98,"RMSD ΔTm 0,886 °C (makale 0,88); mutlak Tm RMSD 1,61 °C",benchmarks/scorecard/results/lna_mctigue2004
+QC kataloğu: uygulanan kural,91,91,SPC-08 tamamlandı; katalog YAML,reference_py/catalog/qc_catalog.yaml
+QC kataloğu: ıslak lab ile kalibre kural,0,91,REP-03: eşikler literatür başlangıç değeri,reference_py/out/kalibrasyon

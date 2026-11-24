@@ -153,9 +153,9 @@ doğrulandı. Ürünler F–R, R–F ve tek primer (F–F, R–R) yönelimlerini
 ## Docker
 
 ```bash
-docker build -t oligoscout:0.4.0 .
+docker build -t oligoscout:0.4.1 .
 docker run --rm -p 8766:8766 -v /srv/oligoscout-data:/data -e OLIGOSCOUT_OAUTH=1 \
-  -e OLIGOSCOUT_PUBLIC_URL=https://oligoscout.org/mcp oligoscout:0.4.0
+  -e OLIGOSCOUT_PUBLIC_URL=https://oligoscout.org/mcp oligoscout:0.4.1
 ```
 
 ## Bilinen sınırlar

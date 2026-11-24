@@ -455,6 +455,78 @@ HYBRID_NN_KEYS = ("AA", "AC", "AG", "AT", "CA", "CC", "CG", "CT",
                   "GA", "GC", "GG", "GT", "TA", "TC", "TG", "TT")
 
 
+
+# ---------------------------------------------------------------------------
+# LNA + DNA:DNA en yakin komsu artislari (McTigue, Peterson, Kahn 2004)
+# ---------------------------------------------------------------------------
+# Tek LNA tasiyan DNA ipliginin tam tamamlayici DNA ile dupleksi icin, DNA
+# dupleksinin dH/dS'ine eklenen ddH/ddS. Her LNA iki dinukleotide katki verir:
+#   "lna_5prime" anahtari  X N  -> 5'-X^L N-3' (LNA dinukleotitin 5' uyesi)
+#   "lna_3prime" anahtari  M X  -> 5'-M X^L-3' (LNA dinukleotitin 3' uyesi)
+# Deger: [ddH kcal/mol, ddS cal/(mol K), ddG37 kcal/mol]. ddG37 SVD ile ayri
+# kestirildigi icin ddH - 310.15*ddS'e yalniz yaklasik esittir (en cok 0.13).
+LNA_MCTIGUE_2004 = ParameterTable(
+    provenance=TableProvenance(
+        table_id="lna_dna_nn_mctigue_2004",
+        citation=("McTigue PM, Peterson RJ, Kahn JD. Sequence-dependent "
+                  "thermodynamic parameters for locked nucleic acid (LNA)-DNA "
+                  "duplex formation. Biochemistry 2004;43:5388-5405. "
+                  "doi:10.1021/bi035976d"),
+        table_in_source="Table 4, 32NN parameter set derived from combined data set",
+        units="ddH kcal/mol, ddS cal/(mol K), ddG37 kcal/mol",
+        conditions="1 M NaCl (1011 mM Na+), pH 7.0; tek ic LNA, uclardan en az 2 nt",
+        verification_status="transcribed_unverified",
+        notes=("Kullanicinin verdigi makale PDF'inin metin katmanindan (pdftotext) "
+               "aktarildi ve sayfa goruntusuyle karsilastirildi. Ic tutarlilik: "
+               "Tablo 1'deki 98 LNA oligosunda (LT6a/LT6b makalede dizi ile "
+               "trinukleotit sutunu celistigi icin disarida) olculen referans DNA "
+               "dH/dS + bu tablo ile RMSD(dTm)=0.886 C; makalenin bildirdigi 0.88 C. "
+               "Tuz bagimliligi DNA gibi dS'e yedirilir (makale, s. 5399). "
+               "Kapsam disi: uca 2 nt'den yakin LNA, bitisik LNA, LNA'ya komsu "
+               "uyumsuzluk; bu durumlarda artis uygulanir ama sonuc "
+               "'extrapolated' olarak isaretlenir."),
+    ),
+    data={
+        "lna_5prime": {
+            "AA": [0.707, 2.477, -0.092],
+            "AC": [1.131, 4.064, -0.122],
+            "AG": [0.264, 2.613, -0.561],
+            "AT": [2.282, 7.457, -0.007],
+            "CA": [1.049, 4.32, -0.27],
+            "CC": [2.096, 7.996, -0.457],
+            "CG": [0.785, 3.709, -0.332],
+            "CT": [0.708, 4.175, -0.666],
+            "GA": [3.162, 10.544, -0.072],
+            "GC": [-0.36, -0.251, -0.414],
+            "GG": [-2.844, -6.68, -0.7],
+            "GT": [-0.212, 0.073, -0.194],
+            "TA": [-0.046, 1.562, -0.563],
+            "TC": [1.893, 6.685, -0.208],
+            "TG": [-1.54, -3.044, -0.548],
+            "TT": [1.528, 5.298, -0.13],
+        },
+        "lna_3prime": {
+            "AA": [0.992, 4.065, -0.396],
+            "AC": [2.89, 10.576, -0.39],
+            "AG": [-1.2, -1.826, -0.603],
+            "AT": [1.816, 6.863, -0.309],
+            "CA": [1.358, 4.367, 0.046],
+            "CC": [2.063, 7.565, -0.404],
+            "CG": [-0.276, -0.718, -0.003],
+            "CT": [-1.671, -4.07, -0.409],
+            "GA": [0.444, 2.898, -0.437],
+            "GC": [-0.925, -1.111, -0.535],
+            "GG": [-0.943, -0.933, -0.666],
+            "GT": [-0.635, -0.342, -0.52],
+            "TA": [1.591, 5.281, 0.004],
+            "TC": [0.609, 3.169, -0.396],
+            "TG": [2.165, 7.163, -0.106],
+            "TT": [2.326, 8.051, -0.212],
+        },
+    },
+)
+
+
 # ---------------------------------------------------------------------------
 REGISTRY: dict[str, ParameterTable] = {
     t.provenance.table_id: t
@@ -465,6 +537,7 @@ REGISTRY: dict[str, ParameterTable] = {
         DNA_LOOP_SANTALUCIA_HICKS_2004,
         TERMINAL_MISMATCH_SANTALUCIA_PEYRET,
         HYBRID_SUGIMOTO_1995,
+        LNA_MCTIGUE_2004,
     )
 }
 

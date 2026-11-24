@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.4.1 — 2026-11-25
+
+LNA
+- **LNA duplex thermodynamics** (McTigue, Peterson & Kahn 2004, Table 4, 32NN set):
+  every `+N` base adds ΔΔH/ΔΔS for its 5′ and 3′ nearest-neighbour pairs to the
+  DNA duplex; salt and concentration are applied as for DNA. New module
+  `oligoscout_thermo/lna.py`, table `LNA_MCTIGUE_2004` in `params.py`.
+- Validation against the paper's Table 1 (`cli/lna_validate.py`, data in
+  `reference_py/validation/`): 98 oligos, RMSD ΔTm 0.886 °C with the measured DNA
+  references (paper: 0.88 °C); with OligoScout's DNA model RMSD Tm 1.61 °C, the same
+  as the DNA references alone (1.54 °C). LT6a/LT6b excluded: the printed sequence
+  and trinucleotide disagree.
+- Measured domain is one internal LNA (≥ 2 nt from each end) on a perfect-match
+  DNA target. Adjacent, terminal or multiple LNAs and LNA next to a mismatch are
+  computed additively and flagged `in_domain: false` with reasons.
+- Used by TH-01/TH-03 (`engine.evaluate` accepts `+N` and `/end/` notation),
+  PAIR-01, CT-05 (blocker/probe discrimination), MCP `oligoscout_thermo` and
+  `oligoscout_check_blocker`, the local web API and the browser probe checker
+  (JS port identical to Python, 2000/2000). LNA effects on hairpins, dimers and
+  3′-end ΔG are not modelled.
+
 ## 0.4.0 — 2026-11-22
 
 Specificity
@@ -45,7 +66,7 @@ Benchmarks
   threshold, to be revisited with wet-lab data (REP-03).
 
 Known gaps
-- LNA (needs the McTigue 2004 table), non-human genomes, wet-lab calibration.
+- Non-human genomes and wet-lab calibration are out of scope.
 
 ## 0.3.0
 - Thermodynamic reference engine, 90/91 QC rules, Test #81 benchmark, web UI.
