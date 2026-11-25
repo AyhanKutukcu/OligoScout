@@ -69,7 +69,7 @@ if [[ -f "$SCRIPT_DIR/cmake_path.env" ]]; then
 fi
 ( cd "$REPO" && cmake --preset "$PRESET" >/dev/null )
 ( cd "$REPO" && cmake --build --preset "$PRESET" \
-      --target oligoscout_panel -j"$(nproc)" )
+      --target oligoscout_panel oligoscout_contig_scan oligoscout_vpcr_scan -j"$(nproc)" )
 
 head1 "2 — Tum genomda panel aramasi"
 "$BUILDDIR/oligoscout_panel" \

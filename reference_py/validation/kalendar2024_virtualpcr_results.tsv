@@ -1,0 +1,21 @@
+# virtualPCR amplicons for GRCh38.p14 from Kalendar et al. 2024, Zenodo 10.5281/zenodo.13625500 (Result.zip, CC BY 4.0).
+# Coordinates as printed by virtualPCR (1-based, inclusive). experiment: six_genes (Human/*/chNN.fasta.out),
+# rt_copia (Copia-like_RT_gene/Human/*.out; primers RTp CARATGGAYGTNAARAC, RTm CATRTCRTCNACRTA, 200-500 bp).
+experiment	id	chrom	start	end	size_bp	ta_c
+six_genes	CA2	chr8	85473967	85474724	758	60
+six_genes	COL1A1	chr17	50186438	50187094	657	61
+six_genes	FAM20C	chr7	255575	256212	638	63
+six_genes	BEST4	chr1	44784341	44784992	652	61
+six_genes	SHF	chr15	45198820	45198994	175	61
+six_genes	MMP9	chr20	46010880	46011618	739	62
+rt_copia	RT01	chr1	247748285	247748708	424	43
+rt_copia	RT02	chr4	74759694	74760104	411	43
+rt_copia	RT03	chr4	89364195	89364684	490	43
+rt_copia	RT04	chr4	142370193	142370529	337	42
+rt_copia	RT05	chr7	115977066	115977531	466	43
+rt_copia	RT06	chr8	118467362	118467800	439	43
+rt_copia	RT07	chr11	16490829	16491117	289	42
+rt_copia	RT08	chr14	84561478	84561881	404	43
+rt_copia	RT09	chr15	34831989	34832366	378	42
+rt_copia	RT10	chr15	44708344	44708659	316	42
+rt_copia	RT11	chr15	99285244	99285681	438	43

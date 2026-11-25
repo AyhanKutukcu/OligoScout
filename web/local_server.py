@@ -23,7 +23,7 @@ MAX_BODY = 64000
 MAX_JOBS = 40
 MAX_PENDING = 4
 PAIR_TOOLS = {"qc", "variants", "melt", "probe", "isoform"}
-TOOLS = PAIR_TOOLS | {"design", "multiplex_design", "scan", "thermo", "blocker"}
+TOOLS = PAIR_TOOLS | {"design", "multiplex_design", "scan", "thermo", "blocker", "vpcr"}
 
 # --- Public deployment (reverse proxy) ---------------------------------------
 # Comma-separated hostnames allowed behind a TLS-terminating reverse proxy,

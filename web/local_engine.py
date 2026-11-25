@@ -750,6 +750,8 @@ class LocalEngine:
 
     def oligo(self, action, data, work):
         conditions = reaction(data.get("conditions", {}))
+        if action == "vpcr":
+            return virtual_pcr(data, conditions, work)
         if action == "thermo":
             s = dna(data.get("sequence"), "Primer", 8, 80, modified=True)
             return {"result": engine.ThermoEngine(cond=condition_model(conditions)).evaluate("WEB", s)}
@@ -764,6 +766,65 @@ class LocalEngine:
                 f"--forward={primers[0]}", f"--reverse={primers[1]}", f"--blocker={primers[2]}",
                 "--out", work, *condition_args(conditions))
         return {"records": jsonl(work / "ct05_qc_records.jsonl")}
+
+
+VPCR_LINE = re.compile(r"^\s*([A-Za-z0-9_.\-]{1,32})\s+(\S+)(?:\s+(primer|probe))?(?:\s+(\S{1,32}))?\s*$")
+
+
+def virtual_pcr(data, conditions, work):
+    """Sanal PCR (cli/virtual_pcr.py): yapistirilan FASTA ya da GRCh38."""
+    text = str(data.get("oligos") or "")
+    rows = []
+    for n, line in enumerate(text.splitlines(), 1):
+        if not line.strip() or line.lstrip().startswith("#"):
+            continue
+        m = VPCR_LINE.match(line)
+        if not m:
+            raise ValueError(f"Oligo satırı {n}: 'KİMLİK DİZİ [primer|probe] [çift]' biçiminde olmalı.")
+        rows.append(m.groups())
+    if not rows or len(rows) > 200:
+        raise ValueError("1–200 oligo girin.")
+    if len({r[0] for r in rows}) != len(rows):
+        raise ValueError("Oligo kimlikleri tekil olmalı.")
+    ol = work / "oligos.tsv"
+    with ol.open("w", encoding="utf-8") as fh:
+        fh.write("id\tsequence\trole\tpair\n")
+        for oid, seq, role, pair in rows:
+            fh.write(f"{oid}\t{seq}\t{role or 'primer'}\t{pair or ''}\n")
+    args = ["--oligos", ol, "--out", work / "out", "--extract",
+            "--max-mismatch", finite(data.get("mismatches", 3), "Uyumsuzluk", 0, 6, integer=True),
+            "--terminal-window", finite(data.get("terminal_window", 7), "3′ pencere", 1, 30, integer=True),
+            "--terminal-max", finite(data.get("terminal_max", 1), "3′ pencerede uyumsuzluk", 0, 6, integer=True),
+            "--min-product", finite(data.get("min_product", 50), "En kısa ürün", 1, 100000, integer=True),
+            "--max-product", finite(data.get("max_product", 5000), "En uzun ürün", 1, 100000, integer=True),
+            *condition_args(conditions)]
+    mode = data.get("mode") or ""
+    if mode in ("pairs", "all"):
+        args += ["--mode", mode]
+    if data.get("template_n") in ("mismatch", "match"):
+        args += ["--template-n", data["template_n"]]
+    if str(data.get("g_tolerant") or "").strip() not in ("", "off"):
+        args += ["--g-tolerant", finite(data.get("g_tolerant"), "G toleransı", 0, 6, integer=True)]
+    fasta = str(data.get("template") or "").strip()
+    if fasta:
+        if len(fasta) > 20_000_000:
+            raise ValueError("Kalıp en fazla 20 MB olabilir.")
+        if not fasta.startswith(">"):
+            fasta = ">template\n" + fasta
+        (work / "template.fa").write_text(fasta + "\n", encoding="utf-8")
+        args += ["--template", work / "template.fa"]
+        if str(data.get("circular") or "").strip():
+            args += ["--circular", re.sub(r"\s+", "", str(data["circular"]))]
+    if data.get("genome") in (True, "on", "grch38"):
+        args += ["--genome", "grch38"]
+    if not fasta and "--genome" not in args:
+        raise ValueError("FASTA kalıbı yapıştırın ya da GRCh38'i seçin.")
+    run_cli("virtual_pcr.py", *args)
+    out = work / "out"
+    return {"summary": json.loads((out / "summary.json").read_text(encoding="utf-8")),
+            "products": read_tsv(out / "products.tsv")[:2000],
+            "sites": read_tsv(out / "sites.tsv")[:2000],
+            "links": read_tsv(out / "links.tsv")}
 
 
 def specific_pairs(template, candidates, work):

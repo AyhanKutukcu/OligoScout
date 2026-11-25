@@ -67,6 +67,25 @@ Long jobs return `job_id`; poll `oligoscout_job_status`.
   hairpins, dimers and 3′-end ΔG are not modelled. End labels (dyes, quenchers,
   MGB) are not modelled.
 
+## Virtual PCR (oligoscout_virtual_pcr)
+* Templates: pasted FASTA (any number of records; `circular` = 'all' or names, which also
+  gives inverse-PCR products and products across the origin) or GRCh38 (24 chromosomes).
+* Oligos may be IUPAC-degenerate; template IUPAC codes match when the base sets intersect;
+  template N rejects a site unless `template_n` says otherwise.
+* Rule: <= `max_mismatches` per oligo and <= `terminal_max` in the 3'-terminal
+  `terminal_window` (default 3 / 1 / 7 nt, as virtualPCR). `g_tolerant=K` does not count up to K
+  G.T/G.G/G.A mismatches (they are reported as 'g' in the mask).
+* Lower-case leading/trailing bases are non-binding tails: 5' tails enter the amplicon,
+  a 3' tail blocks extension (beacon-type probes). role='probe' oligos only report sites and
+  products that contain them.
+* mode 'pairs' uses the pair labels; 'all' combines every primer with every other and with
+  itself (IRAP/ISSR/RAPD/SINE-PCR fingerprinting).
+* Ta = lowest primer-site Tm + ln(product length) (Kalendar et al. 2024). Site Tm uses the
+  Allawi-Peyret NN for isolated internal mismatches; mismatches within 2 nt of an end are
+  trimmed; tandem mismatches fall back to the best single-defect helix (noted).
+* Validation: the six human genes of Kalendar et al. 2024 give identical coordinates (6/6);
+  all 11 virtualPCR amplicons of the degenerate RT primers are found.
+
 ## Variants (VAR family)
 * gnomAD v4 genomes/exomes (API or local cache). Variants in the last 5 nt of the
   3′ end matter most (VAR-02). Coordinates are 1-based VCF positions.

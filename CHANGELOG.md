@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.5.0 — 2026-11-25
+
+Virtual PCR (scope of Kalendar et al. 2024, virtualPCR; non-human genomes excluded)
+- **IUPAC-degenerate primers** in the genome search: `search_terminal_rule` matches a
+  template base against the code's set; `oligoscout_panel` routes IUPAC primers in
+  anchored mode to the equivalent rule (window = anchor, 0 terminal mismatches).
+  Brute-force equal on synthetic data and genome-wide (degenerate RT primers, 646,632
+  sites, FM-index = exhaustive scan).
+- **`oligoscout_vpcr_scan`** (C++, bit-parallel, exhaustive): any FASTA, many records,
+  linear or circular, oligos 8-512 nt, IUPAC in oligo and template, template-N policy,
+  3'-terminal rule, optional tolerance of G.T/G.G/G.A mismatches. Identical to the Python
+  oracle.
+- **`cli/virtual_pcr.py`** and `oligoscout_thermo/vpcr.py`: products in pairs mode or
+  all-vs-all fingerprinting (single-primer products included), products across the
+  origin and inverse PCR on circular templates, non-binding 5'/3' tails (lower case),
+  probes (sites + "inside product"), linked-sequence search, amplicon and template
+  sequences, site Tm (multi-mismatch Allawi-Peyret NN) and Ta = min Tm + ln(length).
+  Exposed as MCP `oligoscout_virtual_pcr`, the local web API (`vpcr`) and a web form.
+- Validation against the paper's Zenodo outputs (`cli/vpcr_validate.py`): six human
+  genes 6/6 identical coordinates; degenerate Copia RT primers 11/11 virtualPCR
+  amplicons found.
+
 ## 0.4.1 — 2026-11-25
 
 LNA

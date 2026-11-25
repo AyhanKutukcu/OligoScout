@@ -1,0 +1,225 @@
+{
+ "source": "Kalendar et al. 2024 Front. Bioinform. 4:1464197; Zenodo 13625500 virtualPCR outputs",
+ "six_genes": {
+  "virtualpcr_products": 6,
+  "oligoscout_products": 6,
+  "identical_coordinates": 6,
+  "pairs": [
+   {
+    "id": "CA2",
+    "region": "chr8:85473967-85474724",
+    "found": true,
+    "orientation": "5836|5837",
+    "mismatches": [
+     0,
+     0
+    ],
+    "ta_virtualpcr": 60.0,
+    "ta_oligoscout": 67.7
+   },
+   {
+    "id": "COL1A1",
+    "region": "chr17:50186438-50187094",
+    "found": true,
+    "orientation": "5838|5839",
+    "mismatches": [
+     0,
+     0
+    ],
+    "ta_virtualpcr": 61.0,
+    "ta_oligoscout": 68.32
+   },
+   {
+    "id": "FAM20C",
+    "region": "chr7:255575-256212",
+    "found": true,
+    "orientation": "5840|5841",
+    "mismatches": [
+     0,
+     0
+    ],
+    "ta_virtualpcr": 63.0,
+    "ta_oligoscout": 69.42
+   },
+   {
+    "id": "BEST4",
+    "region": "chr1:44784341-44784992",
+    "found": true,
+    "orientation": "5842|5843",
+    "mismatches": [
+     0,
+     0
+    ],
+    "ta_virtualpcr": 61.0,
+    "ta_oligoscout": 68.97
+   },
+   {
+    "id": "SHF",
+    "region": "chr15:45198820-45198994",
+    "found": true,
+    "orientation": "5844|5845",
+    "mismatches": [
+     0,
+     0
+    ],
+    "ta_virtualpcr": 61.0,
+    "ta_oligoscout": 67.61
+   },
+   {
+    "id": "MMP9",
+    "region": "chr20:46010880-46011618",
+    "found": true,
+    "orientation": "5846|5847",
+    "mismatches": [
+     0,
+     0
+    ],
+    "ta_virtualpcr": 62.0,
+    "ta_oligoscout": 68.98
+   }
+  ],
+  "rule": "<=3 mismatches/primer, 0 in the 3'-terminal 7 nt (number3errors=0), 100-1000 bp"
+ },
+ "rt_copia_degenerate": {
+  "virtualpcr_products": 11,
+  "found_by_oligoscout": 11,
+  "oligoscout_products_same_rule": 13690,
+  "products": [
+   {
+    "id": "RT01",
+    "region": "chr1:247748285-247748708",
+    "found": true,
+    "orientation": "RTm|RTm",
+    "mismatches": [
+     3,
+     3
+    ],
+    "ta_virtualpcr": 43.0,
+    "ta_oligoscout": null
+   },
+   {
+    "id": "RT02",
+    "region": "chr4:74759694-74760104",
+    "found": true,
+    "orientation": "RTp|RTm",
+    "mismatches": [
+     3,
+     2
+    ],
+    "ta_virtualpcr": 43.0,
+    "ta_oligoscout": null
+   },
+   {
+    "id": "RT03",
+    "region": "chr4:89364195-89364684",
+    "found": true,
+    "orientation": "RTm|RTm",
+    "mismatches": [
+     2,
+     0
+    ],
+    "ta_virtualpcr": 43.0,
+    "ta_oligoscout": null
+   },
+   {
+    "id": "RT04",
+    "region": "chr4:142370193-142370529",
+    "found": true,
+    "orientation": "RTm|RTm",
+    "mismatches": [
+     2,
+     1
+    ],
+    "ta_virtualpcr": 42.0,
+    "ta_oligoscout": null
+   },
+   {
+    "id": "RT05",
+    "region": "chr7:115977066-115977531",
+    "found": true,
+    "orientation": "RTp|RTm",
+    "mismatches": [
+     3,
+     2
+    ],
+    "ta_virtualpcr": 43.0,
+    "ta_oligoscout": null
+   },
+   {
+    "id": "RT06",
+    "region": "chr8:118467362-118467800",
+    "found": true,
+    "orientation": "RTm|RTm",
+    "mismatches": [
+     2,
+     1
+    ],
+    "ta_virtualpcr": 43.0,
+    "ta_oligoscout": null
+   },
+   {
+    "id": "RT07",
+    "region": "chr11:16490829-16491117",
+    "found": true,
+    "orientation": "RTm|RTm",
+    "mismatches": [
+     2,
+     1
+    ],
+    "ta_virtualpcr": 42.0,
+    "ta_oligoscout": null
+   },
+   {
+    "id": "RT08",
+    "region": "chr14:84561478-84561881",
+    "found": true,
+    "orientation": "RTm|RTm",
+    "mismatches": [
+     1,
+     2
+    ],
+    "ta_virtualpcr": 43.0,
+    "ta_oligoscout": null
+   },
+   {
+    "id": "RT09",
+    "region": "chr15:34831989-34832366",
+    "found": true,
+    "orientation": "RTm|RTm",
+    "mismatches": [
+     1,
+     2
+    ],
+    "ta_virtualpcr": 42.0,
+    "ta_oligoscout": null
+   },
+   {
+    "id": "RT10",
+    "region": "chr15:44708344-44708659",
+    "found": true,
+    "orientation": "RTm|RTm",
+    "mismatches": [
+     3,
+     3
+    ],
+    "ta_virtualpcr": 42.0,
+    "ta_oligoscout": null
+   },
+   {
+    "id": "RT11",
+    "region": "chr15:99285244-99285681",
+    "found": true,
+    "orientation": "RTm|RTm",
+    "mismatches": [
+     2,
+     2
+    ],
+    "ta_virtualpcr": 43.0,
+    "ta_oligoscout": null
+   }
+  ],
+  "rule": "IUPAC primers, <=3 mismatches/primer, <=1 in the 3'-terminal 7 nt, 200-500 bp, all primer combinations",
+  "note": "virtualPCR does not document a total-mismatch cap per primer; its 11 products carry 0-3 mismatches per site and are a subset of the OligoScout set under the stated rule"
+ },
+ "ta_note": "Ta formula identical (min primer Tm + ln length); absolute values differ because the primer Tm models differ (virtualPCR/FastPCR vs OligoScout NN at 50 mM Na+, 1.5 mM Mg2+, 200 nM)."
+}

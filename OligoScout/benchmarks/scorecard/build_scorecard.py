@@ -55,8 +55,8 @@ def regression():
     dm = re.search(r"dizi sayisi: (\d+)", dtxt)
     pc = OUT / "param_crosscheck" / "crosscheck_summary.md"
     return {
-        "unit_tests": {"tests": 292, "status": "OK (1 platform skip)", "evidence": "reference_py/tests",
-                       "note": "v0.4.1; the end-to-end regression log below predates it"},
+        "unit_tests": {"tests": 305, "status": "OK (1 platform skip)", "evidence": "reference_py/tests",
+                       "note": "v0.5.0; the end-to-end regression log below predates it"},
         "cpp_tests": {"single_primer_products": "PASS", "primer_pair_assembler_equivalence": "PASS (500 checks)",
                       "terminal_rule_search_vs_brute_force": "PASS (terminal max 0/1/2)"},
         "salt_layer_vs_oligotm": {"values": 60, "identical": 60, "tolerance_c": 0.05,
@@ -121,6 +121,16 @@ def lna_model():
     return {"evidence": rel(p), **d} if d else None
 
 
+def virtual_pcr():
+    d = HERE / "results" / "virtual_pcr_kalendar2024"
+    a, b = jload(d / "summary.json"), jload(d / "iupac_fm_vs_scan.json")
+    if not a:
+        return None
+    return {"evidence": rel(d / "summary.json"), "six_genes": {k: v for k, v in a["six_genes"].items() if k != "pairs"},
+            "rt_copia_degenerate": {k: v for k, v in a["rt_copia_degenerate"].items() if k != "products"},
+            "iupac_genome_fm_vs_exhaustive": b}
+
+
 def primerbank():
     p = HERE / "results" / "primerbank" / "summary.json"
     d = jload(p)
@@ -157,7 +167,7 @@ def main():
     card = {
         "title": "OligoScout validation & benchmark scorecard",
         "generated_utc": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "engine": "oligoscout-thermo-ref/0.4.1 + oligoscout_panel 0.4 (C++20 FM-index, PPFM 24 shards; "
+        "engine": "oligoscout-thermo-ref/0.5.0 + oligoscout_panel 0.4 (C++20 FM-index, PPFM 24 shards; "
                   "anchored and sensitive search modes, single-primer products)",
         "how_to_read": [
             "Every number links to an evidence file under the project root.",
@@ -172,6 +182,7 @@ def main():
         "speed_repeated": speed(),
         "primerbank_validated_pairs": primerbank(),
         "lna_model_vs_mctigue2004": lna_model(),
+        "virtual_pcr_vs_kalendar2024": virtual_pcr(),
         "thermodynamics_vs_primer3": thermo(),
         "software_integrity": regression(),
         "qc_catalog": catalog(),
@@ -267,6 +278,16 @@ def render_md(c):
               f"(paper {m3['paper_reported_rmsd_dtm_c']} °C)",
               f"- OligoScout DNA model + LNA table: RMSD Tm {m4['rmsd_tm_c']} °C, {m4['within_2c']}/{ln['n']} within "
               f"2 °C; DNA references alone {m4['dna_reference_rmsd_tm_c']} °C"]
+    vp = c.get("virtual_pcr_vs_kalendar2024")
+    if vp:
+        g, r, f = vp["six_genes"], vp["rt_copia_degenerate"], vp.get("iupac_genome_fm_vs_exhaustive") or {}
+        L += ["", "## 2e. Virtual PCR vs. virtualPCR (Kalendar et al. 2024, GRCh38 outputs on Zenodo)", "",
+              f"- six human genes: {g['identical_coordinates']}/{g['virtualpcr_products']} identical amplicon coordinates "
+              f"({g['oligoscout_products']} products in total)",
+              f"- degenerate Copia RT primers: {r['found_by_oligoscout']}/{r['virtualpcr_products']} virtualPCR amplicons found "
+              f"({r['oligoscout_products_same_rule']} products under the stated rule)",
+              f"- IUPAC genome search, FM-index vs exhaustive scan: {f.get('identical', 0):,}/{f.get('exhaustive_scan_sites', 0):,} "
+              f"sites identical"]
     pk = c.get("primerbank_validated_pairs")
     if pk:
         L += ["", "## 3b. PrimerBank experimentally tested mouse pairs", ""] + [f"- {x}" for x in pk.get("lines", [])]

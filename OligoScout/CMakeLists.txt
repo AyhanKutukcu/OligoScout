@@ -1364,6 +1364,18 @@ target_link_libraries(
         Threads::Threads
 )
 
+# virtual PCR core: exhaustive bit-parallel scan of any FASTA (IUPAC, circular)
+add_executable(
+    oligoscout_vpcr_scan
+    tools/oligoscout_vpcr_scan.cpp
+)
+
+target_link_libraries(
+    oligoscout_vpcr_scan
+    PRIVATE
+        Threads::Threads
+)
+
 add_executable(
     oligoscout_panel
     tools/oligoscout_panel.cpp

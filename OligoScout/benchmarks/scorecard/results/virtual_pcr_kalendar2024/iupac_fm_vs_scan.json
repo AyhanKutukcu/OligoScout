@@ -1,0 +1,11 @@
+{
+ "test": "degenerate RT primers, GRCh38 24 chromosomes, <=3 mm, <=1 in last 7 nt",
+ "fm_index_sites": 646632,
+ "exhaustive_scan_sites": 646632,
+ "identical": 646632,
+ "only_fm": 0,
+ "only_scan": 0,
+ "fm_seconds": 40.7,
+ "scan_seconds": 44.6,
+ "machine": "AMD Ryzen 9 9950X VM, 2 vCPU"
+}

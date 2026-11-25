@@ -1,6 +1,6 @@
 # OligoScout validation & benchmark scorecard
 
-_generated 2026-11-24T23:21:42Z_
+_generated 2026-11-25T00:07:10Z_
 
 ## 1. Specificity search vs. independent oracle (Test #81)
 
@@ -70,6 +70,12 @@ Dimer model: nn_single_internal_mismatch_or_bulge+end_terms (dangling ends, doub
 - measured DNA reference + LNA table: RMSD ΔTm 0.886 °C (paper 0.88 °C)
 - OligoScout DNA model + LNA table: RMSD Tm 1.605 °C, 75/98 within 2 °C; DNA references alone 1.538 °C
 
+## 2e. Virtual PCR vs. virtualPCR (Kalendar et al. 2024, GRCh38 outputs on Zenodo)
+
+- six human genes: 6/6 identical amplicon coordinates (6 products in total)
+- degenerate Copia RT primers: 11/11 virtualPCR amplicons found (13690 products under the stated rule)
+- IUPAC genome search, FM-index vs exhaustive scan: 646,632/646,632 sites identical
+
 ## 3b. PrimerBank experimentally tested mouse pairs
 
 - 121 PrimerBank mouse pairs with validation pages (89 genes): 101 sequence-confirmed, 9 expected transcript not the top BLAST hit, 11 without a BLAST result
@@ -80,7 +86,7 @@ Dimer model: nn_single_internal_mismatch_or_bulge+end_terms (dangling ends, doub
 
 ## 4. Software integrity
 
-- unit tests: 292 OK; C++ single-primer + assembler equivalence tests PASS
+- unit tests: 305 OK; C++ single-primer + assembler equivalence tests PASS
 - end-to-end regression: {'pass': 20, 'skip': 1, 'fail': 0, 'evidence': 'reference_py/out/regresyon/REGRESYON_RAPORU.md'}
 - Python vs C++: 74 sequences, 0 differences
 - parameter tables vs primer3: 371/373 identical, 0 flagged deviations

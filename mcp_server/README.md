@@ -11,7 +11,7 @@ OligoScout motorunu (oligoscout.org'un kullandığı `web/local_engine.py` + C++
 | Ek | REST `POST /api/tools/<ad>` + OpenAPI 3.1 `/openapi.json` (GPT Actions, Gemini function calling) |
 | Güvenlik | `Authorization: Bearer` (OLIGOSCOUT_MCP_TOKEN) · Origin denetimi (DNS-rebinding) · 60 istek/60 s sınır |
 
-## Araçlar (15)
+## Araçlar (16)
 
 | Araç | Ne yapar |
 |---|---|
@@ -29,6 +29,7 @@ OligoScout motorunu (oligoscout.org'un kullandığı `web/local_engine.py` + C++
 | `oligoscout_check_blocker` | Bloklayıcı / clamp oligo denetimi |
 | `oligoscout_amplicon_melt` | Amplikon erime eğrisi (uMelt tarzı) |
 | `oligoscout_design_multiplex` | 2–8 hedefli multipleks panel tasarımı ve çapraz dimer matrisi |
+| `oligoscout_virtual_pcr` | Sanal PCR: yapıştırılan FASTA (doğrusal/dairesel, ters PCR) ya da GRCh38; IUPAC oligo ve kalıp, 3′ kuralı, kuyruklar, prob, parmak izi modu, ürün dizisi ve Ta |
 | `oligoscout_job_status` | Uzun işler için `job_id` sorgusu |
 
 Kaynaklar: `oligoscout://guide` (asistan yorumlama kuralları), `oligoscout://catalog`,
@@ -153,9 +154,9 @@ doğrulandı. Ürünler F–R, R–F ve tek primer (F–F, R–R) yönelimlerini
 ## Docker
 
 ```bash
-docker build -t oligoscout:0.4.1 .
+docker build -t oligoscout:0.5.0 .
 docker run --rm -p 8766:8766 -v /srv/oligoscout-data:/data -e OLIGOSCOUT_OAUTH=1 \
-  -e OLIGOSCOUT_PUBLIC_URL=https://oligoscout.org/mcp oligoscout:0.4.1
+  -e OLIGOSCOUT_PUBLIC_URL=https://oligoscout.org/mcp oligoscout:0.5.0
 ```
 
 ## Bilinen sınırlar

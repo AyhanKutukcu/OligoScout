@@ -10,13 +10,31 @@ namespace {
 
 constexpr char kBases[4] = {'A', 'C', 'G', 'T'};
 
-char complement(const char b) {
+/*
+ * IUPAC code -> 4-bit base set (A=1, C=2, G=4, T=8). A template base is a
+ * match when it belongs to the primer position's set; degenerate primers
+ * (e.g. RT-PCR consensus primers) are therefore searched natively.
+ */
+std::uint8_t iupac_mask(const char c) {
+    switch (c) {
+        case 'A': return 1; case 'C': return 2; case 'G': return 4; case 'T': return 8;
+        case 'R': return 1 | 4; case 'Y': return 2 | 8; case 'S': return 2 | 4; case 'W': return 1 | 8;
+        case 'K': return 4 | 8; case 'M': return 1 | 2; case 'B': return 2 | 4 | 8;
+        case 'D': return 1 | 4 | 8; case 'H': return 1 | 2 | 8; case 'V': return 1 | 2 | 4;
+        case 'N': return 15;
+        default: return 0;
+    }
+}
+
+std::uint8_t complement_mask(const std::uint8_t m) {
+    // A<->T (1<->8), C<->G (2<->4)
+    return static_cast<std::uint8_t>(((m & 1) << 3) | ((m & 8) >> 3) | ((m & 2) << 1) | ((m & 4) >> 1));
+}
+
+std::uint8_t base_bit(const char b) {
     switch (b) {
-        case 'A': return 'T';
-        case 'C': return 'G';
-        case 'G': return 'C';
-        case 'T': return 'A';
-        default: return 'N';
+        case 'A': return 1; case 'C': return 2; case 'G': return 4; case 'T': return 8;
+        default: return 0;
     }
 }
 
@@ -25,8 +43,8 @@ std::string normalize(std::string_view primer) {
     s.reserve(primer.size());
     for (const char c : primer) {
         const char u = static_cast<char>(std::toupper(static_cast<unsigned char>(c)));
-        if (u != 'A' && u != 'C' && u != 'G' && u != 'T') {
-            throw std::invalid_argument("terminal-rule search accepts only A/C/G/T primers");
+        if (iupac_mask(u) == 0) {
+            throw std::invalid_argument("terminal-rule search accepts A/C/G/T and IUPAC codes only");
         }
         s.push_back(u);
     }
@@ -59,8 +77,9 @@ bool verify(const PackedReference& reference, const std::string& primer, const s
         }
         // primer position (5' origin) aligned to window position j
         const std::size_t p = reverse ? L - 1 - j : j;
-        const char expected = reverse ? complement(primer[p]) : primer[p];
-        if (obs != expected) {
+        const std::uint8_t allowed = reverse ? complement_mask(iupac_mask(primer[p]))
+                                             : iupac_mask(primer[p]);
+        if ((base_bit(obs) & allowed) == 0) {
             mask |= (std::uint64_t{1} << p);
             ++mm;
             if (p + o.terminal_window >= L) {
@@ -107,8 +126,9 @@ search_terminal_rule(const BidirectionalFMIndex& index, const PackedReference& r
          */
         std::vector<Node> stack;
         for (const char b : kBases) {
-            const char want = reverse ? complement(primer[L - 1]) : primer[L - 1];
-            const bool mis = b != want;
+            const std::uint8_t want = reverse ? complement_mask(iupac_mask(primer[L - 1]))
+                                              : iupac_mask(primer[L - 1]);
+            const bool mis = (base_bit(b) & want) == 0;
             const std::size_t term = mis ? 1 : 0;
             if (term > o.max_terminal_mismatches || term > o.max_mismatches) {
                 continue;
@@ -136,13 +156,14 @@ search_terminal_rule(const BidirectionalFMIndex& index, const PackedReference& r
             }
             const std::size_t p = L - 1 - n.depth;               // primer position
             const bool in_window = n.depth < window;
-            const char want = reverse ? complement(primer[p]) : primer[p];
+            const std::uint8_t want = reverse ? complement_mask(iupac_mask(primer[p]))
+                                              : iupac_mask(primer[p]);
             if (!reverse) {
                 const auto kids = index.extend_left_all(n.state);
                 for (int k = 0; k < 4; ++k) {
                     ++local.states_visited;
                     if (kids[k].empty()) continue;
-                    const bool mis = kBases[k] != want;
+                    const bool mis = (base_bit(kBases[k]) & want) == 0;
                     const std::size_t mm = n.mismatches + (mis ? 1 : 0);
                     const std::size_t term = n.terminal + (mis && in_window ? 1 : 0);
                     if (mm > o.max_mismatches || term > o.max_terminal_mismatches) continue;
@@ -151,7 +172,7 @@ search_terminal_rule(const BidirectionalFMIndex& index, const PackedReference& r
             } else {
                 for (const char b : kBases) {
                     ++local.states_visited;
-                    const bool mis = b != want;
+                    const bool mis = (base_bit(b) & want) == 0;
                     const std::size_t mm = n.mismatches + (mis ? 1 : 0);
                     const std::size_t term = n.terminal + (mis && in_window ? 1 : 0);
                     if (mm > o.max_mismatches || term > o.max_terminal_mismatches) continue;

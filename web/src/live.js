@@ -219,6 +219,7 @@ const localToolLabels = {
   variants: 'gnomAD varyantları', isoform: 'GENCODE izoformları',
   probe: 'Hidroliz probu', melt: 'Amplikon erime profili',
   thermo: 'Tek primer termodinamiği', blocker: 'Prob ve blocker QC',
+  vpcr: 'Sanal PCR · kendi kalıbınız / GRCh38',
 };
 
 function localToolLink(tool, label, pm) {
@@ -377,6 +378,24 @@ function qualityCheckCards(E, prefixes) {
 }
 
 function renderLocalOutput(tool, result) {
+  if (tool === 'vpcr') {
+    const s = result.summary || {};
+    const r = s.rule || {};
+    const head = `<p class="small muted">${esc(s.engine || '')} · ≤ ${r.max_mismatch} uyumsuzluk/oligo, son ${r.terminal_window} bazda ≤ ${r.terminal_max}`
+      + (r.template_n && r.template_n !== 'reject' ? ` · kalıpta N: ${esc(r.template_n)}` : '')
+      + ` · ${esc(s.mode)} · ${s.product_range?.[0]}–${s.product_range?.[1]} bp · ${s.products} ürün`
+      + (s.products_wrapping_origin ? ` (${s.products_wrapping_origin} tanesi orijinden geçiyor)` : '') + `</p>
+      <p class="tiny faint">Ta = en düşük primer-yer Tm'i + ln(ürün uzunluğu) (Kalendar ve ark. 2024). Yer Tm'i: çoklu iç uyumsuzluk için Allawi–Peyret NN, uçtaki uyumsuzluklar kırpılır.</p>`;
+    const prods = (result.products || []).map(p => ({...p, region: `${p.record}:${(+p.start + 1).toLocaleString('tr-TR')}-${(+p.end_exclusive).toLocaleString('tr-TR')}`}));
+    return liveResult('Sanal PCR ürünleri', head + localRows(prods.slice(0, 500), [
+      ['product_id','Ürün'], ['region','Konum (1 tabanlı)'], ['topology','Topoloji'], ['orientation','Oligolar'],
+      ['amplicon_length','bp'], ['left_mismatches','Sol uyumsuz'], ['right_mismatches','Sağ uyumsuz'],
+      ['tm_left_c','Tm sol'], ['tm_right_c','Tm sağ'], ['ta_c','Ta'], ['probes_inside','İçteki problar'], ['amplicon_sequence','Amplikon dizisi'],
+    ])) + liveResult('Bağlanma yerleri', localRows((result.sites || []).slice(0, 500), [
+      ['oligo_id','Oligo'], ['role','Rol'], ['record','Kayıt'], ['start','Başlangıç (0 tabanlı)'], ['strand','İplik'],
+      ['mismatches','Uyumsuz'], ['terminal_mismatches','3′ penceredeki'], ['mask','Maske'], ['site_plus_strand','Yer'], ['tm_c','Tm'],
+    ])) + (result.links?.length ? liveResult('Bağlantılı diziler', localRows(result.links)) : '');
+  }
   if (tool === 'scan') {
     if (result.bisulfite) return liveResult('BIS-04 · CT ve GA taraması',
       localRows(result.summary) + localRecords(result.records.map(r => r.check || r)));
@@ -417,7 +436,7 @@ function localConditionsHTML() {
 
 RENDER.yerel = el => {
   const tool = LIVE.tool;
-  const pairTool = tool !== 'thermo' && tool !== 'blocker';
+  const pairTool = tool !== 'thermo' && tool !== 'blocker' && tool !== 'vpcr';
   const source = LIVE.source;
   const localSources = new Map(STATE.local.filter(pm => pm.kind === 'live')
     .map(pm => [pm.source, pm.sourceLabel || pm.tplName]));
@@ -451,6 +470,19 @@ RENDER.yerel = el => {
       ${tool === 'isoform' ? control('gene','GENCODE gen simgesi') : ''}
       ${tool === 'probe' ? control('probe','Var olan prob (boş bırakılırsa aday aranır)',false) : ''}
       ${tool === 'thermo' ? control('sequence','Primer dizisi (5′ → 3′; LNA: +N)') + localConditionsHTML() : ''}
+      ${tool === 'vpcr' ? `<label class="f"><span>Oligolar <em>her satır: KİMLİK DİZİ [primer|probe] [çift] · IUPAC kabul · küçük harfli baş/son = bağlanmayan kuyruk</em></span>
+          <textarea name="oligos" rows="5" spellcheck="false" required placeholder="RTp CARATGGAYGTNAARAC\nRTm CATRTCRTCNACRTA"></textarea></label>
+        <label class="f"><span>Kalıp FASTA <em>bir ya da çok kayıt; boş bırakılırsa yalnız GRCh38</em></span>
+          <textarea name="template" rows="5" spellcheck="false" placeholder=">pUC19\nTCGCGCGTTTCGGTGATGACGG..."></textarea></label>
+        <div class="fgrid c3">
+          <label class="switch"><input type="checkbox" name="genome" value="grch38"> GRCh38 (24 kromozom) de taransın</label>
+          <label class="f"><span>Dairesel kayıtlar</span><input name="circular" placeholder="all ya da ad1,ad2"></label>
+          <label class="f"><span>Ürün kurulumu</span><select name="mode"><option value="">Otomatik</option><option value="pairs">Yalnız aynı çiftin oligoları</option><option value="all">Tüm primerler birbiriyle (parmak izi)</option></select></label>
+          ${[['mismatches','Oligo başına uyumsuzluk',3,0,6],['terminal_window','3′ pencere (nt)',7,1,30],['terminal_max','3′ pencerede en fazla',1,0,6],['min_product','En kısa ürün (bp)',50,1,100000],['max_product','En uzun ürün (bp)',5000,1,100000]].map(([id,label,val,min,max]) =>
+            `<label class="f"><span>${label}</span><input name="${id}" type="number" min="${min}" max="${max}" value="${val}" required></label>`).join('')}
+          <label class="f"><span>Kalıpta N</span><select name="template_n"><option value="reject">Yeri reddet</option><option value="mismatch">Uyumsuzluk say</option><option value="match">Eşleşme say</option></select></label>
+          <label class="f"><span>G·T / G·G / G·A toleransı</span><select name="g_tolerant"><option value="">Kapalı</option><option value="1">En fazla 1</option><option value="2">En fazla 2</option><option value="3">En fazla 3</option></select></label>
+        </div>${localConditionsHTML()}` : ''}
       ${tool === 'blocker' ? `<div class="fgrid c3">${control('mutant','Mutant prob')}${control('wt','WT prob')}${control('blocker','Blocker (isteğe bağlı)',false)}${control('forward','İleri primer (isteğe bağlı)',false)}${control('reverse','Geri primer (isteğe bağlı)',false)}</div>${localConditionsHTML()}` : ''}
       ${!liveReady() ? liveNote(localAvailability()) : ''}
       ${jobNotice(key)}
@@ -482,8 +514,11 @@ RENDER.yerel = el => {
     if (tool === 'scan') { for (const name of ['anchor','mismatches','min_product','max_product']) body[name] = +fd.get(name); body.search_mode = fd.get('search_mode') || 'anchored'; }
     if (tool === 'isoform') body.gene = fd.get('gene');
     if (tool === 'probe') body.probe = fd.get('probe');
-    if (tool === 'thermo' || tool === 'blocker') {
-      for (const name of ['sequence','mutant','wt','blocker','forward','reverse']) if (fd.has(name)) body[name] = fd.get(name);
+    if (tool === 'thermo' || tool === 'blocker' || tool === 'vpcr') {
+      for (const name of ['sequence','mutant','wt','blocker','forward','reverse','oligos','template','circular','mode',
+        'mismatches','terminal_window','terminal_max','min_product','max_product','template_n','g_tolerant'])
+        if (fd.has(name)) body[name] = fd.get(name);
+      if (tool === 'vpcr') body.genome = fd.has('genome') ? 'grch38' : '';
       body.conditions = liveConditions(form);
     }
     const button = $('#runLocalTool', form);

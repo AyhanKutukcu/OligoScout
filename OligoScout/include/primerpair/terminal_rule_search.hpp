@@ -19,7 +19,12 @@
  * reference (N rejects) and recomputes the mismatch mask.
  *
  * The anchored contract is a subset: every anchored site has zero
- * mismatches in its last 5 nt.
+ * mismatches in its last 5 nt. With terminal_window = anchor length and
+ * max_terminal_mismatches = 0 the search reproduces the anchored contract.
+ *
+ * Primers may carry IUPAC codes (R Y S W K M B D H V N): a template base
+ * matches when it is in the code's set. The reference itself is A/C/G/T/N
+ * (N rejects), so no template ambiguity arises here.
  */
 
 #include <cstddef>

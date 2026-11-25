@@ -40,7 +40,7 @@ from oligoscout_thermo import (align, engine, nn, oligomod, params, profiles,  #
 if os.getenv("OLIGOSCOUT_PANEL_BINARY"):
     LE.BINARY = Path(os.environ["OLIGOSCOUT_PANEL_BINARY"])
 
-VERSION = "0.4.1"
+VERSION = "0.5.0"
 CALIBRATION = ("REP-03: most thresholds are literature starting values, NOT calibrated against "
                "wet-lab data; LNA duplex Tm uses McTigue 2004 (single internal LNA; other layouts are extrapolated). "
                "Research use only - confirm experimentally.")
@@ -772,6 +772,88 @@ def t_specificity(args):
     return job_response(rec, render)
 
 
+def t_virtual_pcr(args):
+    """Virtual PCR on pasted FASTA templates or GRCh38 (Kalendar et al. 2024 scope)."""
+    import subprocess
+    import sys as _sys
+    oligos = args["oligos"]
+    if not args.get("template_fasta") and args.get("genome") != "grch38":
+        raise ToolInputError("give template_fasta (FASTA text) or genome='grch38'")
+    ids = [o["id"] for o in oligos]
+    if len(set(ids)) != len(ids):
+        raise ToolInputError("oligo ids must be unique")
+    for o in oligos:
+        if not re.fullmatch(r"[A-Za-z0-9_.\-]{1,32}", o["id"]):
+            raise ToolInputError(f"oligo id '{o['id']}': letters, digits, _ . - (max 32)")
+    pr = args.get("product_range") or [50, 5000]
+
+    def run(stage):
+        with tempfile.TemporaryDirectory(prefix="oligoscout-mcp-vpcr-") as tmp:
+            tmp = Path(tmp)
+            ol = tmp / "oligos.tsv"
+            with ol.open("w", encoding="utf-8") as fh:
+                fh.write("id\tsequence\trole\tpair\n")
+                for o in oligos:
+                    seq = re.sub(r"\s+", "", o["sequence"])
+                    fh.write("\t".join([o["id"], seq, o.get("role", "primer"), o.get("pair", "")]) + "\n")
+            cmd = [_sys.executable, str(ROOT / "reference_py" / "cli" / "virtual_pcr.py"), "--oligos", str(ol),
+                   "--out", str(tmp / "out"), "--min-product", str(pr[0]), "--max-product", str(pr[1]),
+                   "--max-mismatch", str(args.get("max_mismatches", 3)),
+                   "--terminal-window", str(args.get("terminal_window", 7)),
+                   "--terminal-max", str(args.get("terminal_max", 1)),
+                   "--template-n", args.get("template_n", "reject"), "--extract"]
+            if args.get("mode"):
+                cmd += ["--mode", args["mode"]]
+            if args.get("g_tolerant") is not None:
+                cmd += ["--g-tolerant", str(args["g_tolerant"])]
+            cond = conditions(args)
+            cmd += ["--na", str(cond["na"]), "--mg", str(cond["mg"]), "--dntp", str(cond["dntp"]),
+                    "--primer-nm", str(cond["pnm"])]
+            if args.get("template_fasta"):
+                fa = tmp / "template.fa"
+                text = args["template_fasta"].strip()
+                if not text.startswith(">"):
+                    text = ">template\n" + text
+                fa.write_text(text + "\n", encoding="utf-8")
+                cmd += ["--template", str(fa)]
+                if args.get("circular"):
+                    cmd += ["--circular", args["circular"]]
+            if args.get("genome") == "grch38":
+                cmd += ["--genome", "grch38"]
+            stage("virtual PCR")
+            done = subprocess.run(cmd, capture_output=True, text=True, timeout=1800)
+            if done.returncode != 0:
+                raise ToolInputError((done.stderr or done.stdout).strip().splitlines()[-1][:300])
+            out = tmp / "out"
+            summary = json.loads((out / "summary.json").read_text(encoding="utf-8"))
+            rd = lambda n: list(csv.DictReader((out / n).open(encoding="utf-8"), delimiter="\t"))
+            return {"summary": summary, "products": rd("products.tsv"), "sites": rd("sites.tsv")}
+
+    def render(res):
+        s, prods = res["summary"], res["products"]
+        lines = [f"Virtual PCR · {s['engine']} · rule: <= {s['rule']['max_mismatch']} mismatches/oligo, "
+                 f"<= {s['rule']['terminal_max']} in the 3'-terminal {s['rule']['terminal_window']} nt"
+                 + (", template N " + s['rule']['template_n'] if s['rule']['template_n'] != 'reject' else "")
+                 + f" · mode {s['mode']} · products {s['product_range'][0]}-{s['product_range'][1]} bp",
+                 f"{len(res['sites'])} binding sites, {s['products']} products"
+                 + (f" ({s['products_wrapping_origin']} across the origin)" if s.get("products_wrapping_origin") else "")]
+        for p in prods[:25]:
+            lines.append(f"- {p['product_id']} {p['record']}:{int(p['start']) + 1:,}-{int(p['end_exclusive']):,} "
+                         f"{p['amplicon_length']} bp {p['orientation']} mm {p['left_mismatches']}/{p['right_mismatches']}"
+                         f" Tm {p['tm_left_c']}/{p['tm_right_c']} Ta {p['ta_c']}"
+                         + (f" probes {p['probes_inside']}" if p.get('probes_inside') else ""))
+        if len(prods) > 25:
+            lines.append(f"... {len(prods) - 25} more in structured output")
+        lines.append("Ta = lowest primer-site Tm + ln(product length) (Kalendar et al. 2024). " + CALIBRATION)
+        keep = prods[:200] if args.get("detail") != "full" else prods
+        return {"text": "\n".join(lines), "structured": {"summary": s, "products": keep,
+                                                         "sites": res["sites"][:500] if args.get("detail") == "full" else [],
+                                                         "provenance": provenance()}}
+
+    rec = JOBS.run("virtual_pcr", run, args.get("wait_seconds", 50))
+    return job_response(rec, render)
+
+
 def t_variants(args):
     f, r = _pair_inputs(args)
     src = template_source(args, "sanger")
@@ -989,6 +1071,32 @@ def build_registry():
                        "product_range": {**span("[min,max] product bp"), "default": [50, 3000]},
                        "conditions": COND_SCHEMA, "detail": detail, "wait_seconds": wait}, ["pairs"]),
                   t_specificity))
+    reg.tool(Tool("oligoscout_virtual_pcr", "Virtual (in silico) PCR",
+                  "virtualPCR-style in silico PCR on pasted FASTA templates (plasmids, amplicon sets, multi-record, "
+                  "linear or circular incl. inverse PCR) or on GRCh38: IUPAC-degenerate oligos and templates, 3'-terminal "
+                  "mismatch rule (default <=1 in the last 7 nt, <=3 total), lower-case 5'/3' tails, optional tolerance "
+                  "of G.T/G.G/G.A mismatches, probes (binding only, reported inside products), pairs mode or all-vs-all "
+                  "fingerprinting (IRAP/ISSR/RAPD, single-primer products). Returns sites, products with sequences, "
+                  "site Tm and Ta = min Tm + ln(length).",
+                  obj({"oligos": {"type": "array", "minItems": 1, "maxItems": 200, "items": obj(
+                          {"id": {"type": "string", "maxLength": 32},
+                           "sequence": {"type": "string", "minLength": 8, "maxLength": 600,
+                                        "description": "IUPAC; lower-case leading/trailing bases are non-binding tails"},
+                           "role": {"type": "string", "enum": ["primer", "probe"], "default": "primer"},
+                           "pair": {"type": "string", "maxLength": 32, "description": "pairs mode: oligos with the same pair label amplify together"}},
+                          ["id", "sequence"])},
+                       "template_fasta": {"type": "string", "maxLength": 2000000, "description": "FASTA text (one or more records) or raw DNA"},
+                       "genome": {"type": "string", "enum": ["grch38"]},
+                       "circular": {"type": "string", "maxLength": 400, "description": "'all' or comma-separated record names"},
+                       "mode": {"type": "string", "enum": ["pairs", "all"], "description": "default: pairs if any oligo has a pair label, else all"},
+                       "max_mismatches": {"type": "integer", "minimum": 0, "maximum": 6, "default": 3},
+                       "terminal_window": {"type": "integer", "minimum": 1, "maximum": 30, "default": 7},
+                       "terminal_max": {"type": "integer", "minimum": 0, "maximum": 6, "default": 1},
+                       "template_n": {"type": "string", "enum": ["reject", "mismatch", "match"], "default": "reject"},
+                       "g_tolerant": {"type": ["integer", "null"], "minimum": 0, "maximum": 6, "default": None},
+                       "product_range": {**span("[min,max] product bp"), "default": [50, 5000]},
+                       "conditions": COND_SCHEMA, "detail": detail, "wait_seconds": wait}, ["oligos"]),
+                  t_virtual_pcr))
     reg.tool(Tool("oligoscout_check_variants", "gnomAD variants under primers",
                   "SNPCheck-style: gnomAD v4 variants under the primers and in the amplicon with allele frequency, "
                   "distance from the 3' end and VAR-01..08 verdicts. Requires a GRCh38 region.",

@@ -1,7 +1,7 @@
 {
   "title": "OligoScout validation & benchmark scorecard",
-  "generated_utc": "2026-11-24T23:21:42Z",
-  "engine": "oligoscout-thermo-ref/0.4.1 + oligoscout_panel 0.4 (C++20 FM-index, PPFM 24 shards; anchored and sensitive search modes, single-primer products)",
+  "generated_utc": "2026-11-25T00:07:10Z",
+  "engine": "oligoscout-thermo-ref/0.5.0 + oligoscout_panel 0.4 (C++20 FM-index, PPFM 24 shards; anchored and sensitive search modes, single-primer products)",
   "how_to_read": [
     "Every number links to an evidence file under the project root.",
     "Specificity results are exact against the stated CONTRACT; the anchor_blind_spot section measures what lies outside it.",
@@ -595,6 +595,33 @@
       "concentration": "CT/4 (5 uM; 1 uM for LT4/LT5)"
     }
   },
+  "virtual_pcr_vs_kalendar2024": {
+    "evidence": "OligoScout/benchmarks/scorecard/results/virtual_pcr_kalendar2024/summary.json",
+    "six_genes": {
+      "virtualpcr_products": 6,
+      "oligoscout_products": 6,
+      "identical_coordinates": 6,
+      "rule": "<=3 mismatches/primer, 0 in the 3'-terminal 7 nt (number3errors=0), 100-1000 bp"
+    },
+    "rt_copia_degenerate": {
+      "virtualpcr_products": 11,
+      "found_by_oligoscout": 11,
+      "oligoscout_products_same_rule": 13690,
+      "rule": "IUPAC primers, <=3 mismatches/primer, <=1 in the 3'-terminal 7 nt, 200-500 bp, all primer combinations",
+      "note": "virtualPCR does not document a total-mismatch cap per primer; its 11 products carry 0-3 mismatches per site and are a subset of the OligoScout set under the stated rule"
+    },
+    "iupac_genome_fm_vs_exhaustive": {
+      "test": "degenerate RT primers, GRCh38 24 chromosomes, <=3 mm, <=1 in last 7 nt",
+      "fm_index_sites": 646632,
+      "exhaustive_scan_sites": 646632,
+      "identical": 646632,
+      "only_fm": 0,
+      "only_scan": 0,
+      "fm_seconds": 40.7,
+      "scan_seconds": 44.6,
+      "machine": "AMD Ryzen 9 9950X VM, 2 vCPU"
+    }
+  },
   "thermodynamics_vs_primer3": {
     "evidence": "OligoScout/benchmarks/scorecard/results/thermo_vs_primer3/summary.json",
     "primers": 2048,
@@ -712,10 +739,10 @@
   },
   "software_integrity": {
     "unit_tests": {
-      "tests": 292,
+      "tests": 305,
       "status": "OK (1 platform skip)",
       "evidence": "reference_py/tests",
-      "note": "v0.4.1; the end-to-end regression log below predates it"
+      "note": "v0.5.0; the end-to-end regression log below predates it"
     },
     "cpp_tests": {
       "single_primer_products": "PASS",

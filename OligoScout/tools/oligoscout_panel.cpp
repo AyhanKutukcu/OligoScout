@@ -29,6 +29,11 @@
  *                  --terminal-max (1) of them in the 3'-terminal
  *                  --terminal-window (5) nt
  *
+ *   Primers may contain IUPAC codes (R Y S W K M B D H V N); a template base
+ *   matches when it is in the code's set. In anchored mode such primers are
+ *   searched with the equivalent terminal rule (window = --anchor, 0 terminal
+ *   mismatches).
+ *
  *   --single-primer on (default) also assembles single-primer products
  *   (F-> <-F and R-> <-R), which Primer-BLAST reports as well. Each product
  *   row carries left_role, right_role and orientation (F-R, R-F, F-F, R-R).
@@ -468,7 +473,31 @@ int main(
                         continue;
                     }
 
-                    if (sensitive_mode) {
+                    const bool degenerate =
+                        primer->find_first_not_of("ACGTacgt") != std::string::npos;
+
+                    if (!sensitive_mode && degenerate) {
+                        /*
+                         * IUPAC primer in anchored mode: the anchored contract
+                         * (exact 3' anchor, <= max mismatches elsewhere) is the
+                         * terminal rule with window = anchor and 0 terminal
+                         * mismatches, which the terminal-rule searcher handles
+                         * with IUPAC sets natively.
+                         */
+                        TerminalRuleOptions anchored_iupac;
+                        anchored_iupac.max_mismatches = max_mismatches;
+                        anchored_iupac.terminal_window = anchor_length;
+                        anchored_iupac.max_terminal_mismatches = 0;
+                        primer_hits.emplace(
+                            *primer,
+                            search_terminal_rule(
+                                shard.index(),
+                                shard.reference(),
+                                *primer,
+                                anchored_iupac
+                            )
+                        );
+                    } else if (sensitive_mode) {
                         terminal_options.max_mismatches = max_mismatches;
                         primer_hits.emplace(
                             *primer,

@@ -292,6 +292,30 @@ untargeted transcript list). No transcriptome FM-index required.
 
 ---
 
+### 11) Virtual PCR — `virtual_pcr.py`
+
+In silico PCR on your own FASTA (plasmids, amplicon sets, any multi-record file; linear or
+circular) or on GRCh38, covering the task scope of virtualPCR (Kalendar et al. 2024).
+
+```bash
+# plasmid, circular (inverse PCR and products across the origin), 5' tail in lower case
+python reference_py/cli/virtual_pcr.py --template pUC19.fa --circular all \
+    --primer M13F=gtaaaacgacggccagtGTAAAACGACGGCCAGT --primer RV=CAGGAAACAGCTATGAC \
+    --mode all --extract --out out/vpcr
+
+# degenerate primers on the human genome (FM-index, IUPAC), all combinations
+python reference_py/cli/virtual_pcr.py --genome grch38 --primer RTp=CARATGGAYGTNAARAC \
+    --primer RTm=CATRTCRTCNACRTA --mode all --min-product 200 --max-product 500
+```
+
+Rule: <= `--max-mismatch` (3) per oligo, <= `--terminal-max` (1) in the 3'-terminal
+`--terminal-window` (7) nt; IUPAC in oligos and templates; `--template-n`; `--g-tolerant K`
+(G.T/G.G/G.A not counted); probes (`--probe`), linked sequences (`--link A,B,min,max`);
+`--mode pairs|all` (all = fingerprinting incl. single-primer products). **Output:**
+`sites.tsv`, `products.tsv` (sequence with `--extract`, site Tm, Ta = min Tm + ln length),
+`links.tsv`, `summary.json`. Engines: `oligoscout_vpcr_scan` (C++, exhaustive) for FASTA
+templates, `oligoscout_panel` (FM-index) or an exhaustive scan for GRCh38.
+
 ## Evidence record schema
 
 Each check emits a **REP-02 evidence record** (JSONL). Example:
@@ -318,12 +342,13 @@ identical** result; the reference FASTA SHA-256 (SEQ-06) is stored with the resu
 
 | Tool | What it does | Result |
 |---|---|---|
-| Unit tests | `reference_py/tests/` | 292, all passing (1 platform skip) |
+| Unit tests | `reference_py/tests/` | 305, all passing (1 platform skip) |
 | `param_crosscheck.py` | Tables vs primer3 (independent oracle) | 373 comparisons, 0 transcription errors |
 | `salt_crosscheck.py` | Salt layer vs primer3 `oligotm` | 60/60 Tm values identical |
 | `diff_cpp.py` | Python ↔ C++ differential | 74 sequences × 17 columns, 0 differences |
 | `regresyon.py` | 21-step end-to-end | 20 PASS / 1 SKIP / 0 FAIL |
 | `lna_validate.py` | LNA model vs McTigue 2004 Table 1 (98 oligos) | RMSD ΔTm 0.886 °C (paper 0.88); Tm 1.61 °C |
+| `vpcr_validate.py` | Virtual PCR vs virtualPCR's published GRCh38 outputs | 6/6 genes identical; 11/11 degenerate RT amplicons |
 | `benchmarks/scorecard/` | Search vs brute force, Primer-BLAST web, primer3, timings | see [`SCORECARD.md`](OligoScout/benchmarks/scorecard/SCORECARD.md) |
 
 Highlights of the v0.4.0 scorecard: the sensitive search mode (Primer-BLAST's

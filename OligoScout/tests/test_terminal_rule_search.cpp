@@ -31,10 +31,19 @@ char other(char b, int k) {
 
 using Key = std::tuple<std::uint64_t, int, std::uint64_t, std::size_t>;
 
+int iupac(char c) {
+    switch (c) {
+        case 'A': return 1; case 'C': return 2; case 'G': return 4; case 'T': return 8;
+        case 'R': return 5; case 'Y': return 10; case 'S': return 6; case 'W': return 9;
+        case 'K': return 12; case 'M': return 3; case 'B': return 14; case 'D': return 13;
+        case 'H': return 11; case 'V': return 7; case 'N': return 15; default: return 0;
+    }
+}
+int comp_mask(int m) { return ((m & 1) << 3) | ((m & 8) >> 3) | ((m & 2) << 1) | ((m & 4) >> 1); }
+
 std::set<Key> brute(const std::string& ref, const std::string& p, const TerminalRuleOptions& o) {
     std::set<Key> out;
     const std::size_t L = p.size();
-    const std::string rc = revcomp(p);
     for (std::size_t pos = 0; pos + L <= ref.size(); ++pos) {
         for (int strand = 0; strand < 2; ++strand) {
             std::uint64_t mask = 0; std::size_t mm = 0, term = 0; bool n = false;
@@ -42,8 +51,8 @@ std::set<Key> brute(const std::string& ref, const std::string& p, const Terminal
                 const char obs = ref[pos + j];
                 if (obs == 'N') { n = true; break; }
                 const std::size_t pp = strand ? L - 1 - j : j;
-                const char want = strand ? rc[j] : p[j];
-                if (obs != want) { mask |= std::uint64_t{1} << pp; ++mm; if (pp + o.terminal_window >= L) ++term; }
+                const int want = strand ? comp_mask(iupac(p[pp])) : iupac(p[pp]);
+                if ((iupac(obs) & want) == 0) { mask |= std::uint64_t{1} << pp; ++mm; if (pp + o.terminal_window >= L) ++term; }
             }
             if (!n && mm <= o.max_mismatches && term <= o.max_terminal_mismatches)
                 out.insert({pos, strand, mask, mm});
@@ -96,6 +105,23 @@ int main() {
                 return 1;
             }
             std::cout << "terminal_max=" << tmax << ": " << got.size() << " sites == brute force\n";
+        }
+        // IUPAC primer (degenerate consensus) on the same reference, both the
+        // sensitive rule and the anchored-equivalent rule (window 12, 0 terminal)
+        const std::string degenerate = "CCTTRTCNAAGCGGCTCYTG";
+        for (const auto& [win, tmax] : {std::pair<std::size_t, std::size_t>{5, 1}, {12, 0}, {7, 1}}) {
+            TerminalRuleOptions o; o.max_mismatches = 3; o.terminal_window = win; o.max_terminal_mismatches = tmax;
+            const auto hits = search_terminal_rule(index, packed, degenerate, o);
+            std::set<Key> got;
+            for (const auto& h : hits)
+                got.insert({h.position, h.orientation == PrimerOrientation::Reverse ? 1 : 0, h.mismatch_mask, h.mismatches});
+            const auto want = brute(ref, degenerate, o);
+            if (got != want || got.empty()) {
+                std::cerr << "IUPAC window=" << win << " got " << got.size() << " want " << want.size() << '\n';
+                return 1;
+            }
+            std::cout << "IUPAC window=" << win << " terminal_max=" << tmax << ": " << got.size()
+                      << " sites == brute force\n";
         }
         std::cout << "terminal_rule_search: PASS\n";
         return 0;
