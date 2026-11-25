@@ -137,7 +137,10 @@ class OAuthFlow(unittest.TestCase):
         cid = json.loads(body)["client_id"]
         q = {"response_type": "code", "client_id": cid, "redirect_uri": redirect, "code_challenge": "a" * 43,
              "code_challenge_method": "S256", "state": "s1"}
-        _, _, page = req(self.base + "/mcp/oauth/authorize?" + urllib.parse.urlencode(q))
+        _, hdr, page = req(self.base + "/mcp/oauth/authorize?" + urllib.parse.urlencode(q))
+        # the consent form's POST is answered by a redirect to the client: CSP form-action
+        # must allow that origin or browsers silently block the "allow" button
+        self.assertIn("form-action 'self' http://localhost:9;", hdr["Content-Security-Policy"])
         fields = dict(re.findall(r'<input type="hidden" name="([^"]+)" value="([^"]*)"', page.decode()))
         fields = {k: v.replace("&amp;", "&") for k, v in fields.items()}
         fields["decision"] = "deny"

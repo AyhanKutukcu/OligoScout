@@ -415,9 +415,14 @@ class _Handler(BaseHTTPRequestHandler):
             if err:
                 self._send(HTTPStatus.BAD_REQUEST, f"OAuth isteği geçersiz: {err}".encode(), ctype="text/plain")
             else:
+                # form-action also governs the redirect that follows the form POST: browsers
+                # block the 302 to the client's callback unless its origin is listed here.
+                cb = urlsplit(q.get("redirect_uri", ""))
+                cb_src = (f"{cb.scheme}://{cb.netloc}" if cb.scheme in ("http", "https") and cb.netloc
+                          else f"{cb.scheme}:" if cb.scheme else "")
                 self._send(HTTPStatus.OK, o.consent_page(q, client).encode(), ctype="text/html",
                            headers={"Content-Security-Policy": "default-src 'none'; style-src 'unsafe-inline'; "
-                                    "form-action 'self'; frame-ancestors 'none'"})
+                                    f"form-action 'self' {cb_src}; frame-ancestors 'none'"})
             return True
         return False
 
