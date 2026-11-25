@@ -41,8 +41,22 @@ if [[ ! -s "$APP/OligoScout/data/annotations/grch38_extra_contigs.fa" ]]; then
     fi
 fi
 
-echo "== 5/7 web data + site"
-as_app "python3 web/build_web_data.py && python3 web/build_site.py"
+echo "== 5/7 web site"
+# The single-file site embeds demo results from reference_py/out and hedef_chr22.fa, which
+# live on the development machine. Where they exist the site is rebuilt here; otherwise
+# the web/index.html uploaded from the development machine (scp) is served as is.
+if [[ -s "$APP/hedef_chr22.fa" && -d "$APP/reference_py/out/design_ctdna" ]]; then
+    as_app "python3 web/build_web_data.py && python3 web/build_site.py"
+elif [[ -s "$APP/web/index.html" ]]; then
+    chown "$SVC_USER:$SVC_USER" "$APP/web/index.html"
+    echo "   using the uploaded web/index.html ($(stat -c %y "$APP/web/index.html" | cut -d. -f1));"
+    grep -q "Sanal PCR" "$APP/web/index.html" && echo "   site build includes the v0.5 virtual PCR form" \
+        || echo "   WARNING: this web/index.html predates v0.5 (no virtual PCR form): upload the new one"
+else
+    echo "   web/index.html missing: upload it from the development machine, e.g."
+    echo "   scp web\\index.html <user>@<server>:$APP/web/index.html"
+    exit 1
+fi
 
 echo "== 6/7 systemd units + restart"
 install -d -m 750 -o "$SVC_USER" -g "$SVC_USER" /etc/oligoscout
