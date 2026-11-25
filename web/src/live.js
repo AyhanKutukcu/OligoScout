@@ -381,12 +381,14 @@ function renderLocalOutput(tool, result) {
   if (tool === 'vpcr') {
     const s = result.summary || {};
     const r = s.rule || {};
-    const head = `<p class="small muted">${esc(s.engine || '')} · ≤ ${r.max_mismatch} uyumsuzluk/oligo, son ${r.terminal_window} bazda ≤ ${r.terminal_max}`
-      + (r.template_n && r.template_n !== 'reject' ? ` · kalıpta N: ${esc(r.template_n)}` : '')
-      + ` · ${esc(s.mode)} · ${s.product_range?.[0]}–${s.product_range?.[1]} bp · ${s.products} ürün`
-      + (s.products_wrapping_origin ? ` (${s.products_wrapping_origin} tanesi orijinden geçiyor)` : '') + `</p>
+    // Each part is its own element so the page translation can match it on its own.
+    const parts = [esc(s.engine || ''), `≤ ${r.max_mismatch} uyumsuzluk/oligo, son ${r.terminal_window} bazda ≤ ${r.terminal_max}`,
+      r.template_n && r.template_n !== 'reject' ? `kalıpta N: ${esc(r.template_n)}` : '', esc(s.mode || ''),
+      `${s.product_range?.[0]}–${s.product_range?.[1]} bp`,
+      s.products_wrapping_origin ? `${s.products} ürün (${s.products_wrapping_origin} tanesi orijinden geçiyor)` : `${s.products} ürün`].filter(Boolean);
+    const head = `<p class="small muted">${parts.map(x => `<span>${x}</span>`).join(' · ')}</p>
       <p class="tiny faint">Ta = en düşük primer-yer Tm'i + ln(ürün uzunluğu) (Kalendar ve ark. 2024). Yer Tm'i: çoklu iç uyumsuzluk için Allawi–Peyret NN, uçtaki uyumsuzluklar kırpılır.</p>`;
-    const prods = (result.products || []).map(p => ({...p, region: `${p.record}:${(+p.start + 1).toLocaleString('tr-TR')}-${(+p.end_exclusive).toLocaleString('tr-TR')}`}));
+    const prods = (result.products || []).map(p => ({...p, region: `${p.record}:${(+p.start + 1).toLocaleString(numLocale())}-${(+p.end_exclusive).toLocaleString(numLocale())}`}));
     return liveResult('Sanal PCR ürünleri', head + localRows(prods.slice(0, 500), [
       ['product_id','Ürün'], ['region','Konum (1 tabanlı)'], ['topology','Topoloji'], ['orientation','Oligolar'],
       ['amplicon_length','bp'], ['left_mismatches','Sol uyumsuz'], ['right_mismatches','Sağ uyumsuz'],
@@ -457,7 +459,7 @@ RENDER.yerel = el => {
         ${[...localSources].reverse().map(([id, label]) => `<option value="${esc(id)}" ${source === id ? 'selected' : ''}>
         Yerel tasarım · ${esc(label)} · ${esc(id.slice(0, 5))}</option>`).join('')}
         </select></label>
-        ${!pairs.length ? `<div class="note">${ic('info')}<div>Bu analiz için bir primer çifti gerekir. <a href="/tasarla">Primer Tasarla</a> sayfasında kendi hedefinizi çalıştırın.</div></div>` :
+        ${!pairs.length ? `<div class="note">${ic('info')}<div>Bu analiz için bir primer çifti gerekir. <a href="/design">Primer Tasarla</a> sayfasında kendi hedefinizi çalıştırın.</div></div>` :
         tool === 'scan' ? `<fieldset class="live-fieldset"><legend>Taranacak çiftler</legend><button type="button" class="btn sm" id="selectAllPairs">Tümünü seç</button>
           <div class="live-pairs">${pairs.map(pm => `<label class="switch"><input type="checkbox" name="pair" value="${esc(pm.key)}" ${selectedKeys.includes(pm.key) ? 'checked' : ''}>
           ${esc(pm.id)} · ${pm.prod} bp</label>`).join('')}</div></fieldset>` :
@@ -489,7 +491,7 @@ RENDER.yerel = el => {
       <div class="row"><button id="runLocalTool" type="submit" class="btn pri" ${!liveReady() || LIVE.pending.has(key) || (pairTool && !pairs.length) ? 'disabled' : ''}>Analizi çalıştır</button></div>
     </form></section>
     ${LIVE.last?.tool === tool ? `<div class="row"><button class="btn sm" id="localDownload">Sonucu JSON olarak indir</button>
-      ${pairTool && choice ? `<a class="btn sm" href="${choice.kind === 'project' ? '/dokumantasyon/cift/' + choice.key : '/cift'}">Çift incelemeyi aç</a>` : ''}</div>${renderLocalOutput(tool, LIVE.last.result)}` : ''}
+      ${pairTool && choice ? `<a class="btn sm" href="${routeUrl(choice.kind === 'project' ? 'dokumantasyon/cift/' + choice.key : 'cift')}">Çift incelemeyi aç</a>` : ''}</div>${renderLocalOutput(tool, LIVE.last.result)}` : ''}
   </div>`;
   const form = $('#localForm', el);
   $('#localTool', el).onchange = e => { LIVE.tool = e.target.value; rerender(); };

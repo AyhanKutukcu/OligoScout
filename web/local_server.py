@@ -19,10 +19,13 @@ from local_engine import LocalEngine, clean_json
 
 WEB = Path(__file__).resolve().parent
 JOB_ID = re.compile(r"[a-f0-9]{24}")
-# Page addresses of the single-page app (oligoscout.org/tasarla, /dokumantasyon/cift/...):
+# Page addresses of the single-page app (oligoscout.org/design, /docs/pair/...):
 # each is answered with index.html and the browser-side router picks the view.
-APP_ROUTE = re.compile(r"/(?:genel|tasarla|multipleks|cift|yerel|katalog|dokumantasyon|iletisim|"
-                       r"panel|prob|erime|dogrulama)(?:/[A-Za-z0-9_.:%-]+){0,3}/?")
+APP_ROUTE = re.compile(r"/(?:overview|design|multiplex|pair|analysis|catalog|docs|contact|"
+                       r"panel|probes|melt|validation|"
+                       # older Turkish addresses, rewritten to the English ones in the browser
+                       r"genel|tasarla|multipleks|cift|yerel|katalog|dokumantasyon|iletisim|"
+                       r"prob|erime|dogrulama)(?:/[A-Za-z0-9_.:%-]+){0,3}/?")
 MAX_BODY = 64000
 MAX_JOBS = 40
 MAX_PENDING = 4

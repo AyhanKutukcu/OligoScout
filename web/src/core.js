@@ -7,13 +7,19 @@ const COND0 = {na:50, mg:1.5, dntp:0.6, pnm:200, ta:60};
 const $ = (s, r=document) => r.querySelector(s);
 const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const nf = (x, d=1) => (x==null || x==='' || isNaN(+x)) ? '—' : (+x).toLocaleString('tr-TR', {minimumFractionDigits:d, maximumFractionDigits:d});
-const ni = x => (x==null||isNaN(+x)) ? '—' : Math.round(+x).toLocaleString('tr-TR');
-const gpos = i => (OFF + i + 1).toLocaleString('tr-TR');          // 0-tabanlı şablon indeksi → 1-tabanlı chr22 koordinatı
-const afFmt = a => a==null ? '—' : a >= 0.01 ? (a*100).toLocaleString('tr-TR',{maximumFractionDigits:1})+' %' : a >= 1e-4 ? (a*100).toLocaleString('tr-TR',{maximumFractionDigits:3})+' %' : a.toExponential(1).replace('e-','×10⁻').replace(/⁻(\d+)/, (m,g)=>'⁻'+g.split('').map(c=>'⁰¹²³⁴⁵⁶⁷⁸⁹'[c]).join(''));
+// Numbers follow the page language: 1,234.5 in English, 1.234,5 in Turkish.
+function numLocale() { try { return siteLanguage === 'en' ? 'en-US' : 'tr-TR'; } catch { return 'tr-TR'; } }
+const pct = (x, d=1) => { const v = nf(x, d); try { return siteLanguage === 'en' ? v + '%' : '%' + v; } catch { return '%' + v; } };
+const nf = (x, d=1) => (x==null || x==='' || isNaN(+x)) ? '—' : (+x).toLocaleString(numLocale(), {minimumFractionDigits:d, maximumFractionDigits:d});
+const ni = x => (x==null||isNaN(+x)) ? '—' : Math.round(+x).toLocaleString(numLocale());
+const gpos = i => (OFF + i + 1).toLocaleString(numLocale());          // 0-tabanlı şablon indeksi → 1-tabanlı chr22 koordinatı
+const afFmt = a => a==null ? '—' : a >= 0.01 ? (a*100).toLocaleString(numLocale(),{maximumFractionDigits:1})+' %' : a >= 1e-4 ? (a*100).toLocaleString(numLocale(),{maximumFractionDigits:3})+' %' : a.toExponential(1).replace('e-','×10⁻').replace(/⁻(\d+)/, (m,g)=>'⁻'+g.split('').map(c=>'⁰¹²³⁴⁵⁶⁷⁸⁹'[c]).join(''));
 const sevRank = s => ({FAIL:3, WARN:2, INFO:1, PASS:1, OK:1}[s] || 0);
 const worst = arr => arr.reduce((w, s) => sevRank(s) > sevRank(w) ? s : w, 'INFO');
 const tidyKey = k => String(k).replace(/_/g,' ');
+// Text inside nested evidence values (JSON shown as text) follows the page language as well.
+const localizeDeep = x => typeof x === 'string' ? translateMessage(x) : Array.isArray(x) ? x.map(localizeDeep)
+  : x && typeof x === 'object' ? Object.fromEntries(Object.entries(x).map(([k, y]) => [k, localizeDeep(y)])) : x;
 const technicalField = key => /sha[-_]?256|digest|calibration_status/i.test(key);
 const evidenceJson = (value, space) => JSON.stringify(value, (key, item) => technicalField(key) ? undefined : item, space);
 
@@ -277,18 +283,47 @@ const VIEWS = [
   {id:'iletisim', t:'İletişim', i:'info', grp:'Destek'}
 ];
 const RENDER = {};
-/* Clean URLs: oligoscout.org/tasarla instead of oligoscout.org/#tasarla.
-   The History API needs a server, so a page opened from disk (file://) keeps hash routes. */
+/* Clean English page addresses: oligoscout.org/design, /docs/panel, /docs/pair/<key>/map.
+   Views keep their internal ids; only the address bar uses the English slugs. Older links
+   (/tasarla, /#tasarla) still open and are rewritten. A page opened from disk (file://)
+   has no server for the History API, so it keeps hash routes (#design). */
 const HASH_ROUTES = location.protocol === 'file:';
-const ROUTE_ROOTS = new Set([...VIEWS.map(v => v.id), 'panel', 'prob', 'erime', 'dogrulama']);
+const URL_SLUG = {genel:'overview', tasarla:'design', multipleks:'multiplex', cift:'pair', yerel:'analysis',
+  katalog:'catalog', dokumantasyon:'docs', iletisim:'contact', panel:'panel', prob:'probes', erime:'melt',
+  dogrulama:'validation'};
+const TAB_SLUG = {harita:'map', ozgulluk:'specificity', varyant:'variants', yapi:'structure',
+  termo:'thermodynamics', kanit:'evidence'};
+const invertMap = o => Object.fromEntries(Object.entries(o).map(([k, v]) => [v, k]));
+const SLUG_ID = invertMap(URL_SLUG), TAB_ID = invertMap(TAB_SLUG);
+const ROUTE_ROOTS = new Set([...Object.keys(URL_SLUG), ...Object.values(URL_SLUG)]);
+const trimRoute = value => String(value).replace(/^[#/]+|\/+$/g, '');
+function routeToUrlPath(path) {      // internal ids -> English address
+  const [page, section, key, tab, ...rest] = trimRoute(path).split('/');
+  const out = [URL_SLUG[page] ?? page];
+  if (section !== undefined) out.push(page === 'dokumantasyon' ? URL_SLUG[section] ?? section : section);
+  if (key !== undefined) out.push(key);
+  if (tab !== undefined) out.push(page === 'dokumantasyon' && section === 'cift' ? TAB_SLUG[tab] ?? tab : tab);
+  const url = [...out, ...rest].join('/');
+  return url === 'overview' ? '' : url;
+}
+function urlPathToRoute(path) {      // English (or older Turkish) address -> internal ids
+  const [slug, section, key, tab, ...rest] = trimRoute(path).split('/');
+  const page = SLUG_ID[slug] ?? slug;
+  // Example pages also open at the top level (/melt); their address is /docs/melt.
+  if (['panel', 'prob', 'erime', 'dogrulama'].includes(page)) return 'dokumantasyon/' + page;
+  const out = [page];
+  if (section !== undefined) out.push(page === 'dokumantasyon' ? SLUG_ID[section] ?? section : section);
+  if (key !== undefined) out.push(key);
+  if (tab !== undefined) out.push(out[1] === 'cift' ? TAB_ID[tab] ?? tab : tab);
+  return [...out, ...rest].join('/');
+}
 function routePath() {
   const raw = HASH_ROUTES ? location.hash.slice(1) : location.pathname;
-  try { return decodeURIComponent(raw).replace(/^[#/]+|\/+$/g, ''); } catch { return ''; }
+  try { return urlPathToRoute(decodeURIComponent(raw)); } catch { return ''; }
 }
 function routeUrl(path) {
-  path = String(path).replace(/^[#/]+|\/+$/g, '');
-  if (path === 'genel') path = '';
-  return HASH_ROUTES ? (path ? '#' + path : location.pathname) : '/' + path;
+  const url = routeToUrlPath(path);
+  return HASH_ROUTES ? (url ? '#' + url : location.pathname) : '/' + url;
 }
 function navigate(path, {replace = false} = {}) {
   const url = routeUrl(path);
@@ -299,11 +334,13 @@ function navigate(path, {replace = false} = {}) {
   route();
 }
 function route() {
-  // Old shared links such as /#tasarla keep working and are rewritten to /tasarla.
-  if (!HASH_ROUTES && location.hash.length > 1 && ROUTE_ROOTS.has(location.hash.slice(1).split('/')[0])) {
-    history.replaceState(null, '', routeUrl(location.hash.slice(1)));
-  } else if (!HASH_ROUTES && location.pathname.replace(/\/+$/, '') === '/genel') {
-    history.replaceState(null, '', '/');
+  if (!HASH_ROUTES) {
+    // Old links such as /#tasarla or /tasarla are rewritten to /design.
+    const legacy = location.hash.length > 1 && ROUTE_ROOTS.has(trimRoute(location.hash).split('/')[0]);
+    let path = '';
+    try { path = urlPathToRoute(decodeURIComponent(legacy ? location.hash.slice(1) : location.pathname)); } catch {}
+    const canonical = routeUrl(path);
+    if (legacy || canonical !== location.pathname) history.replaceState(null, '', canonical + (legacy ? '' : location.search));
   }
   const [page, section, key, tab] = routePath().split('/');
   const examples = ['panel', 'prob', 'erime', 'dogrulama'];
@@ -337,14 +374,14 @@ const SUBT = {
 };
 window.addEventListener('hashchange', route);
 window.addEventListener('popstate', route);
-// In-app links are plain paths (href="/tasarla"); handle them without a page reload.
+// In-app links are plain paths (href="/design"); handle them without a page reload.
 document.addEventListener('click', e => {
   if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
   const a = e.target.closest?.('a[href]');
   if (!a || (a.target && a.target !== '_self') || a.hasAttribute('download')) return;
   const href = a.getAttribute('href');
   if (!/^\/(?!\/)/.test(href) && href !== '/') return;
-  const path = href.replace(/^\/+/, '');
+  const path = trimRoute(href);
   if (path && !ROUTE_ROOTS.has(path.split('/')[0])) return;
-  e.preventDefault(); navigate(path);
+  e.preventDefault(); navigate(urlPathToRoute(path));
 });

@@ -5,13 +5,13 @@ Tüm iş WSL2 içinde, tek script olarak sırayla çalışır: `setup/00_bootstr
 
 ## Yerel web arayüzü
 
-Windows'ta depo kökündeki `RUN_WEB.cmd` dosyasını çalıştırın. Terminalde hazır mesajı göründüğünde [yerel OligoScout](http://127.0.0.1:8765/#genel) adresini açın. Terminali kapatınca yerel servis durur.
+Windows'ta depo kökündeki `RUN_WEB.cmd` dosyasını çalıştırın. Terminalde hazır mesajı göründüğünde [yerel OligoScout](http://127.0.0.1:8765/) adresini açın. Terminali kapatınca yerel servis durur.
 
 `Primer Tasarla`, yerel GRCh38.p14 FASTA'sından 1–22, X veya Y kromozomuna ait 1 tabanlı koordinatları okur. En fazla 5.000 baz seçilebilir. Tasarım, C++ özgüllük taramasını ve Python kalite kontrolünü otomatik çalıştırır. Sonuçtan `Çift İnceleme` ekranını açarak Varyant, Yapı & Dimer ve Termodinamik grafiklerini görebilirsiniz. `Yerel Analiz` birden fazla çiftle panel taraması ve multipleks çalıştırır. Bisülfit tasarımında CT veya GA seçin. Özgüllük işlemi her iki dönüşüm indeksini okur. Prob, blocker, erime, GENCODE izoformu ve varyant sonuçları aynı analiz ekranında açılabilir.
 
-[Multipleks Tasarla](http://127.0.0.1:8765/#multipleks), 2–8 GRCh38 hedefi için adayları ayrı ayrı üretip tarar. Hedef başına 1–4 aday, ortak Tm aralığı, dimer sınırları ve ürün boyu ayrımı girilebilir. Aynı havuza alınabilecek hedeflerden birer çift seçilir; kapsanamayan hedefler ve gerçek QC uyarıları belirtilir. Seçilen panel TSV olarak indirilir. Tekli ve multipleks tasarım formunun varsayılan profili Sanger'dır.
+[Multipleks Tasarla](http://127.0.0.1:8765/multiplex), 2–8 GRCh38 hedefi için adayları ayrı ayrı üretip tarar. Hedef başına 1–4 aday, ortak Tm aralığı, dimer sınırları ve ürün boyu ayrımı girilebilir. Aynı havuza alınabilecek hedeflerden birer çift seçilir; kapsanamayan hedefler ve gerçek QC uyarıları belirtilir. Seçilen panel TSV olarak indirilir. Tekli ve multipleks tasarım formunun varsayılan profili Sanger'dır.
 
-[Dokümantasyon](http://127.0.0.1:8765/#dokumantasyon) sayfasında adım adım giriş ve çıktı örnekleri, eski proje şablonu, Kayıtlı Panel, Multipleks, Prob & Blocker, qPCR Erime ve motor doğrulama sonuçları bulunur.
+[Dokümantasyon](http://127.0.0.1:8765/docs) sayfasında adım adım giriş ve çıktı örnekleri, eski proje şablonu, Kayıtlı Panel, Multipleks, Prob & Blocker, qPCR Erime ve motor doğrulama sonuçları bulunur.
 
 Primer tasarımı C++ özgüllük taramasını otomatik çalıştırır. Yeni liste, seçilen arama sözleşmesinde her primerin birer tam bağlanma yeri, tek beklenen ürün ve sıfır hedef dışı ürün bulunan çiftleri içerir. Bisülfit için diğer dönüşümde ürün olmaması da gerekir.
 

@@ -14,7 +14,7 @@ RENDER.multipleks = el => {
     <section class="card"><div class="bd mx-intro">
       <div><div class="eyebrow">ÇOK HEDEFLİ PRIMER TASARIMI</div><h2>Birlikte çalışacak primerleri seçin</h2>
       <p class="muted">Hedef bölgelerinizi girin. Her hedef için özgüllüğü kontrol edilen adaylar üretilir; çapraz ürün, dimer, Tm ve ürün boyu koşullarına uyan çiftler aynı panelde birleştirilir.</p></div>
-      <a class="btn sm" href="/dokumantasyon/multipleks">Örnek sonuçları gör</a>
+      <a class="btn sm" href="/docs/multiplex">Örnek sonuçları gör</a>
     </div></section>
     <div class="mx-layout">
       <form class="card" id="mxForm" autocomplete="off">
@@ -151,7 +151,7 @@ function renderMultiplexResult(host){
       <h2>Paneliniz burada oluşacak</h2><ol class="doc-steps">
       <li>Hedef bölgeleri ve ortak koşulları girin.</li><li>Adayları üretin ve genom özgüllüğünü tarayın.</li>
       <li>Birlikte kullanılabilecek çiftleri ve etkileşim matrisini inceleyin.</li></ol>
-      <a class="btn sm" href="/dokumantasyon/multipleks">Multipleks örneğini incele</a></div></div>`;return;
+      <a class="btn sm" href="/docs/multiplex">Multipleks örneğini incele</a></div></div>`;return;
   }
   const pairs=MPD.pms.filter(p=>result.selected.includes(p.id));
   const summary=result.summary;

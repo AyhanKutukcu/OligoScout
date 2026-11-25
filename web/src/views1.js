@@ -16,8 +16,8 @@ RENDER.genel = el => {
       <div class="overview-copy">
         <h2>Primer tasarımından genom kontrolüne</h2>
         <p>İnsan referans genomu üzerinde PCR primerleri tasarlayın. Özgüllük, erime sıcaklığı, dimer riski ve gnomAD varyantlarını birlikte inceleyin.</p>
-        <div class="row live-actions"><a class="btn pri" href="/tasarla">Primer tasarla</a>
-          <a class="btn" href="/multipleks">Multipleks tasarla</a><a class="btn" href="/dokumantasyon">Dokümantasyon</a></div>
+        <div class="row live-actions"><a class="btn pri" href="/design">Primer tasarla</a>
+          <a class="btn" href="/multiplex">Multipleks tasarla</a><a class="btn" href="/docs">Dokümantasyon</a></div>
       </div>
       <div class="overview-visual" aria-hidden="true"><img src="__OVERVIEW_ART__" alt="" width="1254" height="1254"></div>
     </div></section>
@@ -25,7 +25,7 @@ RENDER.genel = el => {
       ${[['design','Tasarım','GRCh38 bölgesine ve PCR koşullarına göre aday çiftler bulun.','tasarla'],
         ['target','Özgüllük','Primerlerin 24 kromozomda oluşturabileceği hedef dışı ürünleri inceleyin.','yerel'],
         ['list','Kanıt','Termodinamik, varyant ve dimer kayıtlarını ölçüm ve eşikleriyle okuyun.','cift']].map(([icon,title,desc,view]) =>
-        `<a class="card intro-step" href="/${view}"><span class="overview-step-icon">${ic(icon)}</span><h3>${title}</h3><p>${desc}</p></a>`).join('')}
+        `<a class="card intro-step" href="${routeUrl(view)}"><span class="overview-step-icon">${ic(icon)}</span><h3>${title}</h3><p>${desc}</p></a>`).join('')}
     </div>
     <section class="card"><div class="hd"><h2>Analiz ve veri kaynakları</h2></div><div class="bd">
       ${!ready ? liveNote(localAvailability()) : ''}
@@ -59,7 +59,7 @@ RENDER.panel = el => {
           <span class="chip">çapa <b>${ct.anchor_length}</b> nt · maks <b>${ct.max_mismatches}</b> uyumsuzluk · ürün ${ct.min_amplicon_length}–${ct.max_amplicon_length} bp</span>
         </div>
       </div>
-      <div class="ringbox">${ring}<div class="small" style="line-height:1.7"><div><i class="dot" style="background:var(--accent)"></i> ${CAT_FULL} tam uygulandı</div><div><i class="dot" style="background:var(--warn)"></i> ${CAT_IMPL-CAT_FULL} kısmi (SPC-08)</div><div><i class="dot" style="background:var(--sunk);border:1px solid var(--line2)"></i> ${CAT.length-CAT_IMPL} altyapı/veri bekliyor</div><a href="/katalog" class="small">Kataloğu aç →</a></div></div>
+      <div class="ringbox">${ring}<div class="small" style="line-height:1.7"><div><i class="dot" style="background:var(--accent)"></i> ${CAT_FULL} tam uygulandı</div><div><i class="dot" style="background:var(--warn)"></i> ${CAT_IMPL-CAT_FULL} kısmi (SPC-08)</div><div><i class="dot" style="background:var(--sunk);border:1px solid var(--line2)"></i> ${CAT.length-CAT_IMPL} altyapı/veri bekliyor</div><a href="/catalog" class="small">Kataloğu aç →</a></div></div>
     </div></div>
 
     <div class="g4">
@@ -82,7 +82,7 @@ RENDER.panel = el => {
 
     <div class="g2">
       <div class="card"><div class="hd"><h2>Boru hattı</h2><span class="sp"></span><span class="faint small">bu panelin geçtiği adımlar</span></div><div class="bd">${pipeline()}</div></div>
-      <div class="card"><div class="hd"><h2>Aile başına kapsam</h2><span class="sp"></span><a class="small" href="/katalog">tüm kurallar →</a></div><div class="bd" style="display:grid;gap:7px">
+      <div class="card"><div class="hd"><h2>Aile başına kapsam</h2><span class="sp"></span><a class="small" href="/catalog">tüm kurallar →</a></div><div class="bd" style="display:grid;gap:7px">
         ${fams.map(({f, rs}) => { const full = rs.filter(r => r.status === 'etiketli_uygulandi').length, part = rs.filter(r => r.status === 'etiketli_kismi').length, pend = rs.length - full - part;
           return `<div style="display:grid;grid-template-columns:130px 1fr 44px;gap:10px;align-items:center;font-size:12.5px"><span>${FAMTR[f]}</span><div style="display:flex;height:9px;border-radius:5px;overflow:hidden;background:var(--sunk)">${'<i style="background:var(--accent);width:'+full/rs.length*100+'%"></i>'}${'<i style="background:var(--warn);width:'+part/rs.length*100+'%"></i>'}${'<i style="background:var(--probe);opacity:.5;width:'+pend/rs.length*100+'%"></i>'}</div><span class="mono tiny faint" style="text-align:right">${full+part}/${rs.length}</span></div>`; }).join('')}
       </div></div>
@@ -185,9 +185,9 @@ RENDER.tasarla = el => {
       } catch (error) { info.textContent = error.message; }
       return;
     }
-    const t = currentTemplate(true); $('#tplInfo', el).innerHTML = t.err ? `<span style="color:var(--fail)">${esc(t.err)}</span>` : `<b class="mono">${t.seq.length.toLocaleString('tr-TR')} bp</b> · GC %${nf(OS.gcf(t.seq)*100,1)} · ${(t.seq.match(/[^ACGT]/g)||[]).length} belirsiz baz${t.range ? ` · aralık <span class="mono">${t.range[0]+1}–${t.range[1]}</span>` : ''}`; };
+    const t = currentTemplate(true); $('#tplInfo', el).innerHTML = t.err ? `<span style="color:var(--fail)">${esc(t.err)}</span>` : `<b class="mono">${t.seq.length.toLocaleString(numLocale())} bp</b> · GC ${pct(OS.gcf(t.seq)*100,1)} · ${(t.seq.match(/[^ACGT]/g)||[]).length} belirsiz baz${t.range ? ` · aralık <span class="mono">${t.range[0]+1}–${t.range[1]}</span>` : ''}`; };
   ['fasta','gregion','tFrom','tTo'].forEach(id => $('#'+id, el).addEventListener('input', () => { if (id === 'fasta') DSG.fasta = $('#fasta', el).value; if (id === 'gregion') DSG.region = $('#gregion', el).value; tplInfo(); }));
-  $('#ffile', el).addEventListener('change', e => { const f = e.target.files[0]; if (!f) return; if (f.size > 100000) { $('#fname', el).textContent = 'FASTA dosyası 100 KB sınırını aşıyor.'; return; } const rd = new FileReader(); rd.onload = () => { DSG.fasta = String(rd.result); DSG.fname = f.name + ' · ' + f.size.toLocaleString('tr-TR') + ' bayt'; $('#fname', el).textContent = DSG.fname; $('#fasta', el).value = DSG.fasta; tplInfo(); }; rd.readAsText(f); });
+  $('#ffile', el).addEventListener('change', e => { const f = e.target.files[0]; if (!f) return; if (f.size > 100000) { $('#fname', el).textContent = 'FASTA dosyası 100 KB sınırını aşıyor.'; return; } const rd = new FileReader(); rd.onload = () => { DSG.fasta = String(rd.result); DSG.fname = f.name + ' · ' + f.size.toLocaleString(numLocale()) + ' bayt'; $('#fname', el).textContent = DSG.fname; $('#fasta', el).value = DSG.fasta; tplInfo(); }; rd.readAsText(f); });
   $('#prof', el).addEventListener('change', () => { const p = PROFILES[$('#prof', el).value]; if (!p) return; DSG.profile = p.profile;
     $('#convField', el).hidden = p.profile !== 'bisulfite' || LIVE.mode === 'file';
     $('#pmin', el).value = p.product_bp[0]; $('#pmax', el).value = p.product_bp[1]; $('#tmin', el).value = p.tm_window_c[0]; $('#tmax', el).value = p.tm_window_c[1]; $('#topt', el).value = (p.tm_window_c[0] + p.tm_window_c[1]) / 2;
@@ -221,7 +221,7 @@ function currentTemplate(quiet) {
     const m = String(DSG.region).replace(/[,.\s]/g, '').match(/^(chr)?(\w+):(\d+)-(\d+)$/i);
     if (!m) return {err:'Bölgeyi kromozom:başlangıç-bitiş biçiminde girin.'};
     const ch = 'chr' + m[2].replace(/^chr/i, ''), a = +m[3], b = +m[4];
-    if (ch.toLowerCase() !== 'chr22' || a < OFF + 1 || b > OFF + TPL.length || b <= a) return {err:`Bu bölgenin dizisi pakette yok (yalnız chr22:${(OFF+1).toLocaleString('tr-TR')}–${(OFF+TPL.length).toLocaleString('tr-TR')}). FASTA yapıştırın.`};
+    if (ch.toLowerCase() !== 'chr22' || a < OFF + 1 || b > OFF + TPL.length || b <= a) return {err:`Bu bölgenin dizisi pakette yok (yalnız chr22:${(OFF+1).toLocaleString(numLocale())}–${(OFF+TPL.length).toLocaleString(numLocale())}). FASTA yapıştırın.`};
     seq = TPL; name = D.meta.header; off = OFF; hasVar = true; range = [a - 1 - OFF, b - OFF];
   } else { const p = parseFasta(DSG.fasta); seq = p.seq; name = p.name; if (!seq) return {err:'Dizi yapıştırın ya da dosya seçin.'};
     const bad = seq.match(/[^ACGTN]/g); if (bad) return {err:`Tanınmayan karakter: ${[...new Set(bad)].slice(0,5).join(', ')} (SEQ-01)`};
@@ -234,7 +234,7 @@ function designIntro() {
     <div class="eyebrow">TASARIM AKIŞI</div><h2 style="margin:6px 0 10px">Bir hedef bölge seçin</h2>
     <p class="muted" style="max-width:68ch">Primer adayları sıralanır ve 24 kromozomda taranır. Sonuç listesi, beklenen tek ürün ve her primer için tek tam bağlanma yeri bulunan çiftleri gösterir.</p>
     <p class="small faint">FASTA dosyasının başlığı ve dizisi GRCh38.p14 aralığıyla doğrulanır.</p>
-    <a class="btn sm" href="/dokumantasyon">Giriş ve çıktı örneklerini gör</a>
+    <a class="btn sm" href="/docs">Giriş ve çıktı örneklerini gör</a>
     ${LIVE.mode === 'file' ? liveNote('Özgüllük taramasıyla primer tasarlamak için RUN_WEB.cmd dosyasını çalıştırın.') : ''}
     </div></div>`;
 }

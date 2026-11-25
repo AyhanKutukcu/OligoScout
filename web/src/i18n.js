@@ -124,5 +124,8 @@ function initSiteLanguage() {
     if (!button || button.dataset.siteLanguage === siteLanguage) return;
     applySiteLanguage(button.dataset.siteLanguage);
     try { localStorage.setItem(LOCALE_STORAGE_KEY, siteLanguage); } catch (_) {}
+    // Read-only views are redrawn so their numbers take the new format (1,234.5 vs 1.234,5);
+    // views with forms or results keep their DOM and pick it up on the next render.
+    if (['genel', 'katalog', 'dokumantasyon', 'iletisim'].includes(STATE.view)) rerender();
   });
 }

@@ -10,7 +10,7 @@ function overviewTrack(width, opts) {
   const span = hi - lo, maxT = Math.max(3, Math.floor(iw / 92)); const step = [10,20,25,50,100,200,250,500,1000,2000,5000,10000].find(s => span / s <= maxT) || 20000;
   out.push(`<line x1="${m.l}" x2="${width-m.r}" y1="${y+14}" y2="${y+14}" stroke="${css('--line2')}"/>`);
   for (let i = Math.ceil(lo / step) * step; i <= hi; i += step) { const X = x(i);
-    out.push(`<line x1="${X}" x2="${X}" y1="${y+10}" y2="${y+18}" stroke="${css('--line2')}"/><text x="${X}" y="${y+6}" class="axm" text-anchor="middle">${off ? (off + i + 1).toLocaleString('tr-TR') : (i + 1).toLocaleString('tr-TR')}</text>`); }
+    out.push(`<line x1="${X}" x2="${X}" y1="${y+10}" y2="${y+18}" stroke="${css('--line2')}"/><text x="${X}" y="${y+6}" class="axm" text-anchor="middle">${off ? (off + i + 1).toLocaleString(numLocale()) : (i + 1).toLocaleString(numLocale())}</text>`); }
   out.push(`<text x="4" y="${y+17}" class="ax">${variantPair?.chrom || pairs[0]?.chrom || (off ? CHR : 'konum')}</text>`); y += 26;
   if (region) out.push(`<rect x="${x(region[0])}" y="${y-4}" width="${Math.max(2, x(region[1]+1)-x(region[0]))}" height="2000" fill="${css('--accent')}" opacity=".06"/>`);
   if (showGC) {
@@ -40,10 +40,10 @@ function overviewTrack(width, opts) {
   y += pairs.length * rowH + 6;
   return `<svg width="${width}" height="${y}" viewBox="0 0 ${width} ${y}" role="img" aria-label="Şablon üzerindeki primer çiftleri">${out.join('')}</svg>`;
 }
-const gposAny = (p, i) => p.tplOff ? (p.tplOff + i + 1).toLocaleString('tr-TR') : (i + 1).toLocaleString('tr-TR');
+const gposAny = (p, i) => p.tplOff ? (p.tplOff + i + 1).toLocaleString(numLocale()) : (i + 1).toLocaleString(numLocale());
 function varTip(v) {
   const pops = Object.entries(v.pop || {}).sort((a, b) => b[1] - a[1]).slice(0, 3).filter(x => x[1] > 0).map(([k, a]) => `${k} ${afFmt(a)}`).join(' · ');
-  return `<b>${esc(v.rsid || 'varyant')}</b> <span class="m">${esc(v.ref)}&gt;${esc(v.alt)}</span><br>${esc(v.chrom || CHR)}:${v.pos.toLocaleString('tr-TR')} · ${vtype(v)}<br>AF ${afFmt(v.af)} · AN ${ni(v.an)}${pops ? '<br>' + pops : ''}`;
+  return `<b>${esc(v.rsid || 'varyant')}</b> <span class="m">${esc(v.ref)}&gt;${esc(v.alt)}</span><br>${esc(v.chrom || CHR)}:${v.pos.toLocaleString(numLocale())} · ${vtype(v)}<br>AF ${afFmt(v.af)} · AN ${ni(v.an)}${pops ? '<br>' + pops : ''}`;
 }
 
 /* --- baz düzeyinde dizi haritası (iki iplik, primer okları, varyantlar) --- */

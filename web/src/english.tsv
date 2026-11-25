@@ -1037,3 +1037,445 @@ Yerel analiz	Local analysis
 1–22, X ve Y	1–22, X and Y
 Ölçüm, eşik ve yapı çizimi için bir karta tıklayın.	Click a card to see the measurement, threshold and structure drawing.
 Dimer yapı modeli	Dimer structure model
+
+# Remaining English coverage: search modes, virtual PCR, server messages, evidence records
+# Search modes and virtual PCR
+Genom özgüllük taraması	Genome specificity scan
+Hızlı · tam 12-nt 3′ çapa	Fast · exact 12-nt 3′ anchor
+Hassas · Primer-BLAST kuralı (son 5 nt içinde en fazla 1 uyumsuzluk)	Sensitive · Primer-BLAST rule (at most 1 mismatch in the last 5 nt)
+Hızlı · tam 3′ çapa	Fast · exact 3′ anchor
+Hassas · Primer-BLAST kuralı	Sensitive · Primer-BLAST rule
+Arama modu	Search mode
+Sanal PCR · kendi kalıbınız / GRCh38	Virtual PCR · your own template / GRCh38
+Oligolar	Oligos
+her satır: KİMLİK DİZİ [primer|probe] [çift] · IUPAC kabul · küçük harfli baş/son = bağlanmayan kuyruk	one per line: ID SEQUENCE [primer|probe] [pair] · IUPAC codes accepted · lower-case 5′/3′ ends = non-binding tail
+Kalıp FASTA	Template FASTA
+bir ya da çok kayıt; boş bırakılırsa yalnız GRCh38	one or more records; if empty, only GRCh38 is searched
+GRCh38 (24 kromozom) de taransın	Also search GRCh38 (24 chromosomes)
+Dairesel kayıtlar	Circular records
+all ya da ad1,ad2	all or name1,name2
+Ürün kurulumu	Product assembly
+Otomatik	Automatic
+Yalnız aynı çiftin oligoları	Oligos of the same pair only
+Tüm primerler birbiriyle (parmak izi)	All primers with each other (fingerprinting)
+Oligo başına uyumsuzluk	Mismatches per oligo
+3′ pencere (nt)	3′ window (nt)
+3′ pencerede en fazla	Max. in the 3′ window
+Kalıpta N	N in the template
+Yeri reddet	Reject the site
+Uyumsuzluk say	Count as a mismatch
+Eşleşme say	Count as a match
+G·T / G·G / G·A toleransı	G·T / G·G / G·A tolerance
+G toleransı	G tolerance
+Kapalı	Off
+En fazla 1	At most 1
+En fazla 2	At most 2
+En fazla 3	At most 3
+≤ {0} uyumsuzluk/oligo, son {1} bazda ≤ {2}	≤ {0} mismatches per oligo, ≤ {2} in the last {1} bases
+kalıpta N: {0}	N in the template: {0}
+{0} ürün ({1} tanesi orijinden geçiyor)	{0} products ({1} span the origin)
+Ta = en düşük primer-yer Tm'i + ln(ürün uzunluğu) (Kalendar ve ark. 2024). Yer Tm'i: çoklu iç uyumsuzluk için Allawi–Peyret NN, uçtaki uyumsuzluklar kırpılır.	Ta = lowest primer-site Tm + ln(product length) (Kalendar et al. 2024). Site Tm uses Allawi–Peyret NN for multiple internal mismatches; terminal mismatches are trimmed.
+Sanal PCR ürünleri	Virtual PCR products
+Konum (1 tabanlı)	Position (1-based)
+Topoloji	Topology
+Sol uyumsuz	Left mismatches
+Sağ uyumsuz	Right mismatches
+Tm sol	Tm left
+Tm sağ	Tm right
+İçteki problar	Internal probes
+Amplikon dizisi	Amplicon sequence
+Bağlanma yerleri	Binding sites
+Rol	Role
+Kayıt	Record
+Başlangıç (0 tabanlı)	Start (0-based)
+İplik	Strand
+Uyumsuz	Mismatches
+3′ penceredeki	In the 3′ window
+Maske	Mask
+Yer	Site
+Bağlantılı diziler	Linked sequences
+# Server messages
+gnomAD API HTTP {0} yanıtı verdi.	The gnomAD API returned HTTP {0}.
+gnomAD API sorgusu tamamlanamadı.	The gnomAD API query did not complete.
+Bu bölge için gnomAD kaynağına erişilemedi.	The gnomAD source could not be reached for this region.
+gnomAD · bölge varyantları alınıyor	gnomAD · fetching variants in the region
+Python · çift kurgulama ve Pareto sıralaması	Python · pair assembly and Pareto ranking
+Python · seçilen çiftlerin kalite kontrolü	Python · quality control of the selected pairs
+Bu önbellek dönüşmemiş GRCh38 referansına ait.	This cache belongs to the unconverted GRCh38 reference.
+3′ çapa	3′ anchor
+C++ · {0} · 24 kromozom taranıyor	C++ · {0} · scanning 24 chromosomes
+24 kromozom taranıyor	scanning 24 chromosomes
+Python · BIS-04 iplik özgüllüğü	Python · BIS-04 strand specificity
+Python · yerel varyant kapsamı ve sıralama	Python · local variant coverage and ranking
+Python · multipleks çapraz ürünleri ve dimer matrisi	Python · multiplex cross-products and dimer matrix
+Oligo satırı {0}: 'KİMLİK DİZİ [primer|probe] [çift]' biçiminde olmalı.	Oligo line {0} must have the form 'ID SEQUENCE [primer|probe] [pair]'.
+Oligo kimlikleri tekil olmalı.	Oligo IDs must be unique.
+Kalıp en fazla 20 MB olabilir.	The template can be at most 20 MB.
+FASTA kalıbı yapıştırın ya da GRCh38'i seçin.	Paste a FASTA template or select GRCh38.
+Arama modu 'anchored' ya da 'sensitive' olmalı.	Search mode must be 'anchored' or 'sensitive'.
+Sayfa bulunamadı.	Page not found.
+İşlem bulunamadı.	Operation not found.
+İstek JSON biçiminde olmalı.	The request must be JSON.
+# Pair review: specificity, variants, structure, thermodynamics, evidence
+1 uyumsuz	1 mismatch
+{0} uyumsuz	{0} mismatches
+yer (√)	sites (√)
+hedef ({0})	target ({0})
+F yeri	F site
+R yeri	R site
+Kaynak: kayıtlı proje paneli.	Source: saved project panel.
+SPC-03 · F–R, R–F ve tek primer (F–F, R–R) ürünleri · {0}–{1} bp	SPC-03 · F–R, R–F and single-primer (F–F, R–R) products · {0}–{1} bp
+yok	none
+{0}. konum: {1}	position {0}: {1}
++ iplik	+ strand
+− iplik	− strand
+3′ mesafe	3′ distance
+3′ ucu	3′ end
+son {0} nt (VAR-02 penceresi)	last {0} nt (VAR-02 window)
+Şerit sırası: {0}	Lane order: {0}
+VAR ailesi (kodun kural numaralandırması)	VAR family (rule numbering used in the code)
+ayrıntı →	details →
+amplifikasyonu engellemez; prob/blocker tasarımı için bilgi	does not block amplification; informative for probe/blocker design
+{0} varyant	{0} variants
+AF ≥ %0,1:	AF ≥ 0.1%:
+AF ≥ %0,1: yok	AF ≥ 0.1%: none
+Dimer modeli:	Dimer model:
+helis	helix
+helis {0} bp	helix {0} bp
+3′ eşleşmiş	3′ paired
+Motor: Zuker MFE (fold.zuker_mfe)	Engine: Zuker MFE (fold.zuker_mfe)
+nokta-parantez	dot-bracket
+Sap ΔG₃₇	Stem ΔG₃₇
+sap {0} bp	stem {0} bp
+ilmek {0} nt	loop {0} nt
+3′ ucu sapta:	3′ end in the stem:
+Yalnız yığın enerjisi; ilmek cezası eklenmez. ΔG > 0 ise yapı kararsızdır.	Stacking energy only; no loop penalty is added. ΔG > 0 means the structure is unstable.
+SS-02 sap ΔG	SS-02 stem ΔG
+· uzatılabilir: {0}	· extendable: {0}
+tek iplik amplikon MFE	single-stranded amplicon MFE
+Profil penceresi {0}	Profile window {0}
+rejim {0}	regime {0}
+tuz modeli duyarlılığı	salt model sensitivity
+Karşılaştırılan modeller arası yayılım	Spread across the compared models
+TH-02/TH-04 eşik karar desteği Doğrulama sayfasında	TH-02/TH-04 threshold decision support is on the Validation page
+primer fazlası	primer excess
+3′ son 5 nt ΔG	3′ last 5 nt ΔG
+TH-04 3′ son 5 nt ΔG₃₇	TH-04 3′ last 5 nt ΔG₃₇
+INFO bandı −9…−6 kcal/mol	INFO band −9…−6 kcal/mol
+CMP-07 ΔG 5′ / 3′ yarı	CMP-07 ΔG 5′ / 3′ half
+uzunluk	length
+iki-hal modeli	two-state model
+motorun concentration.build portu	port of the engine's concentration.build
+θ (bağlı kesir)	θ (bound fraction)
+Ta = 0,3·Tm(primer) + 0,7·Tm(ürün) − 14,9 (Rychlik 1990). Kullanılan Ta {0} °C; θ-tabanlı bakışta Ta'da θ ≈ {1}.	Ta = 0.3·Tm(primer) + 0.7·Tm(product) − 14.9 (Rychlik 1990). Ta used: {0} °C; in the θ-based view, θ ≈ {1} at Ta.
+Ürün Tm değeri motor amplikon modülünden gelir; bu çift için mevcut değil.	The product Tm comes from the engine's amplicon module and is not available for this pair.
+Yalnız ctDNA profilindeki proje çiftleri için.	Only for project pairs in the ctDNA profile.
+ctDNA tespit edilebilirliği	ctDNA detectability
+P(≥1 kopya)	P(≥1 copy)
+Amplikon {0} bp	Amplicon {0} bp
+bütün fragman olasılığı	intact-fragment probability
+· {0} genom eşdeğeri	· {0} genome equivalents
+· {0} genom eşdeğeri · noktalar motor çıktısı, eğri aynı formül.	· {0} genome equivalents · points are engine output; the curve uses the same formula.
+noktalar motor çıktısı, eğri aynı formül.	points are engine output; the curve uses the same formula.
+değerlendirilmedi: {0}	not evaluated: {0}
+değerlendirilmedi:	not evaluated:
+katki maddesi katsayilari aktarilmadi	additive coefficients were not transcribed
+Prob yok	No probe
+ARMS alel-spesifik primer tasarlanmadı; 3′ terminal uyumsuzluk tablosu kaynak farkı (GG/CG) kullanıcı kararı bekliyor	No ARMS allele-specific primer was designed; the source discrepancy in the 3′ terminal mismatch table (GG/CG) awaits a user decision
+Proje reaktif seti (blocker/prob) için ayrı koşu — Prob & Blocker sayfası	Separate run for the project reagent set (blocker/probe) — Probe & Blocker page
+Hedef gen beyan edilmedi (sequence_qc.py --gene)	No target gene declared (sequence_qc.py --gene)
+özgüllük	specificity
+varyant	variant
+karar	decision
+taranmadı	not scanned
+· genom taraması var	· genome scan available
+{0} belirsiz baz	{0} ambiguous bases
+Bu şablon için varyant verisi yok	No variant data for this template
+gnomAD v4 önbelleği yalnız proje bölgesini (chr22:20.000.001–20.001.000) kapsar. Başka bölgeler için	The gnomAD v4 cache covers only the project region (chr22:20,000,001–20,001,000). For other regions, build a variant cache with
+ile varyant önbelleği oluşturun.	.
+Forward (+ iplik, 5′→3′)	Forward (+ strand, 5′→3′)
+Reverse (− iplik)	Reverse (− strand)
+Amplikon GC profili	Amplicon GC profile
+{0} nt kayan pencere	{0} nt sliding window
+amplikon konumu (nt)	amplicon position (nt)
+Amplikonu kopyala	Copy amplicon
+# Evidence notes and thresholds
+F×R hetero-dimer; eşikler DIM-01 ile aynı	F×R hetero-dimer; thresholds as in DIM-01
+3'-uçlu, uzatılabilir F×R dimeri; eşikler DIM-02 ile aynı	3′-end, extendable F×R dimer; thresholds as in DIM-02
+Simetri değişmezliği tarayıcı portunda canlı sınandı	Symmetry invariance tested live in the browser port
+Değer final_ranked.tsv; eşik design.py sert filtresi	Value from final_ranked.tsv; threshold is the design.py hard filter
+Rychlik 1990 formülü motorun PAIR-04 ürün Tm değeriyle tarayıcıda uygulandı	Rychlik 1990 formula applied in the browser with the engine's PAIR-04 product Tm
+cfDNA fragman dağılımı üzerinden bütün fragman olasılığı	Intact-fragment probability over the cfDNA fragment-size distribution
+λ = GE × VAF × P_bütün; GE {0}	λ = GE × VAF × P_intact; GE {0}
+P(tespit | VAF 0,1 %) < 0,5	P(detect | VAF 0.1%) < 0.5
+> 100 bp (ctdna profili)	> 100 bp (ctdna profile)
+ctDNA profili: cfDNA ~166 bp tepe	ctDNA profile: cfDNA peak ~166 bp
+ctDNA profili	ctDNA profile
+A/C/G/T dışı tanınmayan karakter	unrecognised character other than A/C/G/T
+oligomod ayrıştırması: modifikasyon yok	oligomod parsing: no modifications
+%40–%60 dışı (design.py sert filtre)	outside 40–60% (design.py hard filter)
+Tasarım sert filtresi; tarayıcıda yeniden hesaplandı	Design hard filter; recomputed in the browser
+1–3 dışı	outside 1–3
+≥ 4 veya GGGG	≥ 4 or GGGG
+≥ 4 ardışık birim	≥ 4 consecutive units
+referans kimliği beyan edilmedi	no reference identifier declared
+Yapıştırılan şablonun başlığı	Header of the pasted template
+18-30 dışı	outside 18–30
+15-35 dışı	outside 15–35
+dejenere baz yok	no degenerate bases
+G≥3 N1-7 dört tekrar	G≥3 N1-7 repeated four times
+3' yarı > 2 kcal/mol daha kararlı	3′ half > 2 kcal/mol more stable
+{0}-{1} °C dışı	outside {0}–{1} °C
+>-6.0 veya <-9.0	>-6.0 or <-9.0
+analitik özdeşlik testi	analytical identity test
+3' uzatılabilir ve dG37 < -2.0	3′ extendable and dG37 < -2.0
+align.hairpin_stem (yalnız sap yığını)	align.hairpin_stem (stem stacking only)
+asimetri	asymmetry
+pencere kenarına < %10	< 10% from the window edge
+{0}-{1} bp dışı	outside {0}–{1} bp
+ara < 10 nt	gap < 10 nt
+örtüşme	overlap
+global %35-%65 dışı veya pencere > %75	global outside 35–65% or window > 75%
+pencere > %85	window > 85%
+düşük karmaşıklık ya da G-quadruplex	low complexity or G-quadruplex
+amplikonda N > 0	N in the amplicon > 0
+primer bölgesinde N	N in a primer site
+koordinattaki dizi primerle uyuşmuyor	sequence at the coordinates does not match the primer
+Ürün Tm modeli (amplicon.py) tarayıcıya taşınmadı; RUN_MELT.cmd ile hesaplanır	The product Tm model (amplicon.py) is not ported to the browser; compute it with RUN_MELT.cmd
+sap dG37 < -3.0 (tarayıcı göstergesi)	stem dG37 < -3.0 (browser indicator)
+Tarayıcı: hairpin_stem yaklaşık; motor SS-01 Zuker MFE + döngü terimleri kullanır	Browser: hairpin_stem approximation; the engine uses SS-01 Zuker MFE + loop terms
+bağlanma yerinin tamamı tarandı (gnomAD v4 önbelleği)	whole binding site scanned (gnomAD v4 cache)
+3' uca yakın uyumsuzluk uzamayı doğrudan engeller	a mismatch near the 3′ end directly blocks extension
+yaygın varyant kohortun büyük kısmında alel düşmesi demek	a common variant means allele dropout in a large part of the cohort
+Dejenere baz yok	No degenerate bases
+GC penceresi dışı	outside the GC window
+di/tri-nükleotit tekrar	di/tri-nucleotide repeat
+Tm penceresi dışı	outside the Tm window
+θ(Ta) eşik altında	θ(Ta) below threshold
+3'-uçlu self-dimer	3′-end self-dimer
+3'-uçlu hetero-dimer	3′-end hetero-dimer
+dimer taraması sınırı	dimer screen limit
+# Saved panel, multiplex, probe, melting and validation records
+chr22:20000000-20001000 GRCh38.p14 (0-tabanli)	chr22:20000000-20001000 GRCh38.p14 (0-based)
+profil	profile
+maks	max
+nadir	rare
+Primerler (5′→3′)	Primers (5′→3′)
+Termo skoru	Thermo score
+Ikinci insan aktarimi yapilamaz; primer3_config/stack.{dh,ds} bagimsiz kaynagina karsi diferansiyel denetim yapilacak (adim 2-4).	A second human transcription is not possible; a differential check against the independent primer3_config/stack.{dh,ds} source will be run (steps 2–4).
+primer3_config/stackmm.{dh,ds} ile 48 girdi karsilastirilacak.	48 entries will be compared with primer3_config/stackmm.{dh,ds}.
+primer3_config/dangle.{dh,ds} ile 32 girdi karsilastirilacak.	32 entries will be compared with primer3_config/dangle.{dh,ds}.
+primer3_config/loops.{dh,ds} ile 47 girdi karsilastirilacak; primer3 dG37'yi dH/dS'ten uretir, karsilastirma dG37 uzerinden yapilir.	47 entries will be compared with primer3_config/loops.{dh,ds}; primer3 derives dG37 from dH/dS, so the comparison uses dG37.
+salt.py katsayilari (Owczarzy 2004/2008, von Ahsen 2001)	salt.py coefficients (Owczarzy 2004/2008, von Ahsen 2001)
+primer3_config bu katsayilari tasimaz; denetim ancak birincil makaleden ikinci aktarimla yapilir. Kapsam disi birakildi.	primer3_config does not carry these coefficients; they can only be checked by a second transcription from the primary papers. Left out of scope.
+fold.py: cok dalli dongu, 1x1 ic dongu, diziye bagli uc terimleri	fold.py: multibranch loops, 1×1 internal loops, sequence-dependent terminal terms
+model_kapsami	model_scope
+Bu planin kapsaminda degil; SS-01/SS-03 INFO kaydi olarak kaliyor.	Not in the scope of this plan; SS-01/SS-03 remain INFO records.
+ctdna profili: ARMS alel ayrimi	ctdna profile: ARMS allele discrimination
+3' TERMINAL uyumsuzluk tablosu yok (mevcut tablo yalniz IC uyumsuzluk). Beyan edilmis sinirlandirici (bounding) modelle uygulanacak (adim 7).	No 3′ TERMINAL mismatch table (the existing table covers INTERNAL mismatches only). To be applied with a declared bounding model (step 7).
+RT-qPCR hedef geometrisi	RT-qPCR target geometry
+amplicon.py: dongu entropisi yok	amplicon.py: no loop entropy
+Erime egrisi tek sigma ile; dongu tablolari uygulanmiyor. Kapsam disi.	The melting curve uses a single sigma; loop tables are not applied. Out of scope.
+chr3 hedef varyant konumu secilmedi	chr3 target variant position not chosen
+T02_005 ve T02_006 farkli bolgeleri kapsiyor; hedef konumu kullanicinin karari (adim 10).	T02_005 and T02_006 cover different regions; the target position is the user's decision (step 10).
+{0}/{1} kural uygulanmış	{0}/{1} rules implemented
+{0} capraz urun	{0} cross-products
+toplam urun {0}, tasarlanmis {1}, tam eslesen capraz {2}, capraz kombinasyon {3}	total products {0}, designed {1}, exact-match cross {2}, cross combinations {3}
+fail: herhangi bir capraz urun	fail: any cross-product
+min bosluk {0} bp	min. gap {0} bp
+{0} catisma, {1} urun; panelde beyan edilen hedef urun boylari	{0} conflicts, {1} products; target product sizes declared in the panel
+tam eslesen capraz yuk / tasarlanmis yuk = {0}	exact-match cross load / designed load = {0}
+cfDNA {0} bp ile agirlikli	weighted by cfDNA {0} bp
+{0}, {1} ic uyumsuzluk	{0}, {1} internal mismatches
+en kotu 3'-uclu capraz dimer	worst 3′-end cross-dimer
+Konum	Position
+{0} benzersiz primer	{0} unique primers
+n(n+1)/2 = {0} kombinasyon	n(n+1)/2 = {0} combinations
+genel ΔG	overall ΔG
+genel {0}	overall {0}
+nokta	dot
+Boy	Length
+Uyumsuzluk	Mismatches
+Sonuç: {0} çift.	Result: {0} pairs.
+Otomatik seçim sıralamaya göre çift ekler; çapraz ürün, örtüşen amplikon, < 10 bp boy farkı, > 3 °C Tm aralığı ya da 3′ çapraz dimer < −5 kcal/mol getiren çifti atlar.	Auto-select adds pairs in rank order and skips any pair that would add a cross-product, an overlapping amplicon, a size difference < 10 bp, a Tm spread > 3 °C or a 3′ cross-dimer < −5 kcal/mol.
+tıklayın: hizalama	click: alignment
+yapı yok	no structure
+motor {0}	engine {0}
+tarayıcı portu {0}	browser port {0}
+Prob Tm karşılaştırması ({0})	Probe Tm comparison ({0})
+DNA iskeleti	DNA backbone
+Bu kayıtlı sonuç LNA modeli öncesine ait.	This saved result predates the LNA model.
+Tm değerleri DNA iskeletinindir; canlı blocker QC ile yeniden hesaplayın.	Tm values are for the DNA backbone; recompute them with live blocker QC.
+LNA katkısı McTigue 2004 en yakın komşu artışlarıyla eklendi.	LNA contribution added with McTigue 2004 nearest-neighbour increments.
+Problar modelin ölçüm alanında (tek, iç LNA).	Probes are within the model's measured domain (single, internal LNA).
+Problar ölçüm alanının dışında (bitişik, uca yakın ya da çok sayıda LNA): değerler dışdeğerlemedir.	Probes are outside the measured domain (adjacent, near-terminal or many LNAs): values are extrapolations.
+ölçüm alanı dışı	outside the measured domain
+prob/blocker × primer dimerleri	probe/blocker × primer dimers
+Reaktif	Reagent
+ddPCR hidroliz prob paneli	ddPCR hydrolysis probe panel
+Prob (5′→3′)	Probe (5′→3′)
+Wild-type prob	Wild-type probe
+PROB YOK	NO PROBE
+Prob denetleyici	Probe checker
+Denetle	Check
+prob × F	probe × F
+prob × R	probe × R
+prob self	probe self
+−dθ/dT erime piki	−dθ/dT melting peak
+{0} pik, en buyuk ayrim {1} C	{0} peaks, largest separation {1} °C
+Amplikonlar	Amplicons
+Pik	Peaks
+{0} pik	{0} peaks
+1 pik	1 peak
+tek pik	single peak
+tolerans	tolerance
+DIM-01 self-dimer (uyumsuzluk + bulge)	DIM-01 self-dimer (mismatch + bulge)
+Dimer hizalama dizgisi (karakter karakter)	Dimer alignment string (character by character)
+tam	exact
+{0} fark	{0} differences
+CT-04'e etkisi	effect on CT-04
+karar sizde	your decision
+Buyukluk	Quantity
+Tablo	Table
+ddG37 (tablo)	ddG37 (table)
+Fark	Difference
+Karar (tablo -> oracle)	Decision (table -> oracle)
+Karsilastirilan	Compared
+Eslesen	Matching
+Bizde yok	Missing here
+Oracle'da yok	Missing in the oracle
+En buyuk mutlak fark	Largest absolute difference
+Kaynak	Source
+mevcut WARN {0}	current WARN {0}
+en büyük |Δ| (4 basamak yuvarlama)	largest |Δ| (rounded to 4 digits)
+tarayıcıda	in the browser
+Tuz katmani capraz denetimi (salt.py <-> primer3 oligotm) - oracle: /sessions/rcw-01yjfqqphcb3hecjguuxffqs/p3/src/oligotm (-tp 1 -sc 2) - tolerans: 0.05 C (oligotm iki ondalik basar) - dizi: 10, primer 200.0 nM - konsantrasyon sozlesmesi esitlendi: oligotm -d = 4 x C_etkin (simetrik dizide C_etkin) | Asama | Ne olcer | Karsilastirma | Sapan | Ortalama fark | Ortalamadan sapma | |---|---|---:|---:|---:|---:| | A | NN + konsantrasyon sozlesmesi (1 M Na) | 10 | 0 | +0.0000 C | 0.0000 C | | B | tuz duzeltmesi | 50 | 0 | +0.0000 C | 0.0000 C | Asama A temiz: iki uygulama 1 M Na'da ayni Tm'i veriyor, yani konsantrasyon sozlesmesi ayni. Asama B'deki fark dogrudan TUZ KATMANINA aittir. En buyuk farklar Yok. Bu denetim salt.py kunyesini 'verified' YAPMAZ; katsayilarin birincil makaleden ikinci aktarimi ayri bir istir.	Salt-layer cross-check (salt.py vs primer3 oligotm; -tp 1 -sc 2; tolerance 0.05 °C; 10 sequences, primer 200 nM; concentration convention matched: oligotm -d = 4 × C_eff). Stage A, NN + concentration convention at 1 M Na: 10 comparisons, 0 outliers, mean difference +0.0000 °C. Stage B, salt correction: 50 comparisons, 0 outliers, mean difference +0.0000 °C. Stage A is clean, so the two implementations agree at 1 M Na and any Stage B difference would belong to the salt layer; none was found. This check does not mark salt.py as 'verified'; a second transcription of the coefficients from the primary papers is a separate task.
+Yerel iş akışı birincil 24 kromozom dışındaki tüm GRCh38.p14 dizilerini tarar: chrM, 260 ALT lokus, 254 yama ve 166 iskele (rDNA kopyaları dahil). Ayrı 45S rDNA referansı (KY962518) derlemede yoktur; ALT/yama bağlanmaları alternatif haplotip kopyası olarak bilgi düzeyinde raporlanır.	The local workflow scans every GRCh38.p14 sequence outside the 24 primary chromosomes: chrM, 260 ALT loci, 254 patches and 166 scaffolds (including rDNA copies). The separate 45S rDNA reference (KY962518) is not part of the assembly; ALT/patch binding is reported at information level as alternate-haplotype copies.
+sol {0} 3′ sağlam	left {0} 3′ intact
+sağ {0} 3′ sağlam	right {0} 3′ intact
+Profil penceresi {0} · Tm(1 M) {1} · rejim {2}	Profile window {0} · Tm(1 M) {1} · regime {2}
+# Engine evidence records (panel_qc, variant_qc and sequence_qc outputs)
+{0}-{1} disi	outside {0}–{1}
+{0}-{1} C disi	outside {0}–{1} °C
+{0}-{1} bp disi	outside {0}–{1} bp
+18-30 disi	outside 18–30
+15-35 disi	outside 15–35
+>256 veya 3' son 3 nt dejenere	>256 or degenerate in the last 3 nt at 3′
+G>=3 N1-7 dort tekrar (primer)	G≥3 N1-7 repeated four times (primer)
+3' yari > 2 kcal/mol daha kararli	3′ half > 2 kcal/mol more stable
+3' ucun asiri kararli olmasi yanlis onceleme riski	an over-stable 3′ end risks mispriming
+3'-T (uyumsuzluga toleransli, Kwok 1990)	3′-T (mismatch tolerant, Kwok 1990)
+3' uzatilabilir ve dG37 < -2.0	3′ extendable and dG37 < -2.0
+pencere kenarina < %10	< 10% from the window edge
+ortusme	overlap
+global %35-%65 disi veya pencere > %75	global outside 35–65% or window > 75%
+dusuk karmasiklik ya da G-quadruplex (amplikonda)	low complexity or G-quadruplex (in the amplicon)
+amplikonda N / soft-mask > 0	N / soft-mask in the amplicon > 0
+primer baglanma bolgesinde N	N in a primer binding site
+koordinattaki referans dizisi primer dizisiyle uyusmuyor	reference sequence at the coordinates does not match the primer
+Tm_yapi > {0} C	Tm_structure > {0} °C
+urun Tm'i gerekir (amplikon modulu)	requires the product Tm (amplicon module)
+referans ve alternatif aleller varyant QC asamasinda kullanilir	reference and alternate alleles are used in the variant QC step
+model belirsizliginin raporlanmasi (REP-03); yayilim yalniz beyan edilen kosullara uygulanabilir modeller uzerinden	reporting of model uncertainty (REP-03); the spread covers only models applicable to the declared conditions
+zayif	weak
+pencere_ici	in_window
+>-6.0 veya <-9.0 kcal/mol	>-6.0 or <-9.0 kcal/mol
+esik literatur kilavuz degeridir; islak-lab kalibrasyonu bekler	the threshold is a literature guideline value; awaits wet-lab calibration
+son 5 bazin NN yigin toplami, baslatma terimi haric	NN stack sum of the last 5 bases, excluding the initiation term
+analitik ozdeslik testi	analytical identity test
+en fazla bir kusur: tekli ic uyumsuzluk VEYA tek bazlik ic bulge (her iki yanda >=2 WC); coklu kusur ve uc terimleri kapsam disi	at most one defect: a single internal mismatch OR a single-base internal bulge (≥2 WC pairs on each side); multiple defects and terminal terms are out of scope
+align.py tek bazlik ic bulge (DIM-01..DIM-04, DIM-06, DIM-08)	align.py single-base internal bulge (DIM-01..DIM-04, DIM-06, DIM-08)
+SantaLucia & Hicks 2004 A-T kapanis cezasini SAC TOKASI dongusu icin tanimlar (denklem 8; fold.py'de oyle kullanilir). Bulge kapanisina ayni buyuklukte bir ceza uygulamak LITERATURDEN AKTARILMIS bir deger degil, bu projenin modelleme kararidir. Islak-lab kalibrasyonu beklemektedir (REP-03).	SantaLucia & Hicks 2004 define the A-T closure penalty for HAIRPIN loops (eq. 8; used that way in fold.py). Applying a penalty of the same size to bulge closure is NOT a value transcribed from the literature but a modelling decision of this project. It awaits wet-lab calibration (REP-03).
+dG37 kcal/mol, kapanan A/T cifti basina	dG37 kcal/mol per closing A/T pair
+kalibre karar esigi yok	no calibrated decision threshold
+cok dalli donguler	multibranch loops
+1x1 ic donguler	1×1 internal loops
+diger uc terimleri ve kisa sac tokasi bonuslari	other terminal terms and short-hairpin bonuses
+WC yiginlari, uzunluga dayali donguler ve secili kapanis terimleri	WC stacks, length-based loops and selected closure terms
+her baz icin marjinal eslesmeme olasiligi	marginal unpaired probability for each base
+yalniz tek uyumsuzluk desteklenir	only single mismatches are supported
+unscored reasons.yalniz tek uyumsuzluk desteklenir	unscored reasons.only single mismatches are supported
+unscored reasons.uc ve uca bitisik uyumsuzluk desteklenmez	unscored reasons.terminal and near-terminal mismatches are not supported
+tekli ic uyumsuzluk icin theta(Ta); kalibre karar esigi yok	theta(Ta) for a single internal mismatch; no calibrated decision threshold
+primer GC oranina dayali yaklasim	approximation based on primer GC content
+birden fazla tam eslesmeli site (ozgul degil)	more than one exact-match site (not specific)
+tam eslesmeli site yok	no exact-match site
+primer duzeyi genom tekilligi (tam eslesme sayimi)	primer-level genome uniqueness (exact-match count)
+fazladan tam eslesmeli hedef disi yer	additional exact-match off-target site
+3'-capali uyumsuzluklu hedef disi yer var	there is a 3′-anchored mismatched off-target site
+genom taramasi baglanma kayitlarindan; kalibre esik yok	from genome-scan binding records; no calibrated threshold
+hedef disi yerde tolerant (G.T/T.G) 3' uc uyumsuzlugu (uzamaya izin verir)	tolerant (G.T/T.G) 3′-end mismatch at an off-target site (allows extension)
+tolerant 3' uc uyumsuzlugu ozgulluk riski (Kwok 1990)	a tolerant 3′-end mismatch is a specificity risk (Kwok 1990)
+baglanma yeri psodogenle ortusuyor	binding site overlaps a pseudogene
+psodogen uzerindeki baglanma hedef disi urun riski (paralog tespiti BioMart gerektirir, kapsam disi)	binding on a pseudogene risks an off-target product (paralogue detection needs BioMart; out of scope)
+baglanma yeri segmental duplikasyonda	binding site lies in a segmental duplication
+segmental duplikasyonda baglanma kopya ayrimini zorlastirir	binding in a segmental duplication makes copies harder to tell apart
+desteklenen uyumsuzluk yok	no supported mismatch
+not_evaluated: desteklenen uyumsuzluk yok	not_evaluated: no supported mismatch
+partial: {0} yer	partial: {0} sites
+puanlanabilir dimer yok	no scorable dimer
+baglanma yerinin tamami tarandi	whole binding site scanned
+0-tabanli yari acik, GRCh38	0-based half-open, GRCh38
+literatur baslangic degeri, kalibre degil	literature starting value, not calibrated
+3' uca yakin uyumsuzluk uzamayi dogrudan engeller	a mismatch near the 3′ end directly blocks extension
+yaygin varyant kohortun buyuk kisminda alel dusmesi demek	a common variant means allele dropout in a large part of the cohort
+dG37(alternatif) - dG37(referans); kalibre karar esigi yok	dG37(alternate) - dG37(reference); no calibrated decision threshold
+indel dizi kaymasi yaratir; tek baz uyumsuzlugundan agirdir	an indel shifts the sequence; it is more severe than a single-base mismatch
+belirli atalarda alel dusmesi; kuresel AF bunu gizler	allele dropout in specific ancestries; the global AF hides it
+uc ve uca bitisik uyumsuzluk desteklenmez	terminal and near-terminal mismatches are not supported
+yalniz tek baz degisimi desteklenir	only single-base changes are supported
+primer disi indel AF >= 0.01	indel outside the primers AF >= 0.01
+urun boyu degisir; boy ayrimina dayanan okumalar etkilenir	the product size changes; size-based readouts are affected
+primer baglanma yerlerine dusen varyantlar haric	excluding variants in primer binding sites
+tam eslesmeli hedef disi urun	exact-match off-target product
+pencere icinde hedef disi urun	off-target product within the window
+cift duzeyi ozgulluk; kalibre esik yok	pair-level specificity; no calibrated threshold
+F-R urunler sozlesme araligindan; F-F/R-R ve genisletilmis aralik ayri C++ taramasi ister	F-R products are from the contract range; F-F/R-R and the extended range need a separate C++ scan
+sozlesme alanlari eksik	contract fields missing
+arama sozlesmesi beyani: capa/uyumsuzluk/urun araligi + indeks checksum (manifest per-shard sha256 uzerinden)	search contract declaration: anchor/mismatch/product range + index checksum (via the per-shard sha256 manifest)
+Na/K + Mg + dNTP + primer + Ta reaksiyon kosullari	Na/K + Mg + dNTP + primer + Ta reaction conditions
+serbest Mg2+ <= 0 (dNTP tum Mg'yi sekestre eder)	free Mg2+ <= 0 (dNTP sequesters all Mg)
+serbest Mg2+ Tm/salt duzeltmesinin girdisidir	free Mg2+ is an input to the Tm/salt correction
+tasarlandi	designed
+Tm DNA iskeletinden; LNA stabilizasyonu modellenMEDI (alt sinir). Mutlak esik LNA-dogru Tm ile kalibre edilmeli (REP-03)	Tm from the DNA backbone; LNA stabilisation was NOT modelled (lower bound). The absolute threshold should be calibrated with an LNA-correct Tm (REP-03)
+dG37 < -6.0 (genel) / -5.0 (3')	dG37 < -6.0 (overall) / -5.0 (3′)
+Tum esikler kalibre degil (22 yer)	Not all thresholds are calibrated (22 places)
+Islak-lab verisi gerekir. TH-02/TH-04 icin yalniz karar kaniti uretilecek (adim 8).	Requires wet-lab data. Only decision evidence will be produced for TH-02/TH-04 (step 8).
+Son ctDNA/chr3	Latest ctDNA/chr3
+SYBR tabanli qPCR	SYBR-based qPCR
+ctDNA / cfDNA, kisa amplikon	ctDNA / cfDNA, short amplicon
+NGS amplikon paneli	NGS amplicon panel
+Bisulfit donusturulmus DNA	Bisulfite-converted DNA
+QPCR-01: amplikon 70-150 bp (MIQE)	QPCR-01: amplicon 70–150 bp (MIQE)
+QPCR-02: tek erime piki beklenir; erime modeli oligoscout_thermo.amplicon, CLI: cli/amplicon_melt.py	QPCR-02: a single melting peak is expected; melting model oligoscout_thermo.amplicon, CLI: cli/amplicon_melt.py
+QPCR-02 model sabiti (sigma) kalibre degil, dongu entropisi tablolari bekliyor	QPCR-02 model constant (sigma) is not calibrated; loop entropy tables pending
+RT-01: ekson-ekson kavsagi tercih edilir	RT-01: an exon–exon junction is preferred
+RT-02: gDNA urunu ayrica taranmali	RT-02: the gDNA product should be scanned separately
+RT-01/RT-03: transkriptom indeksi henuz kurulmadi	RT-01/RT-03: transcriptome index not built yet
+RT-04: RNA dongu parametreleri aktarilmadi	RT-04: RNA loop parameters not transcribed
+CT-01: cfDNA ~166 bp tepe; amplikon <=100 bp	CT-01: cfDNA peak ~166 bp; amplicon <=100 bp
+CT-02/CT-03: butun fragman ve Poisson tespit olasiligi	CT-02/CT-03: intact-fragment and Poisson detection probability
+CT-04: ARMS alel baglanma ayrimi, KALIBRE DEGIL	CT-04: ARMS allele binding discrimination, NOT CALIBRATED
+PRB-01: prob Tm'i primerlerden 6-10 C yuksek	PRB-01: probe Tm 6–10 °C above the primers
+PRB-02: 5' uc G yasak; PRB-03: C sayisi > G sayisi	PRB-02: no G at the 5′ end; PRB-03: C count > G count
+PRB-04: prob primer baglanma yerleriyle cakisamaz	PRB-04: the probe must not overlap primer binding sites
+PRB-05: prob self/x-primer dimerleri (tekli ic uyumsuzluk dahil)	PRB-05: probe self/cross-primer dimers (including single internal mismatches)
+prob modulu: oligoscout_thermo.probe, CLI: cli/probe_qc.py	probe module: oligoscout_thermo.probe, CLI: cli/probe_qc.py
+SAN-01: ilgi bolgesi primere >=60 nt uzak olmali	SAN-01: the region of interest should be >=60 nt from the primer
+SAN-02: amplikon 300-800 bp	SAN-02: amplicon 300–800 bp
+NGS-01: adaptor kuyruklari dimer analizine dahil edilmeli	NGS-01: adaptor tails should be included in dimer analysis
+NGS-01: kuyruk dahil analiz (DIM-07) CLI'ye baglanmadi	NGS-01: tail-inclusive analysis (DIM-07) not wired to the CLI
+BIS-01: primerde CpG bulunmamali (MSP disi)	BIS-01: no CpG in the primer (except MSP)
+BIS-01..BIS-04: donusturulmus genom indeksleri kurulmadi	BIS-01..BIS-04: converted genome indexes not built
+veri paketi	data bundle
+align.best_dimer (veri paketi)	align.best_dimer (data bundle)
+align.py portu	align.py port
+{0} · {1} uyumsuzluk: {2} yer	{0} · {1} mismatches: {2} sites
+{0} uyumsuzluk	{0} mismatches
+{0} uyumsuzluk · HEDEF	{0} mismatches · TARGET
+{0} {1}. baz {2}: p(eşleşmemiş) {3}	{0} base {1} {2}: p(unpaired) {3}
+3′ ucuna {0} nt	{0} nt from the 3′ end
+dG37 < -9.0 (genel) / -7.0 (3')	dG37 < -9.0 (overall) / -7.0 (3′)
+partial: 1 yer	partial: 1 site
+yer	sites
+sol site + iplikte, sağ site − iplikte	left site on the + strand, right site on the − strand
