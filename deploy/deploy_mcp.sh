@@ -9,7 +9,7 @@ APP=${APP:-/opt/oligoscout}
 cd "$APP"
 echo "== build C++ tools"
 ( cd OligoScout && cmake --preset release >/dev/null && \
-  cmake --build --preset release --target oligoscout_panel oligoscout_contig_scan -j"$(nproc)" )
+  cmake --build --preset release --target oligoscout_panel oligoscout_contig_scan oligoscout_vpcr_scan -j"$(nproc)" )
 echo "== python tests"
 ( cd reference_py && python3 -B -m unittest discover -s tests -q )
 python3 -B -m unittest discover -s mcp_server/tests -q

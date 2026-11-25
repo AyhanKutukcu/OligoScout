@@ -124,6 +124,14 @@ PKCE (S256) ile token alınır. Kayıt açıktır (araçlar yalnızca okur, hız
 
 ## Sunucuya kurulum (oligoscout.org)
 
+Güncelleme tek komuttur (git pull, derleme, testler, site paketi, iki servis, sağlık denetimi):
+
+```bash
+sudo bash /opt/oligoscout/deploy/update_server.sh
+```
+
+İlk kurulumda elle:
+
 ```bash
 sudo cp deploy/oligoscout-mcp.service /etc/systemd/system/
 sudo systemctl daemon-reload && sudo systemctl enable --now oligoscout-mcp
