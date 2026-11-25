@@ -27,7 +27,7 @@ RENDER.dokumantasyon = el => {
   const [, title] = DOC_PAGES.find(([id]) => id === section);
   el.innerHTML = `<div class="stack">
     <nav class="card doc-nav" aria-label="Dokümantasyon bölümleri">${DOC_PAGES.map(([id, label]) => {
-      const href = id === 'rehber' ? '#dokumantasyon' : '#dokumantasyon/' + id;
+      const href = id === 'rehber' ? '/dokumantasyon' : '/dokumantasyon/' + id;
       return `<a href="${href}" ${id === section ? 'aria-current="page"' : ''}>${label}</a>`;
     }).join('')}</nav>
     <div id="docContent"></div>
@@ -36,20 +36,20 @@ RENDER.dokumantasyon = el => {
   if (section === 'rehber') { renderGuide(content); return; }
   content.className = 'stack';
   content.innerHTML = `<div class="note">${ic('info')}<div><b>Arşiv örneği · ${esc(title)}</b><br><span class="small">Bu sayfa daha önce kaydedilmiş bir çalışmayı gösterir. Kendi sonuçlarınız için Primer Tasarla veya Yerel Analiz’i kullanın.</span></div></div>
-    ${section === 'multipleks' ? '<a class="btn pri" href="#multipleks">Kendi multipleks panelini tasarla</a>' : ''}
+    ${section === 'multipleks' ? '<a class="btn pri" href="/multipleks">Kendi multipleks panelini tasarla</a>' : ''}
     ${DOC_TOOL_STEPS[section] ? liveResult('Girişten çıktıya', `<ol class="doc-steps">${DOC_TOOL_STEPS[section].map(step => `<li>${esc(step)}</li>`).join('')}</ol>`) : ''}<div></div>`;
   RENDER[section === 'multipleks' ? 'multipleksOrnek' : section](content.lastElementChild);
 };
 
 function renderGuide(el) {
   const pair = PROJ[0];
-  const examplePairLink = '#dokumantasyon/cift/' + pair.key;
+  const examplePairLink = '/dokumantasyon/cift/' + pair.key;
   el.innerHTML = `<div class="stack">
     <section class="card"><div class="bd intro-hero">
       <div class="eyebrow">OLIGOSCOUT KULLANIM REHBERİ</div>
       <h2>Girişten sonuçlara primer tasarımı</h2>
       <p>Bir insan genom bölgesi seçin, tasarımı çalıştırın ve otomatik özgüllük taramasından geçen çiftleri inceleyin. Aşağıdaki örnekleri formu doldurmak veya bir sonucun nasıl göründüğünü anlamak için kullanabilirsiniz.</p>
-      <div class="row live-actions"><a class="btn pri" href="#tasarla">Primer Tasarla</a><a class="btn" href="#dokumantasyon/panel">Kayıtlı Paneli aç</a></div>
+      <div class="row live-actions"><a class="btn pri" href="/tasarla">Primer Tasarla</a><a class="btn" href="/dokumantasyon/panel">Kayıtlı Paneli aç</a></div>
     </div></section>
 
     <section class="card"><div class="hd"><h2>1 · Bir giriş biçimi seçin</h2></div><div class="bd stack">
@@ -72,7 +72,7 @@ function renderGuide(el) {
         <p>Kaydedilmiş chr22 panelinin şablonu <code>${esc(D.meta.header)}</code> bölgesidir. İlk örnek, bu şablonun 320 bazlık bir kesitini kullanır.</p>
         <div class="row">
           <button class="btn sm" type="button" data-doc-input="project">Tam şablonu formda aç</button>
-          <a class="btn sm" href="#dokumantasyon/panel">Kayıtlı şablon ve sonuçları incele</a>
+          <a class="btn sm" href="/dokumantasyon/panel">Kayıtlı şablon ve sonuçları incele</a>
         </div>
       </details>
     </div></section>
@@ -91,7 +91,7 @@ function renderGuide(el) {
       <div class="doc-box"><pre>Hedef 1  chr22:20000001-20001000
 Hedef 2  chr22:20004001-20005000</pre><button class="btn sm" type="button" id="docMultiplexExample">Bu hedefleri multipleks formunda aç</button></div>
       <p class="small muted">Hedef başına aday sayısı, o bölgeden kaç özgül çiftin panel seçimine gireceğidir. “En fazla Tm aralığı”, paneldeki en yüksek ve en düşük primer Tm farkını sınırlar. Ürün boyu farkı 0 ise bu koşul uygulanmaz. Panel tüm hedefleri kapsamayabilir; sonucu ve gerekçeleri kontrol edin.</p>
-      <a class="btn sm" href="#dokumantasyon/multipleks">Kayıtlı etkileşim raporunu incele</a>
+      <a class="btn sm" href="/dokumantasyon/multipleks">Kayıtlı etkileşim raporunu incele</a>
     </div></section>
 
     <section class="card"><div class="hd"><h2>3 · Bir çıktıyı okuyun</h2><span class="tag">Kayıtlı örnek</span></div><div class="bd stack">
@@ -101,7 +101,7 @@ Hedef 2  chr22:20004001-20005000</pre><button class="btn sm" type="button" id="d
           <span class="chip">Karar ${sev(pair.verdict)}</span><a class="btn sm" href="${examplePairLink}/harita">Tam örnek çıktıyı aç</a></div>
       </div>
       <div class="doc-results">${DOC_RESULT_TABS.map(([id, label, desc]) => `<a href="${examplePairLink}/${id}"><b>${label}</b><span>${desc}</span></a>`).join('')}</div>
-      <p class="small muted">Multipleks, Prob & Blocker ve qPCR Erime örnekleri üstteki sekmelerdedir. Kendi primerlerinizle bu araçları <a href="#yerel">Yerel Analiz</a> sayfasından kullanabilirsiniz.</p>
+      <p class="small muted">Multipleks, Prob & Blocker ve qPCR Erime örnekleri üstteki sekmelerdedir. Kendi primerlerinizle bu araçları <a href="/yerel">Yerel Analiz</a> sayfasından kullanabilirsiniz.</p>
     </div></section>
 
     <section class="card"><div class="hd"><h2>Sık karşılaşılan durumlar</h2></div><div class="bd stack">

@@ -9,7 +9,7 @@ RENDER.cift = el => {
     (example ? pool[0] : STATE.design?.pms?.[0] || pool.at(-1));
   if (!pm) {
     el.innerHTML = liveResult('Henüz bir primer çifti yok', `<p class="muted">Tasarım ve otomatik özgüllük taraması tamamlandığında çiftinizi burada inceleyebilirsiniz.</p>
-      <div class="row"><a class="btn pri" href="#tasarla">Primer tasarla</a><a class="btn" href="#dokumantasyon/panel">Örnek çıktıyı gör</a></div>`);
+      <div class="row"><a class="btn pri" href="/tasarla">Primer tasarla</a><a class="btn" href="/dokumantasyon/panel">Örnek çıktıyı gör</a></div>`);
     return;
   }
   if (example) STATE.docPair = pm.key; else STATE.pair = pm.key;

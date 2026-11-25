@@ -457,7 +457,7 @@ RENDER.yerel = el => {
         ${[...localSources].reverse().map(([id, label]) => `<option value="${esc(id)}" ${source === id ? 'selected' : ''}>
         Yerel tasarım · ${esc(label)} · ${esc(id.slice(0, 5))}</option>`).join('')}
         </select></label>
-        ${!pairs.length ? `<div class="note">${ic('info')}<div>Bu analiz için bir primer çifti gerekir. <a href="#tasarla">Primer Tasarla</a> sayfasında kendi hedefinizi çalıştırın.</div></div>` :
+        ${!pairs.length ? `<div class="note">${ic('info')}<div>Bu analiz için bir primer çifti gerekir. <a href="/tasarla">Primer Tasarla</a> sayfasında kendi hedefinizi çalıştırın.</div></div>` :
         tool === 'scan' ? `<fieldset class="live-fieldset"><legend>Taranacak çiftler</legend><button type="button" class="btn sm" id="selectAllPairs">Tümünü seç</button>
           <div class="live-pairs">${pairs.map(pm => `<label class="switch"><input type="checkbox" name="pair" value="${esc(pm.key)}" ${selectedKeys.includes(pm.key) ? 'checked' : ''}>
           ${esc(pm.id)} · ${pm.prod} bp</label>`).join('')}</div></fieldset>` :
@@ -489,7 +489,7 @@ RENDER.yerel = el => {
       <div class="row"><button id="runLocalTool" type="submit" class="btn pri" ${!liveReady() || LIVE.pending.has(key) || (pairTool && !pairs.length) ? 'disabled' : ''}>Analizi çalıştır</button></div>
     </form></section>
     ${LIVE.last?.tool === tool ? `<div class="row"><button class="btn sm" id="localDownload">Sonucu JSON olarak indir</button>
-      ${pairTool && choice ? `<a class="btn sm" href="${choice.kind === 'project' ? '#dokumantasyon/cift/' + choice.key : '#cift'}">Çift incelemeyi aç</a>` : ''}</div>${renderLocalOutput(tool, LIVE.last.result)}` : ''}
+      ${pairTool && choice ? `<a class="btn sm" href="${choice.kind === 'project' ? '/dokumantasyon/cift/' + choice.key : '/cift'}">Çift incelemeyi aç</a>` : ''}</div>${renderLocalOutput(tool, LIVE.last.result)}` : ''}
   </div>`;
   const form = $('#localForm', el);
   $('#localTool', el).onchange = e => { LIVE.tool = e.target.value; rerender(); };

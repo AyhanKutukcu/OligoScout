@@ -277,8 +277,35 @@ const VIEWS = [
   {id:'iletisim', t:'İletişim', i:'info', grp:'Destek'}
 ];
 const RENDER = {};
+/* Clean URLs: oligoscout.org/tasarla instead of oligoscout.org/#tasarla.
+   The History API needs a server, so a page opened from disk (file://) keeps hash routes. */
+const HASH_ROUTES = location.protocol === 'file:';
+const ROUTE_ROOTS = new Set([...VIEWS.map(v => v.id), 'panel', 'prob', 'erime', 'dogrulama']);
+function routePath() {
+  const raw = HASH_ROUTES ? location.hash.slice(1) : location.pathname;
+  try { return decodeURIComponent(raw).replace(/^[#/]+|\/+$/g, ''); } catch { return ''; }
+}
+function routeUrl(path) {
+  path = String(path).replace(/^[#/]+|\/+$/g, '');
+  if (path === 'genel') path = '';
+  return HASH_ROUTES ? (path ? '#' + path : location.pathname) : '/' + path;
+}
+function navigate(path, {replace = false} = {}) {
+  const url = routeUrl(path);
+  const now = HASH_ROUTES ? (location.hash || location.pathname) : location.pathname;
+  if (url === now) { rerender(true); return; }
+  if (HASH_ROUTES) { location.hash = url.startsWith('#') ? url : ''; return; }
+  history[replace ? 'replaceState' : 'pushState'](null, '', url);
+  route();
+}
 function route() {
-  const [page, section, key, tab] = location.hash.slice(1).split('/');
+  // Old shared links such as /#tasarla keep working and are rewritten to /tasarla.
+  if (!HASH_ROUTES && location.hash.length > 1 && ROUTE_ROOTS.has(location.hash.slice(1).split('/')[0])) {
+    history.replaceState(null, '', routeUrl(location.hash.slice(1)));
+  } else if (!HASH_ROUTES && location.pathname.replace(/\/+$/, '') === '/genel') {
+    history.replaceState(null, '', '/');
+  }
+  const [page, section, key, tab] = routePath().split('/');
   const examples = ['panel', 'prob', 'erime', 'dogrulama'];
   STATE.docSection = examples.includes(page) ? page :
     page === 'dokumantasyon' && [...examples, 'multipleks', 'cift'].includes(section) ? section : 'rehber';
@@ -289,7 +316,7 @@ function route() {
   STATE.view = examples.includes(page) ? 'dokumantasyon' : VIEWS.some(v => v.id === page) ? page : 'genel';
   rerender(true);
 }
-function go(view, opts={}) { Object.assign(STATE, opts); if (location.hash !== '#' + view) location.hash = view; else rerender(true); }
+function go(view, opts={}) { Object.assign(STATE, opts); navigate(view); }
 function rerender(scrollTop) {
   $$('.nav a').forEach(a => a.setAttribute('aria-current', a.dataset.v === STATE.view ? 'page' : 'false'));
   const v = VIEWS.find(x => x.id === STATE.view);
@@ -309,3 +336,15 @@ const SUBT = {
   iletisim:'Proje ekibi ve geri bildirim'
 };
 window.addEventListener('hashchange', route);
+window.addEventListener('popstate', route);
+// In-app links are plain paths (href="/tasarla"); handle them without a page reload.
+document.addEventListener('click', e => {
+  if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+  const a = e.target.closest?.('a[href]');
+  if (!a || (a.target && a.target !== '_self') || a.hasAttribute('download')) return;
+  const href = a.getAttribute('href');
+  if (!/^\/(?!\/)/.test(href) && href !== '/') return;
+  const path = href.replace(/^\/+/, '');
+  if (path && !ROUTE_ROOTS.has(path.split('/')[0])) return;
+  e.preventDefault(); navigate(path);
+});

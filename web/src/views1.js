@@ -16,8 +16,8 @@ RENDER.genel = el => {
       <div class="overview-copy">
         <h2>Primer tasarımından genom kontrolüne</h2>
         <p>İnsan referans genomu üzerinde PCR primerleri tasarlayın. Özgüllük, erime sıcaklığı, dimer riski ve gnomAD varyantlarını birlikte inceleyin.</p>
-        <div class="row live-actions"><a class="btn pri" href="#tasarla">Primer tasarla</a>
-          <a class="btn" href="#multipleks">Multipleks tasarla</a><a class="btn" href="#dokumantasyon">Dokümantasyon</a></div>
+        <div class="row live-actions"><a class="btn pri" href="/tasarla">Primer tasarla</a>
+          <a class="btn" href="/multipleks">Multipleks tasarla</a><a class="btn" href="/dokumantasyon">Dokümantasyon</a></div>
       </div>
       <div class="overview-visual" aria-hidden="true"><img src="__OVERVIEW_ART__" alt="" width="1254" height="1254"></div>
     </div></section>
@@ -25,7 +25,7 @@ RENDER.genel = el => {
       ${[['design','Tasarım','GRCh38 bölgesine ve PCR koşullarına göre aday çiftler bulun.','tasarla'],
         ['target','Özgüllük','Primerlerin 24 kromozomda oluşturabileceği hedef dışı ürünleri inceleyin.','yerel'],
         ['list','Kanıt','Termodinamik, varyant ve dimer kayıtlarını ölçüm ve eşikleriyle okuyun.','cift']].map(([icon,title,desc,view]) =>
-        `<a class="card intro-step" href="#${view}"><span class="overview-step-icon">${ic(icon)}</span><h3>${title}</h3><p>${desc}</p></a>`).join('')}
+        `<a class="card intro-step" href="/${view}"><span class="overview-step-icon">${ic(icon)}</span><h3>${title}</h3><p>${desc}</p></a>`).join('')}
     </div>
     <section class="card"><div class="hd"><h2>Analiz ve veri kaynakları</h2></div><div class="bd">
       ${!ready ? liveNote(localAvailability()) : ''}
@@ -59,7 +59,7 @@ RENDER.panel = el => {
           <span class="chip">çapa <b>${ct.anchor_length}</b> nt · maks <b>${ct.max_mismatches}</b> uyumsuzluk · ürün ${ct.min_amplicon_length}–${ct.max_amplicon_length} bp</span>
         </div>
       </div>
-      <div class="ringbox">${ring}<div class="small" style="line-height:1.7"><div><i class="dot" style="background:var(--accent)"></i> ${CAT_FULL} tam uygulandı</div><div><i class="dot" style="background:var(--warn)"></i> ${CAT_IMPL-CAT_FULL} kısmi (SPC-08)</div><div><i class="dot" style="background:var(--sunk);border:1px solid var(--line2)"></i> ${CAT.length-CAT_IMPL} altyapı/veri bekliyor</div><a href="#katalog" class="small">Kataloğu aç →</a></div></div>
+      <div class="ringbox">${ring}<div class="small" style="line-height:1.7"><div><i class="dot" style="background:var(--accent)"></i> ${CAT_FULL} tam uygulandı</div><div><i class="dot" style="background:var(--warn)"></i> ${CAT_IMPL-CAT_FULL} kısmi (SPC-08)</div><div><i class="dot" style="background:var(--sunk);border:1px solid var(--line2)"></i> ${CAT.length-CAT_IMPL} altyapı/veri bekliyor</div><a href="/katalog" class="small">Kataloğu aç →</a></div></div>
     </div></div>
 
     <div class="g4">
@@ -82,7 +82,7 @@ RENDER.panel = el => {
 
     <div class="g2">
       <div class="card"><div class="hd"><h2>Boru hattı</h2><span class="sp"></span><span class="faint small">bu panelin geçtiği adımlar</span></div><div class="bd">${pipeline()}</div></div>
-      <div class="card"><div class="hd"><h2>Aile başına kapsam</h2><span class="sp"></span><a class="small" href="#katalog">tüm kurallar →</a></div><div class="bd" style="display:grid;gap:7px">
+      <div class="card"><div class="hd"><h2>Aile başına kapsam</h2><span class="sp"></span><a class="small" href="/katalog">tüm kurallar →</a></div><div class="bd" style="display:grid;gap:7px">
         ${fams.map(({f, rs}) => { const full = rs.filter(r => r.status === 'etiketli_uygulandi').length, part = rs.filter(r => r.status === 'etiketli_kismi').length, pend = rs.length - full - part;
           return `<div style="display:grid;grid-template-columns:130px 1fr 44px;gap:10px;align-items:center;font-size:12.5px"><span>${FAMTR[f]}</span><div style="display:flex;height:9px;border-radius:5px;overflow:hidden;background:var(--sunk)">${'<i style="background:var(--accent);width:'+full/rs.length*100+'%"></i>'}${'<i style="background:var(--warn);width:'+part/rs.length*100+'%"></i>'}${'<i style="background:var(--probe);opacity:.5;width:'+pend/rs.length*100+'%"></i>'}</div><span class="mono tiny faint" style="text-align:right">${full+part}/${rs.length}</span></div>`; }).join('')}
       </div></div>
@@ -234,7 +234,7 @@ function designIntro() {
     <div class="eyebrow">TASARIM AKIŞI</div><h2 style="margin:6px 0 10px">Bir hedef bölge seçin</h2>
     <p class="muted" style="max-width:68ch">Primer adayları sıralanır ve 24 kromozomda taranır. Sonuç listesi, beklenen tek ürün ve her primer için tek tam bağlanma yeri bulunan çiftleri gösterir.</p>
     <p class="small faint">FASTA dosyasının başlığı ve dizisi GRCh38.p14 aralığıyla doğrulanır.</p>
-    <a class="btn sm" href="#dokumantasyon">Giriş ve çıktı örneklerini gör</a>
+    <a class="btn sm" href="/dokumantasyon">Giriş ve çıktı örneklerini gör</a>
     ${LIVE.mode === 'file' ? liveNote('Özgüllük taramasıyla primer tasarlamak için RUN_WEB.cmd dosyasını çalıştırın.') : ''}
     </div></div>`;
 }

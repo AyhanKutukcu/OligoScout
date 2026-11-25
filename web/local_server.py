@@ -19,6 +19,10 @@ from local_engine import LocalEngine, clean_json
 
 WEB = Path(__file__).resolve().parent
 JOB_ID = re.compile(r"[a-f0-9]{24}")
+# Page addresses of the single-page app (oligoscout.org/tasarla, /dokumantasyon/cift/...):
+# each is answered with index.html and the browser-side router picks the view.
+APP_ROUTE = re.compile(r"/(?:genel|tasarla|multipleks|cift|yerel|katalog|dokumantasyon|iletisim|"
+                       r"panel|prob|erime|dogrulama)(?:/[A-Za-z0-9_.:%-]+){0,3}/?")
 MAX_BODY = 64000
 MAX_JOBS = 40
 MAX_PENDING = 4
@@ -176,7 +180,7 @@ class Handler(BaseHTTPRequestHandler):
         try:
             self.check_host()
             path = urlsplit(self.path).path
-            if path in ("/", "/index.html"):
+            if path in ("/", "/index.html") or APP_ROUTE.fullmatch(path):
                 self.send_data(HTTPStatus.OK, (WEB / "index.html").read_bytes(), "text/html; charset=utf-8")
             elif path == "/api/status":
                 self.send_data(HTTPStatus.OK, self.server.jobs.motor.status())
