@@ -27,6 +27,8 @@ as_app "cd OligoScout && cmake --preset release >/dev/null && \
         ./build/release/test_single_primer_products && ./build/release/test_terminal_rule_search"
 
 echo "== 3/7 Python and MCP tests"
+# generated, git-ignored catalogue outputs (reference_py/out/durum) follow the YAML catalogue
+as_app "python3 reference_py/cli/catalog_yaml.py export >/dev/null"
 as_app "cd reference_py && python3 -B -m unittest discover -s tests -q"
 as_app "python3 -B -m unittest discover -s mcp_server/tests -q"
 
